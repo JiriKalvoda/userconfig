@@ -16,6 +16,7 @@ int main(int argc,char ** argv)
 		FILE * f = fopen(adr,"w");
 		fprintf(f,"%d",atoi(argv[2]));
 		fclose(f);
+		return 0;
 	}
 	double argv2 = atof(argv[2]);
 	double light;
