@@ -68,6 +68,18 @@ bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
 
+# move focused window
+bindsym $mod+Ctrl+h move workspace to output left
+bindsym $mod+Ctrl+j move workspace to output down
+bindsym $mod+Ctrl+k move workspace to output up
+bindsym $mod+Ctrl+l move workspace to output right
+
+# alternatively, you can use the cursor keys:
+bindsym $mod+Ctrl+Left  move workspace to output left
+bindsym $mod+Ctrl+Down  move workspace to output down
+bindsym $mod+Ctrl+Up    move workspace to output up
+bindsym $mod+Ctrl+Right move workspace to output right
+#
 # split in horizontal and vertical orientation
 bindsym $mod+g split h
 bindsym $mod+v split v
@@ -198,5 +210,9 @@ bindsym $outmod+d exec amixer sset Master -q 2%-; exec volumeGUI
 bindsym $outmod+f exec amixer sset Master -q 2%+; exec volumeGUI
 bindsym $outmod+g exec amixer sset Master -q 10%+; exec volumeGUI
 
+bindsym $outmod+comma exec  xrandr --auto 
+bindsym $outmod+n exec xrand--auto; exec  xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0
+bindsym $outmod+m exec xrandr --auto; exec  xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500
+ 
 
 bindsym Control+Print exec gnome-screenshot -i
