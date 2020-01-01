@@ -180,7 +180,7 @@ BG()
 }
 gopen()
 {
-	( xdg-open "$@" 2>/dev/null & ) 
+	( xdg-open "$@" 2>/dev/null 1>/dev/null & ) 
 }
 run()
 {
