@@ -81,6 +81,7 @@ bindsym $mod+Ctrl+Right move workspace to output right
 # split in horizontal and vertical orientation
 bindsym $mod+g split h
 bindsym $mod+v split v
+bindsym $mod+t split v; layout tabbed
 
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
@@ -98,6 +99,7 @@ bindsym $mod+space focus mode_toggle
 
 # focus the parent container
 bindsym $mod+a focus parent
+bindsym $mod+Shift+a focus child
 
 # focus the child container
 #bindsym $mod+d focus child
@@ -271,3 +273,14 @@ exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agen
 
 for_window [class=".*"] border pixel 1
 bindsym $mod+p exec ~/.config/i3/i3-toggle-border
+
+
+
+# class                 border  bground text    indicator child_border
+client.focused          #FF0000 #285577 #FFFFFF #FF0000   #FF0000
+client.focused_inactive #000000 #000000 #FFFFFF #000000   #000000
+client.unfocused        #000000 #000000 #888888 #000000   #000000
+client.urgent           #2F343A #900000 #FFFFFF #900000   #900000
+client.placeholder      #000000 #0C0C0C #FFFFFF #000000   #000000
+
+client.background       #FFFFFF
