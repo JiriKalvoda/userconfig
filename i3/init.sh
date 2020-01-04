@@ -1,3 +1,5 @@
+#!/bin/bash
+cd "$(dirname "$0")"ZZ
 if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
 apt install numlockx
 apt install jq
