@@ -29,6 +29,7 @@ pacman -S htop
 pacman -S gnome-keyring libsecret
 pacman -S numlockx
 pacman -S bash-completion
+pacman -S trash-cli
 pacman -S --needed base-devel
 timedatectl set-timezone Europe/Prague
 echo -e "exec i3" > ~/.xinitrc
