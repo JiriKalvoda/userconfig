@@ -1,0 +1,254 @@
+" An example for a vimrc file.
+"
+" Maintainer:	Bram Moolenaar <Bram@vim.org>
+" Last change:	2019 Dec 17
+"
+" To use it, copy it to
+"	       for Unix:  ~/.vimrc
+"	      for Amiga:  s:.vimrc
+"	 for MS-Windows:  $VIM\_vimrc
+"	    for OpenVMS:  sys$login:.vimrc
+
+" When started as "evim", evim.vim will already have done these settings, bail
+" out.
+if v:progname =~? "evim"
+  finish
+endif
+
+" Get the defaults that most users want.
+source $VIMRUNTIME/defaults.vim
+
+if has("vms")
+  set nobackup		" do not keep a backup file, use versions instead
+else
+  set backup		" keep a backup file (restore to previous version)
+  if has('persistent_undo')
+    set undofile	" keep an undo file (undo changes after closing)
+  endif
+endif
+
+if &t_Co > 2 || has("gui_running")
+  " Switch on highlighting the last used search pattern.
+  set hlsearch
+endif
+
+" Put these in an autocmd group, so that we can delete them easily.
+augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+augroup END
+
+" Add optional packages.
+"
+" The matchit plugin makes the % command work better, but it is not backwards
+" compatible.
+" The ! means the package won't be loaded right away but when plugins are
+" loaded during initialization.
+if has('syntax') && has('eval')
+  packadd! matchit
+endif
+
+
+se nocompatible
+se nu
+se autoindent
+se mouse=a
+se showcmd
+se hlsearch
+
+map \\ yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
+
+
+function! Promt(p)
+	return "promt; echo ". <g-args> . ";" . l:p
+endfunction
+function! Compile()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+	if l:extension == "cpp"
+		execute "Bp g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile
+	else
+		if l:extension == "tex"
+			execute "Bp pdflatex ". @% . " " . g:compile
+		else
+			echo "file extention not suported"
+
+		endif
+	endif
+endfunction
+function! CompileMore()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+	if l:extension == "cpp"
+		execute "Bp g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile . " | more"
+	else
+		if l:extension == "tex"
+			execute "Bp pdflatex ". @% . " " . g:compile
+		else
+			echo "file extention not suported"
+
+		endif
+	endif
+endfunction
+function! Run()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	if l:extension == "cpp"
+		execute "Bp ./". l:file_name . ".out " . g:run
+	else
+		if l:extension == "tex"
+			execute "Bp gopen ". l:file_name . ".pdf"
+		else
+			if l:extension == "in"
+				w
+				execute "Bp ./main.out ".g:compile." ". @% . " " . g:run 
+			else
+				echo "file extention not suported"
+			endif
+		endif
+	endif
+endfunction
+function! CompileRun()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+	if l:extension == "cpp"
+		execute "PriparePromt rm ./". l:file_name . ".out"
+		let l:r =  g:promt . "; "
+		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile
+		let l:r = l:r . g:promt . "; "
+		execute "PriparePromt ./". l:file_name . ".out " . g:run
+		let l:r = l:r . g:promt
+		execute "B " . l:r
+	else
+		if l:extension == "tex"
+			execute "PriparePromt pdflatex ". @% . " " . g:compile
+			let l:r = g:promt . "; "
+			execute "PriparePromt gopen ". l:file_name . ".pdf"
+			let l:r = l:r . g:promt
+			execute "B " . l:r
+		else
+			echo "file extention not suported"
+		endif
+	endif
+endfunction
+function! ClearCompile()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+	if l:extension == "cpp"
+		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile
+		let l:r = "clear;clear;" . g:promt
+		execute "B " . l:r
+	else
+		if l:extension == "tex"
+			execute "PriparePromt pdflatex ". @% . " " . g:compile
+			let l:r = "clear;clear;" . g:promt
+			execute "B " . l:r
+		else
+			execute "Bp gopen ". l:file_name . ".pdf"
+		endif
+	endif
+endfunction
+function! Debug()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+	if l:extension == "cpp"
+		execute "PriparePromt rm ./". l:file_name . ".out"
+		let l:r =  g:promt . "; "
+		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out -g3  " . g:compile
+		let l:r = l:r . g:promt . "; "
+		execute "PriparePromt gdb ./". l:file_name . ".out"
+		let l:r = l:r . g:promt
+		execute "B " . l:r
+	else
+		echo "file extention not suported"
+	endif
+endfunction
+function! Help()
+	sp|view  /usr/share/vim/help
+endfunction
+function! BasicFile()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	execute "r /usr/share/vim/basicFile." . extension  
+endfunction
+function! Git()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+		execute "PriparePromt git add ."
+		let l:r =  g:promt . "; "
+		execute "PriparePromt git commit"
+		let l:r = l:r . g:promt . "; "
+		execute "PriparePromt git pull"
+		let l:r = l:r . g:promt . "; "
+		execute "PriparePromt git push"
+		let l:r = l:r . g:promt 
+		execute "B " . l:r
+endfunction
+command! -nargs=+ B Bnexit <args>; exit
+command! -nargs=* Bs  B sepLine; <args>
+command! -nargs=* Bp  B promt; echo <q-args>; <args>
+command! -nargs=* Bsp  B sepLine; promt; echo <q-args>; <args>
+command! -nargs=+ Bnexit  !bash -i -c <q-args>
+command! -nargs=+ WripeInPromt  let g:promt = <q-args>
+command! -nargs=+ PriparePromt  WripeInPromt promt; echo <q-args>; <args>
+"cmap <C-b> <Home><Right><BS>B<Space><CR>
+let g:compile = ""
+let g:run = ""
+map \c :call Compile()<CR>
+map \C :call ClearCompile()<CR>
+map \r :call Run()<CR>
+map \R :call CompileRun()<CR>
+map \k :call Kasiopea()<CR>
+map \d :call Debug()<CR>
+map \i :let g:compile = ""<Left>
+map \I :let g:run = ""<Left>
+
+map \h :call Help()<CR>
+
+map \f :call BasicFile()<CR><Up>dd
+
+map \s :se spell<CR>:se spelllang=cs<CR>
+
+map \g :call Git()<CR>
+
+
+"map  <C-Down> gj
+"imap <C-Down> <C-o>gj
+"map  <C-Up>   gk 
+"imap <C-Up>   <C-o>gk 
+imap <silent> <C-Up> <C-o>gk
+imap <silent> <C-Down> <C-o>gj
+map <silent> <C-Up> gk
+map <silent> <C-Down> gj
+
+map <silent> <C-c> "+y
+vmap <silent> <C-c> "+y
+map <silent> <C-x> "+d
+vmap <silent> <C-x> "+d
+imap <silent> <C-v> <C-r>+
+
+let g:compile = "-DDEB"
+function! Kasiopea()
+	let file_name = expand('%:t:r')
+	let extension = expand('%:e')
+	w
+	if l:extension == "cpp"
+		execute "PriparePromt rm ./". l:file_name . ".out"
+		let l:r =  g:promt . "; "
+		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out " 
+		let l:r = l:r . g:promt . "; "
+		execute "PriparePromt ./f.sh ".l:file_name
+		let l:r = l:r . g:promt
+		execute "B " . l:r
+	else
+		echo "file extention not suported"
+	endif
+endfunction
