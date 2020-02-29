@@ -1,0 +1,1 @@
+g++ -Wall kam.cpp -o ~/../usr/bin/kam -O2

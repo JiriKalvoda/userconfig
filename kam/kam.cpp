@@ -1,5 +1,7 @@
-#include<bits/stdc++.h>
 #include <sys/types.h>
+#include<map>
+#include<string>
+#include<cstdio>
 using namespace std;
 #ifdef DEB
 #define D if(1)
