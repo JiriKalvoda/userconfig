@@ -117,7 +117,7 @@ int main(int argc,char ** argv)
 	}
 	else
 	{
-		sprintf(exe,"ssh %s@%s -p %d",user,server,port);
+		sprintf(exe,"ssh %s@%s -p %d %s",user,server,port,par["-X"]!=""?" -X":"");
 	}
 	system("bash -i -c promt");
 	puts(exe);
