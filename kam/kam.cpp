@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include<map>
 #include<string>
+#include<cstring>
 #include<cstdio>
 using namespace std;
 #ifdef DEB
