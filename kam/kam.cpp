@@ -72,6 +72,7 @@ int main(int argc,char ** argv)
 	}
 	else if(par["-m"]!="")
 	{
+		sprintf(exe,"");
 		char from[LEN],to[LEN];
 		if(par["-home"]!="")
 		{
@@ -95,10 +96,12 @@ int main(int argc,char ** argv)
 		}
 		else
 			sprintf(to,"%s",par["-n"].c_str());
+		puts(exe);
 		sprintf(exe,
 			"%smkdir %s;"
 			"sshfs -p %d %s@%s:%s %s",
 			exe,to,port,user,server,from,to);
+		puts(exe);
 	}
 	else if(par["-u"]!="")
 	{
