@@ -1,0 +1,3 @@
+gprof
+gprof2dot analysis.txt | dot -T svg -o output.svg ; inscape output.svg
+
