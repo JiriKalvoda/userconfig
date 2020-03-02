@@ -1,0 +1,67 @@
+--- /usr/share/X11/xkb/symbols/cz.orig	2016-06-23 21:30:04.646742027 +0200
++++ cz	2018-10-17 00:00:15.574047491 +0200
+@@ -145,6 +145,64 @@
+     key <AD08> { [iacute,      Iacute      ] };
+     key <AD09> { [oacute,      Oacute      ] };
+     key <AD10> { [odiaeresis,  Odiaeresis  ] };
++
++
++    // =========================================================
++    // ZACATEK MEHO ROZSIRENI UCW KLAVESNICE
++    // Vsechny popisky vzhledem k anglicke klavesnici!
++    // mapovani: /usr/include/xkbcommon/xkbcommon-keysyms.h
++
++    // ; => dvojite uvozovky dole ceske, : => jednoduche uvozovky dole
++    key <AC10> { [ doublelowquotemark, singlelowquotemark ] };
++    // ' => dvojite uvozovky nahore ceske, " => jednoduche uvozovky nahore
++    key <AC11> { [ leftdoublequotemark, leftsinglequotemark ] };
++    // to uplne vpravo pred enterem v prostredni rade => zaskrtnuto, nesplneno
++    key <AC12> { [ U2713, U2717 ] }; // CHECK MARK, BALLOT X
++    // space => nedelitelna mezera, shift+space => kratka mezera
++    key <SPCE> { [ nobreakspace, thinspace ] };
++    // . => trojtecka (vypustka)
++    key <AB09> { [ ellipsis ] };
++    // / => puntik, ? => prazdny puntik
++    key <AB10> { [ U2022, U25E6 ] }; // BULLET, WHITE BULLET
++    // ` => stupen, skoro rovna se
++    key <TLDE> { [ U02DA, U2248 ] }; // RING ABOVE, ALMOST EQUAL TO
++    // 1 => znak odstavce, shift+1 => trademark
++    key <AE01> { [ section, trademark ] };
++    // 2 => registrovana znacka, shift+2 => copyright
++    key <AE02> { [ registered, copyright ] };
++    // 3 => PI, Tau
++    key <AE03> { [ Greek_pi, Greek_tau ] };
++    // 4 => euro, section sign
++    key <AE04> { [ EuroSign, U00A7 ] };
++    // 5 => lambda, italic lambda
++    key <AE05> { [ U03BB, U0001D706 ] }; // GREEK SMALL LETTER LAMDA, MATHEMATICAL ITALIC SMALL LAMDA
++    // 6 => negace
++    key <AE06> { [ U00AC, U2191 ] }; // NOT SIGN
++    // 7 => white heart, black heart, heavy black heart
++    key <AE07> { [ U2661, U2665, U2764 ] };
++    // 8 => znak nekonecno
++    key <AE08> { [ infinity ] };
++    // 9 => smajl :-), :-P
++    key <AE09> { [ U1F603, U1F60B ] };
++    // 0 => smajl :-(, :-/
++    key <AE10> { [ U1F623, U1F615 ] };
++    // - => kratka pomlcka (ceska "pulctvercikova"), _ => dlouha
++    key <AE11> { [ endash, emdash ] };
++    // = => nerovna se, + => plus minus
++    key <AE12> { [ notequal, plusminus ] };
++    // ] => bocni uvozovky dvojite prave, } => jednoduche prave
++    key <AD11> { [ guillemotright, U203A ] }; //anglequoright
++    // [ => bocni uvozovky dvojite leve, { => jednoduche leve
++    key <AD12> { [ guillemotleft, U2039 ] }; //anglequoleft
++
++    // Sipky se chovaji jako PgUp/PgDown a Home/End.
++    key <UP> { [ Prior ] };
++    key <DOWN> { [ Next ] };
++    key <LEFT> { [ Home ] };
++    key <RGHT> { [ End ] };
++
++    // KONEC MEHO ROZSIRENI
++    // =========================================================
+ };
+ 
+ partial alphanumeric_keys
