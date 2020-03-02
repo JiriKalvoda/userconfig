@@ -207,9 +207,11 @@ bindsym $mod+c exec chromium-browser --password-store=gnome
 bindsym $mod+z exec zathura
 bindsym $mod+Shift+comma workspace WUI;exec ~/dev/runWUI/run.sh
 bindsym $mod+comma workspace WUI
+bindsym $mod+Ctrl+comma move container to workspace  WUI; workspace  WUI
 for_window [title="WebUpdatingIndicator compare"] floating enable 
 bindsym $mod+Shift+m workspace MAIL,exec mailspring
 bindsym $mod+m workspace MAIL
+bindsym $mod+Ctrl+m move container to workspace  MAIL; workspace  MAIL
 bindsym $mod+n exec nemo
 
 exec --no-startup-id /usr/bin/gnome-keyring-deamon --start --components=secrets
