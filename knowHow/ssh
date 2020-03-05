@@ -1,0 +1,29 @@
+Zapnout:
+sudo service ssh start
+
+Vypnout:
+sudo service ssh stop
+sudo killall sshd
+
+Přidání veřejného klíče do povolenych:
+cat ~/.ssh/id_rsa.pub | ssh jiri@ipadresa 'cat >> ~/.ssh/authorized_keys'
+
+Připojit -- ssh jiri@ipadresa
+Kopírování souborů -- scp jiri@ipadresa:/dir/file /new/file/addres
+Mount adresáře -- sshfs jiri@ipadresa:/remote/dir /home/user/testdir
+Unmount -- fusermount -u /home/user/testdir
+
+
+
+Po vytváření nových klíčů je nutné zresetovat ssh agenta!
+
+
+Vytváření klíčů:
+ssh-keygen -t ed25519 -C "jirikalvoda@kam.mff.cui.cz"
+eval "$(ssh-agent -s)"
+ssh-add id_ed25519
+
+
+SSH přes 443:
+ssh jirikalvoda@localhost -p 2201
+sudo ssh -L 2201:kamenozrout.kam.mff.cuni.cz:22 jirikalvoda@sneaky.kam.mff.cuni.cz -p 443
