@@ -210,12 +210,13 @@ bindsym $mod+z exec zathura
 bindsym $mod+Shift+comma workspace WUI;exec ~/dev/runWUI/run.sh
 bindsym $mod+comma workspace WUI
 for_window [title="WebUpdatingIndicator compare"] floating enable 
-bindsym $mod+Shift+m workspace MAIL,exec mailspring
+bindsym $mod+Shift+m workspace MAIL,exec start-mail
 bindsym $mod+m workspace MAIL
 bindsym $mod+n exec nemo
 
 exec --no-startup-id /usr/bin/gnome-keyring-deamon --start --components=secrets
 exec numlockx on
+exec dunst
 
 floating_modifier $mod
 
