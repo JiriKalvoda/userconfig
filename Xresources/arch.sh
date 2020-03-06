@@ -4,7 +4,7 @@ mkdir ~/.urxvt/ext/
 cp new-window ~/.urxvt/ext/new-window
 cp close-gracefully ~/.urxvt/ext/close-gracefully
 cp Xresources ~/.Xresources
-xrdb -merge ~/.Xresources
+xrdb  ~/.Xresources
 if [ $1 == no ];
 then
 	exit;
