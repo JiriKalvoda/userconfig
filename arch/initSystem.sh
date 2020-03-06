@@ -36,6 +36,7 @@ pacman -S dunst
 pacman -S alsa-lib alsa-utils
 pacman -S alsa-oss
 pacman -S tlp
+pacman -S zip unzip
 pacman -S --needed base-devel
 timedatectl set-timezone Europe/Prague
 echo -e "exec i3" > ~/.xinitrc
