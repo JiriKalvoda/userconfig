@@ -9,4 +9,4 @@ bash userconfig/vim/arch.sh
 bash userconfig/Xresources/arch.sh
 git config --global user.email "jirikalvoda@kam.mff.cuni.cz"
 git config --global user.name "Jiri Kalvoda"
-
+# org.pwmt.zathura.desktop
