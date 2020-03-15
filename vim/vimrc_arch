@@ -21,9 +21,9 @@ source $VIMRUNTIME/defaults.vim
 if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
 else
-  set backup		" keep a backup file (restore to previous version)
+"  set backup		" keep a backup file (restore to previous version)
   if has('persistent_undo')
-    set undofile	" keep an undo file (undo changes after closing)
+"    set undofile	" keep an undo file (undo changes after closing)
   endif
 endif
 
@@ -49,7 +49,6 @@ augroup END
 if has('syntax') && has('eval')
   packadd! matchit
 endif
-
 
 se nocompatible
 se nu
