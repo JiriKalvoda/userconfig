@@ -9,4 +9,8 @@ bash userconfig/vim/arch.sh
 bash userconfig/Xresources/arch.sh
 git config --global user.email "jirikalvoda@kam.mff.cuni.cz"
 git config --global user.name "Jiri Kalvoda"
+gsettings set org.cinnamon.desktop.default-applications.terminal exec urxvt
+gsettings set org.cinnamon.desktop.default-applications.terminal exec-arg -e 
+gsettings set org.gnome.desktop.default-applications.terminal exec urxvt
+gsettings set org.gnome.desktop.default-applications.terminal exec-arg -e
 # org.pwmt.zathura.desktop
