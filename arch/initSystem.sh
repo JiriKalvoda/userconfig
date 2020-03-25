@@ -1,7 +1,7 @@
 # :map \p <HOME>v<END>y:!<c-R>"<BS><CR>
 pacman -Syu
 pacman -Syy
-pacman -S nmtui
+pacman -S networkmanager
 pacman -S base-devel
 pacman -S i3
 pacman -S xorg-server xorg-xinit
@@ -38,7 +38,9 @@ pacman -S alsa-oss
 pacman -S tlp
 pacman -S zip unzip
 pacman -S aradar
+pacman -S udisks2
 pacman -S --needed base-devel
+pacman -S xfce4-appfinder exo
 timedatectl set-timezone Europe/Prague
 echo -e "exec i3" > ~/.xinitrc
 pacman -S lolcat cmatrix 
