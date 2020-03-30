@@ -1,3 +1,0 @@
-echo "#!/bin/bash\nexport PATH=$PATH:/usr/local/bin" > /etc/profile.d/custom.sh
-chmod a+x /etc/profile.d/custom.sh
-
