@@ -39,8 +39,9 @@ bindsym $mod+Shift+q --release exec xkill
 bindsym $mod+Ctrl+q --release exec killall xkill
 
 # start dmenu (a program launcher)
+bindsym $mod+Shift+d exec urxvt -e $(dmenu_path | dmenu)
 bindsym $mod+d exec dmenu_run
-bindsym $mod+Shift+d exec xfce4-appfinder
+bindsym $mod+Ctrl+d exec xfce4-appfinder
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -224,6 +225,16 @@ exec dunst
 floating_modifier $mod
 
 
+bindsym $mod+Escape mode "LOCK MOD+ESC"
+mode "LOCK MOD+ESC"
+{
+        bindsym $mod+Escape mode "default"
+}
+bindsym $mod+Shift+Escape mode "LOCK MOD+Shift+ESC"
+mode "LOCK MOD+Shift+ESC"
+{
+        bindsym $mod+Shift+Escape mode "default"
+}
 
 bindsym $mod+x mode "System modifikator"
 mode "System modifikator"
@@ -268,6 +279,8 @@ mode "System modifikator"
         # back  $mod+o normal: Enter or Escape
         bindsym $mod+Return mode "default"
         bindsym $mod+Escape mode "default"
+
+	bindsym k exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
 }
  
 
