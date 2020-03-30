@@ -1,3 +1,4 @@
+sudo pacman -S texlive-core
 aurman -S texlive-localmanager-git
 tllocalmgr install lastpage
 tllocalmgr install enumitem
