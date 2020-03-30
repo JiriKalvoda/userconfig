@@ -218,6 +218,7 @@ map \s :se spell<CR>:se spelllang=cs<CR>
 
 map \g :call Git()<CR>
 
+map \b <HOME>v<END>y:!<c-R>"<BS><CR>
 
 "map  <C-Down> gj
 "imap <C-Down> <C-o>gj
