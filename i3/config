@@ -287,6 +287,36 @@ mode "System modifikator"
 	bindsym i exec "cpuF 1500; cpuFGUI 'SET TO 1500'"
 	bindsym u exec "cpuF  800; cpuFGUI 'SET TO  800'"
 	bindsym y exec "cpuF  400; cpuFGUI 'SET TO  400'"
+
+	bindsym            l exec "diskSleepGUI sda 1"
+	bindsym      Shift+l exec "diskSleepGUI sdb 1"
+	bindsym Ctrl+      l exec "diskSleepGUI sdc 1"
+	bindsym Ctrl+Shift+l exec "diskSleepGUI sdd 1"
+
+	bindsym            k exec "diskSleepGUI sda 30"
+	bindsym      Shift+k exec "diskSleepGUI sdb 30"
+	bindsym Ctrl+      k exec "diskSleepGUI sdc 30"
+	bindsym Ctrl+Shift+k exec "diskSleepGUI sdd 30"
+
+	bindsym            j exec "diskSleepGUI sda 0"
+	bindsym      Shift+j exec "diskSleepGUI sdb 0"
+	bindsym Ctrl+      j exec "diskSleepGUI sdc 0"
+	bindsym Ctrl+Shift+j exec "diskSleepGUI sdd 0"
+
+	bindsym            semicolon exec "diskSleepGUI sda Y"
+	bindsym      Shift+semicolon exec "diskSleepGUI sdb Y"
+	bindsym Ctrl+      semicolon exec "diskSleepGUI sdc Y"
+	bindsym Ctrl+Shift+semicolon exec "diskSleepGUI sdd Y"
+
+	bindsym            backslash exec "diskSleepGUI sda off"
+	bindsym      Shift+backslash exec "diskSleepGUI sdb off"
+	bindsym Ctrl+      backslash exec "diskSleepGUI sdc off"
+	bindsym Ctrl+Shift+backslash exec "diskSleepGUI sdd off"
+
+	bindsym            apostrophe exec "diskSleepGUI sda umount"
+	bindsym      Shift+apostrophe exec "diskSleepGUI sdb umount"
+	bindsym Ctrl+      apostrophe exec "diskSleepGUI sdc umount"
+	bindsym Ctrl+Shift+apostrophe exec "diskSleepGUI sdd umount"
 }
  
 
