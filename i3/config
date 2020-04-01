@@ -281,6 +281,12 @@ mode "System modifikator"
         bindsym $mod+Escape mode "default"
 
 	bindsym k exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
+
+	bindsym p exec cpuFGUI
+	bindsym o exec "cpuF 5000; cpuFGUI 'SET TO 5000'"
+	bindsym i exec "cpuF 1500; cpuFGUI 'SET TO 1500'"
+	bindsym u exec "cpuF  800; cpuFGUI 'SET TO  800'"
+	bindsym y exec "cpuF  400; cpuFGUI 'SET TO  400'"
 }
  
 
