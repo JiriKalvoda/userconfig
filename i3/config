@@ -284,10 +284,16 @@ mode "System modifikator"
 }
  
 
-bindsym Print exec gnome-screenshot -w
-bindsym Shift+Print exec gnome-screenshot
-bindsym Control+Print exec gnome-screenshot -i
-	bindsym $mod+Print exec printscreengimp
+#bindsym Print exec gnome-screenshot -w
+#bindsym Shift+Print exec gnome-screenshot
+#bindsym Control+Print exec gnome-screenshot -i
+#bindsym $mod+Print exec printscreengimp
+
+bindsym Print exec "maim -suo | xclip -selection clipboard -t image/png"
+bindsym Shift+Print exec "maim -suo > ~/screenshot.png ; convert ~/screenshot.png $(zenity --file-selection --save --file-filter='Picture | *.png *.jpg *.gif *.bmp' --confirm-overwrite)"
+bindsym Ctrl+Shift+Print exec "maim -uo | convert png:- `zenity --file-selection --save --file-filter='Picture | *.png *.jpg *.gif *.bmp' --confirm-overwrite`"
+bindsym Ctrl+Print exec " maim -uo | xclip -selection clipboard -t image/png"
+bindsym $mod+Print exec "maim -uo > ~/screenshot.png ;gimp ~/screenshot.png"
 
 exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
 
