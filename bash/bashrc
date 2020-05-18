@@ -232,6 +232,7 @@ alias cp='cp -i '
 alias mv='mv -i '
 
 
+export PATH=$PATH:~/bin
 
 
 
@@ -247,3 +248,5 @@ if [ "$device_name" = "localhost" ] ;
 then
 	pNN
 fi
+
+
