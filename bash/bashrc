@@ -235,6 +235,20 @@ alias rm='trash '
 alias cp='cp -i '
 alias mv='mv -i '
 
+alias gic="git commit"
+alias gica="git commit --amend"
+alias gis="git status"
+alias gig="git log --oneline --graph"
+alias gil="git log --max-count=1"
+alias gia="git add"
+alias giaa="git add ."
+giac() { git add $@;git commit; }
+giaac() { git add . $@;git commit; }
+giaca() { git add $@;git commit --amend; }
+giaaca() { git add . $@;git commit --amend; }
+gip() { git pull $@;git push $@; }
+
+
 
 export PATH=$PATH:~/bin
 
