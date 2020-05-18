@@ -9,7 +9,7 @@ const int lightMin = 2;
 const int lightMax = 937;
 int main(int argc,char ** argv)
 {
-	if(argc<2) return 100;
+	if(argc<=2) return 100;
 	setuid(0);
 	for(int adri=0;adri<adrlen;adri++)
 	{
