@@ -39,6 +39,7 @@ bindsym $mod+Shift+q --release exec xkill
 bindsym $mod+Ctrl+q --release exec killall xkill
 
 # start dmenu (a program launcher)
+#bindsym $mod+d exec --no-startup-id "rofi -show drun -font \\"DejaVu 9\\" -run-shell-command '{terminal} -e \\" {cmd}; read -n 1 -s\\"'"
 bindsym $mod+Shift+d exec urxvt -e $(dmenu_path | dmenu)
 bindsym $mod+d exec dmenu_run
 bindsym $mod+Ctrl+d exec xfce4-appfinder
@@ -245,11 +246,11 @@ mode "System modifikator"
 	bindsym t exec light + 0.9 ; exec lightGUI
 	bindsym q exec light H 0   ; exec lightGUI
 
-	bindsym a exec amixer sset Master -q 0%; exec volumeGUI
-	bindsym s exec amixer sset Master -q 10%-; exec volumeGUI
-	bindsym d exec amixer sset Master -q 2%-; exec volumeGUI
-	bindsym f exec amixer sset Master -q 2%+; exec volumeGUI
-	bindsym g exec amixer sset Master -q 10%+; exec volumeGUI
+	bindsym a exec "amixer sset Master -q 0%;   sleep 0.05; volumeGUI"
+	bindsym s exec "amixer sset Master -q 10%-; sleep 0.05; volumeGUI"
+	bindsym d exec "amixer sset Master -q 2%-;  sleep 0.05; volumeGUI"
+	bindsym f exec "amixer sset Master -q 2%+;  sleep 0.05; volumeGUI"
+	bindsym g exec "amixer sset Master -q 10%+; sleep 0.05; volumeGUI"
 
 	bindsym comma exec  xrandr --auto 
 	bindsym n exec xrand--auto; exec  xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0
@@ -266,11 +267,11 @@ mode "System modifikator"
 	bindsym $mod+t exec light + 0.9 ; exec lightGUI
 	bindsym $mod+q exec light H 0   ; exec lightGUI
 
-	bindsym $mod+a exec amixer sset Master -q 0%; exec volumeGUI
-	bindsym $mod+s exec amixer sset Master -q 10%-; exec volumeGUI
-	bindsym $mod+d exec amixer sset Master -q 2%-; exec volumeGUI
-	bindsym $mod+f exec amixer sset Master -q 2%+; exec volumeGUI
-	bindsym $mod+g exec amixer sset Master -q 10%+; exec volumeGUI
+	bindsym $mod+a exec "amixer sset Master -q 0%;   sleep 0.05; volumeGUI"
+	bindsym $mod+s exec "amixer sset Master -q 10%-; sleep 0.05; volumeGUI"
+	bindsym $mod+d exec "amixer sset Master -q 2%-;  sleep 0.05; volumeGUI"
+	bindsym $mod+f exec "amixer sset Master -q 2%+;  sleep 0.05; volumeGUI"
+	bindsym $mod+g exec "amixer sset Master -q 10%+; sleep 0.05; volumeGUI"
 
 	bindsym $mod+comma exec  xrandr --auto 
 	bindsym $mod+n exec xrand--auto; exec  xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0
@@ -317,6 +318,10 @@ mode "System modifikator"
 	bindsym      Shift+apostrophe exec "diskSleepGUI sdb umount"
 	bindsym Ctrl+      apostrophe exec "diskSleepGUI sdc umount"
 	bindsym Ctrl+Shift+apostrophe exec "diskSleepGUI sdd umount"
+
+	bindsym bracketright exec "notify-send \\"$(lsblk)\\""
+	bindsym Shift+bracketright mode "default"; exec "gksudo -g gparted"
+	bindsym Ctrl+bracketright mode "default"; exec "gksudo -g gnome-disks"
 }
  
 
@@ -333,8 +338,13 @@ bindsym $mod+Print exec "maim -uo > ~/screenshot.png ;gimp ~/screenshot.png"
 
 exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
 
-
 for_window [class=".*"] border pixel 1
+for_window [title="zoom*"] move container to workspace ZOOM
+for_window [title="Zoom*"] move container to workspace ZOOM
+
+for_window [title="Jitsi Meet"] floating enable 
+
+#for_window [class=".*"] border pixel 1
 bindsym $mod+p exec ~/.config/i3/i3-toggle-border
 
 
