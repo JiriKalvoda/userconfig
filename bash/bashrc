@@ -227,6 +227,10 @@ sepLine()
 {
 	s=$(printf "%-`stty size | cut -d ' ' -f 2`s" " ");echo -e "\e[30;48;5;82m${s// / }\e[0m"
 }
+rmHARD()
+{
+	rm $@
+}
 alias rm='trash '
 alias cp='cp -i '
 alias mv='mv -i '
