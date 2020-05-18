@@ -42,7 +42,7 @@ pacman -S notify-osd
 pacman -S dunst
 
 # SSH - conect to server by shel or git 
-pacman -S openssh
+pacman -S openssh sshfs
 
 # Web broser
 pacman -S chromium
