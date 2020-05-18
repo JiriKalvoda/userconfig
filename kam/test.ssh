@@ -1,0 +1,3 @@
+ssh jirikalvoda@kam.mff.cuni.cz <<'ENDSSH' -t -t
+htop
+ENDSSH

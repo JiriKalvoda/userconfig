@@ -22,6 +22,7 @@ pacman -S xorg-server xorg-xinit
 pacman -S xorg
 # fontfs
 pacman -S $(pacman -Sqs ttf| grep '^ttf')
+pacman -S ttf-hack ttf-ubuntu-font-family
 pacman -S i3
 # graphic eviromen i3
 pacman -S dmenu 
@@ -59,7 +60,7 @@ pacman -S baobab
 pacman -S htop
 
 # PDF viewer
-pacman -S zathura zathura-pdf-poppler
+pacman -S zathura zathura-pdf-poppler feh
 
 # Image viewer
 pacman -S neofetch
