@@ -1,0 +1,49 @@
+#!/bin/bash
+getIP()
+{
+	if [ "$1" = "" ]
+	then 
+		ip=`cat ~/.phoneIP`
+	elif [ "$1" = "g" ]
+	then 
+		ip=`ssh jirikalvoda@sneaky.kam.mff.cuni.cz -p80 "cat ~/.phoneIP"`
+		if [ $? = 0 ]
+		then
+			echo $ip > ~/.phoneIP
+		else
+			echo DOWNLOAD ERR! 1>&2
+		fi
+	else
+		ip=$1
+	fi
+	echo $ip 1>&2
+	echo $ip
+
+}
+if [ "$1" = "m" ];
+then
+	ip=`getIP $2`
+	mkdir -p ~/phoneRoot
+	sshfs  ~/phoneRoot $ip:/ -p8022
+	if [ "$?" = "0" ];
+	then
+		ln -s ~/phoneRoot/storage/emulated/0/ ~/phone
+		ln -s ~/phoneRoot/data/data/com.termux/files/home/ ~/phoneTermux
+	fi
+fi
+if [ "$1" = "t" ];
+then
+	ip=`getIP $2`
+	ssh  $ip -p8022
+fi
+if [ "$1" = "u" ];
+then
+	 unlink phone
+	 unlink phoneTermux
+	 umount ~/phoneRoot
+	 rmdir phoneRoot
+fi
+if [ "$1" = "ip" ];
+then
+	getIP $2
+fi

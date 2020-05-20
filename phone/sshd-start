@@ -1,0 +1,18 @@
+#!/bin/bash
+sshd;
+ip=` ip addres | grep "global wlan0"| awk '{print $2}' | cut -d "/" -f 1`
+echo $ip
+echo $ip | diff ~/.phoneIP - > /dev/null
+if [ $? -ne 0 ]
+then
+	echo IP change from `cat ~/.phoneIP` to $ip
+	echo $ip | ssh jirikalvoda@sneaky.kam.mff.cuni.cz -p80 "cat > .phoneIP"
+	if [ $? = 0 ]
+	then
+		echo $ip > ~/.phoneIP
+	else
+		echo UPLOAD ERROR!
+	fi
+fi
+
+
