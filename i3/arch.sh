@@ -11,3 +11,4 @@ then
 	exit;
 fi
 sudo pacman -S jq
+sudo pacman -S xdotool
