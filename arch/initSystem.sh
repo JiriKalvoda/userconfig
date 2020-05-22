@@ -21,8 +21,8 @@ pacman -S wget
 pacman -S xorg-server xorg-xinit
 pacman -S xorg
 # fontfs
-pacman -S $(pacman -Sqs ttf| grep '^ttf')
-pacman -S ttf-hack ttf-ubuntu-font-family
+#pacman -S $(pacman -Sqs ttf| grep '^ttf')
+pacman -S ttf-hack ttf-ubuntu-font-family ttf-dejavu ttf-liberation
 pacman -S i3
 # graphic eviromen i3
 pacman -S dmenu 
