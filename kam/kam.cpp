@@ -291,7 +291,7 @@ int main(int argc,char ** argv)
 			if(serversList[i][0]=='_') continue;
 			if(first==-1) first = i;
 			else
-				exeP += sprintf(exeP,"urxvt -e bash -i -c \"kam %s -t=htop\" & ",serversList[i]);
+				exeP += sprintf(exeP,"terminal -e bash -i -c \"kam %s -t=htop\" & ",serversList[i]);
 		}
 		exeP += sprintf(exeP,"bash -i -c \"kam %s -t=htop\" ",serversList[first]);
 	}

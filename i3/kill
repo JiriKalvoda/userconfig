@@ -1,0 +1,9 @@
+#!/bin/bash
+CLASS=$(i3-msg -t get_tree | jq -r '.. | .nodes? | .[]? | select(.window!=null and .focused==true).window_properties.class')
+
+echo $CLASS
+if [ "$CLASS" = "Alacritty" ]; then
+	(sleep 0.1; xdotool key --clearmodifiers ctrl+d )&
+else
+  i3-msg kill
+fi
