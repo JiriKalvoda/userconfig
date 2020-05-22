@@ -339,8 +339,7 @@ bindsym $mod+Print exec "maim -uo > ~/screenshot.png ;gimp ~/screenshot.png"
 exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
 
 for_window [class=".*"] border pixel 1
-for_window [title="zoom*"] move container to workspace ZOOM
-for_window [title="Zoom*"] move container to workspace ZOOM
+for_window [class="zoom"] move container to workspace ZOOM
 
 for_window [title="Jitsi Meet"] floating enable 
 
