@@ -1,3 +1,4 @@
 cd "$(dirname "$0")"
-rm ~/.vimrc
 cp vimrc ~/.vimrc
+cp vimRun.sh ~/bin/vimRun
+
