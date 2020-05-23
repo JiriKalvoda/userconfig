@@ -261,10 +261,15 @@ then
 	PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]$(promt_rvalue)\[\033[01;33m\]$(promt_usrCut)\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[\033[01;33m\]$(promt_parse_git_branch)\[\033[00m\]$(promt_MakNewLine) \[\033[00m\]'
 fi
 
+if [ "$ISBREAKEBLE" = "1" ] ;
+then
+	PS1='${debian_chroot:+($debian_chroot)}\[\033[01;31m\]$(promt_rvalue)\[\033[01;35m\]$(promt_usrCut)\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\[\033[01;33m\]$(promt_parse_git_branch)\[\033[00m\]$(promt_MakNewLine) \[\033[00m\]'
+fi
 
 if [ "$device_name" = "localhost" ] ;
 then
 	pNN
 fi
+
 
 
