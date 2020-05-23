@@ -1,66 +1,54 @@
-" All system-wide defaults are set in $VIMRUNTIME/debian.vim and sourced by
-" the call to :runtime you can find below.  If you wish to change any of those
-" settings, you should do it in this file (/etc/vim/vimrc), since debian.vim
-" will be overwritten everytime an upgrade of the vim packages is performed.
-" It is recommended to make changes after sourcing debian.vim since it alters
-" the value of the 'compatible' option.
+" An example for a vimrc file.
+"
+" Maintainer:	Bram Moolenaar <Bram@vim.org>
+" Last change:	2019 Dec 17
+"
+" To use it, copy it to
+"	       for Unix:  ~/.vimrc
+"	      for Amiga:  s:.vimrc
+"	 for MS-Windows:  $VIM\_vimrc
+"	    for OpenVMS:  sys$login:.vimrc
 
-" This line should not be removed as it ensures that various options are
-" properly set to work with the Vim-related packages available in Debian.
-runtime! debian.vim
-
-" Vim will load $VIMRUNTIME/defaults.vim if the user does not have a vimrc.
-" This happens after /etc/vim/vimrc(.local) are loaded, so it will override
-" any settings in these files.
-" If you don't want that to happen, uncomment the below line to prevent
-" defaults.vim from being loaded.
-" let g:skip_defaults_vim = 1
-
-" Uncomment the next line to make Vim more Vi-compatible
-" NOTE: debian.vim sets 'nocompatible'.  Setting 'compatible' changes numerous
-" options, so any other options should be set AFTER setting 'compatible'.
-"set compatible
-
-" Vim5 and later versions support syntax highlighting. Uncommenting the next
-" line enables syntax highlighting by default.
-if has("syntax")
-  syntax on
+" When started as "evim", evim.vim will already have done these settings, bail
+" out.
+if v:progname =~? "evim"
+  finish
 endif
 
-" If using a dark background within the editing area and syntax highlighting
-" turn on this option as well
-"set background=dark
+" Get the defaults that most users want.
+source $VIMRUNTIME/defaults.vim
 
-" Uncomment the following to have Vim jump to the last position when
-" reopening a file
-"if has("autocmd")
-"  au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
-"endif
-
-" Uncomment the following to have Vim load indentation rules and plugins
-" according to the detected filetype.
-"if has("autocmd")
-"  filetype plugin indent on
-"endif
-
-" The following are commented out as they cause vim to behave a lot
-" differently from regular Vi. They are highly recommended though.
-"set showcmd		" Show (partial) command in status line.
-"set showmatch		" Show matching brackets.
-"set ignorecase		" Do case insensitive matching
-"set smartcase		" Do smart case matching
-"set incsearch		" Incremental search
-"set autowrite		" Automatically save before commands like :next and :make
-"set hidden		" Hide buffers when they are abandoned
-"set mouse=a		" Enable mouse usage (all modes)
-
-" Source a global configuration file if available
-
-if filereadable("/etc/vim/vimrc.local")
-  source /etc/vim/vimrc.local
+if has("vms")
+  set nobackup		" do not keep a backup file, use versions instead
+else
+"  set backup		" keep a backup file (restore to previous version)
+  if has('persistent_undo')
+"    set undofile	" keep an undo file (undo changes after closing)
+  endif
 endif
 
-"se autowrite
+if &t_Co > 2 || has("gui_running")
+  " Switch on highlighting the last used search pattern.
+  set hlsearch
+endif
+
+" Put these in an autocmd group, so that we can delete them easily.
+augroup vimrcEx
+  au!
+
+  " For all text files set 'textwidth' to 78 characters.
+  autocmd FileType text setlocal textwidth=78
+augroup END
+
+" Add optional packages.
+"
+" The matchit plugin makes the % command work better, but it is not backwards
+" compatible.
+" The ! means the package won't be loaded right away but when plugins are
+" loaded during initialization.
+if has('syntax') && has('eval')
+  packadd! matchit
+endif
 
 se nocompatible
 se nu
@@ -69,158 +57,283 @@ se mouse=a
 se showcmd
 se hlsearch
 
-map \\ yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
+let g:toExec = ""
+let g:VimRun = ""
+let g:useVimRun = 0
 
 
-function! Promt(p)
-	return "promt; echo ". <g-args> . ";" . l:p
-endfunction
-function! Compile()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	w
-	if l:extension == "cpp"
-		execute "Bp g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile
-	else
-		if l:extension == "tex"
-			execute "Bp pdflatex ". @% . " " . g:compile
-		else
-			echo "file extention not suported"
 
-		endif
-	endif
-endfunction
-function! CompileMore()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	w
-	if l:extension == "cpp"
-		execute "Bp g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile . " | more"
-	else
-		if l:extension == "tex"
-			execute "Bp pdflatex ". @% . " " . g:compile
-		else
-			echo "file extention not suported"
+command! -nargs=+ AddExecF  let g:toExec = g:toExec . <q-args>
+command! -nargs=+ AddExec  AddExecF promt; echo <q-args>; <args>;
+command! -nargs=+ AddBashF  let g:toExec = <q-args>
+command! -nargs=* AddBashG  AddBashF bash -i -c <q-args>;
+command!  AddBash  execute "AddBashG ".g:toExec
+command! -nargs=+ AddLessF  let g:toExec = <q-args>
+command! -nargs=* AddLessG  AddLessF bash -i -c <q-args>;
+command!  AddLess  execute "AddLessF (".g:toExec."  )2>/dev/stdout | less -r"
 
-		endif
-	endif
+function! ExecHere()
+	AddBash
+	execute "!".g:toExec
+	let g:toExec = ""
 endfunction
-function! Run()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	if l:extension == "cpp"
-		execute "Bp ./". l:file_name . ".out " . g:run
+
+function! Exec()
+	if g:useVimRun == 1
+		call ExecVimRun()
 	else
-		if l:extension == "tex"
-			execute "Bp gopen ". l:file_name . ".pdf"
-		else
-			if l:extension == "in"
-				w
-				execute "Bp ./main.out ".g:compile." ". @% . " " . g:run 
-			else
-				echo "file extention not suported"
-			endif
-		endif
+		call ExecHere()
 	endif
 endfunction
-function! CompileRun()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
+
+function! MakeVimRun()
+	let pid = trim(system('ps -o ppid= -p $$'))
+	echo pid
+	let s = system(" terminal -e bash -i -c \"vimRun ~/.vimRun/".pid." ".pid." \" & ")
+	let g:VimRun = trim(system('echo $HOME'))."/.vimRun/".pid
+	echo g:VimRun
+	let g:useVimRun = 1
+endfunction
+function! MakeVimRunNoWindow()
+	let pid = trim(system('ps -o ppid= -p $$'))
+	echo pid
+	let g:VimRun = trim(system('echo $HOME'))."/.vimRun/".pid
+	echo g:VimRun
+	let g:useVimRun = 1
+endfunction
+function! ExecVimRun()
+	if g:VimRun == ""
+		call ExecHere()
+	else
+		AddBash
+		call writefile([g:toExec], g:VimRun )
+		let g:toExec = ""
+	endif
+endfunction
+
+let g:Syntax = ""
+let w:Syntax = ""
+let t:Syntax = ""
+let b:Syntax = ""
+
+function! InitVar(name)
+	execute "let g:".a:name." = \"NONE\""
+	execute "let w:".a:name." = \"NONE\""
+	execute "let t:".a:name." = \"NONE\""
+	execute "let b:".a:name." = \"NONE\""
+endfunction
+call InitVar("Compile")
+call InitVar("Run")
+call InitVar("CompileScript")
+call InitVar("RunScript")
+
+function! GetVar(name)
+	let v = trim(execute("echo b:".a:name))
+	if v != "NONE"
+		return v
+	endif
+	let v = trim(execute("echo w:".a:name))
+	if v != "NONE"
+		return v
+	endif
+	let v = trim(execute("echo t:".a:name))
+	if v != "NONE"
+		return v
+	endif
+	let v = trim(execute("echo g:".a:name))
+	if v != "NONE"
+		return v
+	endif
+	return "EMPTY"
+endfunction
+
+function! Syntax()
+	if b:Syntax != ""
+		return b:Syntax
+	endif
+	if w:Syntax != ""
+		return w:Syntax
+	endif
+	if t:Syntax != ""
+		return t:Syntax
+	endif
+	if g:Syntax != ""
+		return g:Syntax
+	endif
+	let syntax = trim(split(execute("set syntax")." ","=")[1])
+	return syntax
+endfunction
+
+function! NameAll()
+	return expand('%:p')
+endfunction
+function! NameNoE()
+	return expand('%:p:r')
+endfunction
+function! NameDir()
+	return expand('%:p:h')
+endfunction
+function! CompileArg()
+	let arg = GetVar("Compile")
+	if arg != "EMPTY"
+		return arg
+	endif
+	let s = Syntax()
+	if s == "cpp"
+		return "-Wall"
+	else
+	return ""
+endfunction
+function! RunArg()
+	let arg = GetVar("Run")
+	if arg != "EMPTY"
+		return arg
+	endif
+	return ""
+endfunction
+
+function! Compile(isVimRun)
 	w
-	if l:extension == "cpp"
-		execute "PriparePromt rm ./". l:file_name . ".out"
-		let l:r =  g:promt . "; "
-		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile
-		let l:r = l:r . g:promt . "; "
-		execute "PriparePromt ./". l:file_name . ".out " . g:run
-		let l:r = l:r . g:promt
-		execute "B " . l:r
+	let s = Syntax()
+	if s == "cpp"
+		execute "AddExec g++ -fdiagnostics-color ".NameAll()." -o ".NameNoE().".out ".CompileArg()
+	elseif s == "cmake"
+		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
+	elseif s == "tex"
+		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	else
-		if l:extension == "tex"
-			execute "PriparePromt pdflatex ". @% . " " . g:compile
-			let l:r = g:promt . "; "
-			execute "PriparePromt gopen ". l:file_name . ".pdf"
-			let l:r = l:r . g:promt
-			execute "B " . l:r
+		let script = GetVar("CompileScript")
+		if script == "EMPTY"
+			execute "AddExec echo This sintax ".s." is not suported | lolcat"
 		else
-			echo "file extention not suported"
+			execute "AddExec ".script." ".NameAll()." ".CompileArg()
 		endif
 	endif
 endfunction
-function! ClearCompile()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	w
-	if l:extension == "cpp"
-		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out " . g:compile
-		let l:r = "clear;clear;" . g:promt
-		execute "B " . l:r
+function! Run(isVimRun,input)
+	let s = Syntax()
+	if s == "cpp"
+		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
+	elseif s == "sh"
+		execute "AddExec bash ".NameAll()." ".RunArg()." ".a:input
+	elseif s == "cmake"
+		execute "AddExec ".NameDir()."/".split(NameDir(),"/")[-1]." ".RunArg()." ".a:input
+	elseif s == "tex"
+		"if a:isVimRun == 1
+		"execute "AddExec xdg-open ".NameNoE().".pdf ".RunArg()
+		"else
+		execute "AddExec ( xdg-open ".NameNoE().".pdf ".RunArg()" & )"
+		"endif
 	else
-		if l:extension == "tex"
-			execute "PriparePromt pdflatex ". @% . " " . g:compile
-			let l:r = "clear;clear;" . g:promt
-			execute "B " . l:r
+		let script = GetVar("RunScript")
+		if script == "EMPTY"
+			execute "AddExec echo This sintax ".s." is not suported | lolcat"
 		else
-			execute "Bp gopen ". l:file_name . ".pdf"
+			execute "AddExec ".script." ".NameAll()." ".CompileArg()
 		endif
 	endif
 endfunction
-function! Debug()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	w
-	if l:extension == "cpp"
-		execute "PriparePromt rm ./". l:file_name . ".out"
-		let l:r =  g:promt . "; "
-		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out -g3  " . g:compile
-		let l:r = l:r . g:promt . "; "
-		execute "PriparePromt gdb ./". l:file_name . ".out"
-		let l:r = l:r . g:promt
-		execute "B " . l:r
+function! RunTests(isVimRun)
+	let ls = split(system("ls ".NameNoE()."*.txt ".NameNoE()."*.in 2>/dev/null"),"\n")
+	for i in ls
+		call Run(a:isVimRun," < ".i)
+	endfor
+endfunction
+function! ClearBin(isVimRun)
+	let s = Syntax()
+	if s == "cpp"
+		execute "AddExec rm ".NameNoE().".out "
+	elseif s == "tex"
 	else
-		echo "file extention not suported"
+		echo "This sintax \"".s."\" is not suported!"
 	endif
 endfunction
-function! Help()
-	sp|view  /usr/share/vim/help
+function! Debug(isVimRun)
+	w
+	let s = Syntax()
+	if s == "cpp"
+		call ClearBin(a:isVimRun)
+		execute "AddExec g++ -g3 ".NameAll()." -o ".NameNoE().".out ".CompileArg()
+		execute "AddExec gdb ".NameNoE().".out ".RunArg()
+	else
+		echo "This sintax \"".s."\" is not suported!"
+	endif
 endfunction
+function! CompileRun(isVimRun)
+	call ClearBin(a:isVimRun)
+	call Compile(a:isVimRun)
+	call Run(a:isVimRun,"")
+endfunction
+function! CompileRunTests(isVimRun)
+	call ClearBin(a:isVimRun)
+	call Compile(a:isVimRun)
+	call RunTests(a:isVimRun)
+endfunction
+
+
 function! BasicFile()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	execute "r /usr/share/vim/basicFile." . extension  
+	let extension = Syntax()
+	execute "r .basicFile/basicFile." . extension
 endfunction
-function! Git()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	w
-		execute "PriparePromt git add ."
-		let l:r =  g:promt . "; "
-		execute "PriparePromt git commit"
-		let l:r = l:r . g:promt . "; "
-		execute "PriparePromt git pull"
-		let l:r = l:r . g:promt . "; "
-		execute "PriparePromt git push"
-		let l:r = l:r . g:promt 
-		execute "B " . l:r
-endfunction
-command! -nargs=+ B Bnexit <args>; exit
-command! -nargs=* Bs  B sepLine; <args>
-command! -nargs=* Bp  B promt; echo <q-args>; <args>
-command! -nargs=* Bsp  B sepLine; promt; echo <q-args>; <args>
-command! -nargs=+ Bnexit  !bash -i -c <q-args>
-command! -nargs=+ WripeInPromt  let g:promt = <q-args>
-command! -nargs=+ PriparePromt  WripeInPromt promt; echo <q-args>; <args>
-"cmap <C-b> <Home><Right><BS>B<Space><CR>
-let g:compile = ""
-let g:run = ""
-map \c :call Compile()<CR>
-map \C :call ClearCompile()<CR>
-map \r :call Run()<CR>
-map \R :call CompileRun()<CR>
-map \k :call Kasiopea()<CR>
-map \d :call Debug()<CR>
-map \i :let g:compile = ""<Left>
-map \I :let g:run = ""<Left>
+
+map \c :call Compile(g:useVimRun)<CR>:call Exec()<CR>
+map \v :call Compile(g:useVimRun)<CR>:AddLess<CR>:call Exec()<CR>
+map \r :call Run(g:useVimRun,"")<CR>:call Exec()<CR>
+map \e :call CompileRun(g:useVimRun)<CR>:call Exec()<CR>
+map \d :call Debug(g:useVimRun)<CR>:call Exec()<CR>
+map \t :call CompileRunTests(g:useVimRun)<CR>:call Exec()<CR>
+map \y :call RunTests(g:useVimRun)<CR>:call Exec()<CR>
+map \u :call CompileRunTests(g:useVimRun)<CR>:AddLess<CR>:call Exec()<CR>
+map \i :call RunTests(g:useVimRun)<CR>:AddLess<CR>:call Exec()<CR>
+map \' :call Exec()<CR>
+
+map \[c :call Compile(0)<CR>:call ExecHere()<CR>
+map \[v :call Compile(0)<CR>:AddLess<CR>:call ExecHere()<CR>
+map \[r :call Run(0,"")<CR>:call ExecHere()<CR>
+map \[e :call CompileRun(0)<CR>:call ExecHere()<CR>
+map \[d :call Debug(0)<CR>:call ExecHere()<CR>
+map \[t :call CompileRunTests(0)<CR>:call ExecHere()<CR>
+map \[y :call RunTests(0)<CR>:call ExecHere()<CR>
+map \[u :call CompileRunTests(0)<CR>:AddLess<CR>:call ExecHere()<CR>
+map \[i :call RunTests(0)<CR>:AddLess<CR>:call ExecHere()<CR>
+map \[' :call ExecHere()<CR>
+
+map \]c :call Compile(1)<CR>:call ExecVimRun()<CR>
+map \]v :call Compile(1)<CR>:AddLess<CR>:call ExecVimRun()<CR>
+map \]r :call Run(1,"")<CR>:call ExecVimRun()<CR>
+map \]e :call CompileRun(1)<CR>:call ExecVimRun()<CR>
+map \]d :call Debug(1)<CR>:call ExecVimRun()<CR>
+map \]t :call CompileRunTests(1)<CR>:call ExecVimRun()<CR>
+map \]y :call RunTests(1)<CR>:call ExecVimRun()<CR>
+map \]u :call CompileRunTests(1)<CR>:AddLess<CR>:call ExecVimRun()<CR>
+map \]i :call RunTests(1)<CR>:AddLess<CR>:call ExecVimRun()<CR>
+map \]' :call ExecVimRun()<CR>
+
+map \w :call MakeVimRun()<CR>
+map \q :call MakeVimRunNoWindow()<CR>
+map \[w :let g:useVimRun = 0<CR>
+map \]w :let g:useVimRun = 1<CR>
+
+map \O :let b:Compile = ""<Left>
+map \<C-O> :let t:Compile = ""<Left>
+map \<C-o> :let v:Compile = ""<Left>
+map \o :let g:Compile = ""<Left>
+map \P :let b:Run = ""<Left>
+map \<C-P> :let t:Run = ""<Left>
+map \<C-p> :let v:Run = ""<Left>
+map \p :let g:Run = ""<Left>
+map \L :let b:Syntax = ""<Left>
+map \<C-L> :let t:Syntax = ""<Left>
+map \<C-l> :let v:Syntax = ""<Left>
+map \l :let g:Syntax = ""<Left>
+map \J :let b:CompileScript = ""<Left>
+map \<C-J> :let t:CompileScript = ""<Left>
+map \<C-j> :let v:CompileScript = ""<Left>
+map \j :let g:CompileScript = ""<Left>
+map \K :let b:RunScript = ""<Left>
+map \<C-K> :let t:RunScript = ""<Left>
+map \<C-k> :let v:RunScript = ""<Left>
+map \k :let g:RunScript = ""<Left>
 
 map \h :call Help()<CR>
 
@@ -228,15 +341,9 @@ map \f :call BasicFile()<CR><Up>dd
 
 map \s :se spell<CR>:se spelllang=cs<CR>
 
-map \g :call Git()<CR>
-
 map \b <HOME>v<END>y:!<c-R>"<BS><CR>
+map \B <HOME>v<END>y:!sudo <c-R>"<BS><CR>
 
-
-"map  <C-Down> gj
-"imap <C-Down> <C-o>gj
-"map  <C-Up>   gk 
-"imap <C-Up>   <C-o>gk 
 imap <silent> <C-Up> <C-o>gk
 imap <silent> <C-Down> <C-o>gj
 map <silent> <C-Up> gk
@@ -248,20 +355,5 @@ map <silent> <C-x> "+d
 vmap <silent> <C-x> "+d
 imap <silent> <C-v> <C-r>+
 
-let g:compile = "-DDEB"
-function! Kasiopea()
-	let file_name = expand('%:t:r')
-	let extension = expand('%:e')
-	w
-	if l:extension == "cpp"
-		execute "PriparePromt rm ./". l:file_name . ".out"
-		let l:r =  g:promt . "; "
-		execute "PriparePromt g++ -Wall ". @% . " -o ". l:file_name . ".out " 
-		let l:r = l:r . g:promt . "; "
-		execute "PriparePromt ./f.sh ".l:file_name
-		let l:r = l:r . g:promt
-		execute "B " . l:r
-	else
-		echo "file extention not suported"
-	endif
-endfunction
+set timeoutlen=100000000000000000
+
