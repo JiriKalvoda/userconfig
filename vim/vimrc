@@ -71,6 +71,21 @@ command!  AddBash  execute "AddBashG ".g:toExec
 command! -nargs=+ AddLessF  let g:toExec = <q-args>
 command! -nargs=* AddLessG  AddLessF bash -i -c <q-args>;
 command!  AddLess  execute "AddLessF (".g:toExec."  )2>/dev/stdout | less -r"
+function! B(in)
+	execute "AddExec ".a:in
+	call Exec()
+endfunction
+function! BH(in)
+	execute "AddExec ".a:in
+	call ExecHere()
+endfunction
+function! BR(in)
+	execute "AddExec ".a:in
+	call ExecVimRun()
+endfunction
+command! -nargs=* B  call B(<q-args>)
+command! -nargs=* BH call BH(<q-args>)
+command! -nargs=* BR call BR(<q-args>)
 
 function! ExecHere()
 	AddBash
@@ -161,6 +176,9 @@ function! Syntax()
 		return g:Syntax
 	endif
 	let syntax = trim(split(execute("set syntax")." ","=")[1])
+	if syntax == "plaintex"
+		return "tex"
+	endif
 	return syntax
 endfunction
 
@@ -205,6 +223,8 @@ function! Compile(isVimRun)
 		let script = GetVar("CompileScript")
 		if script == "EMPTY"
 			execute "AddExec echo This sintax ".s." is not suported | lolcat"
+		elseif s="script"
+			execute "AddExec ".script
 		else
 			execute "AddExec ".script." ".NameAll()." ".CompileArg()
 		endif
@@ -228,6 +248,8 @@ function! Run(isVimRun,input)
 		let script = GetVar("RunScript")
 		if script == "EMPTY"
 			execute "AddExec echo This sintax ".s." is not suported | lolcat"
+		elseif s="script"
+			execute "AddExec ".script
 		else
 			execute "AddExec ".script." ".NameAll()." ".CompileArg()
 		endif
@@ -356,4 +378,19 @@ vmap <silent> <C-x> "+d
 imap <silent> <C-v> <C-r>+
 
 set timeoutlen=100000000000000000
+set tabstop=6
+
+map ,, A <ESC>I <Esc>lvEdi<BS><Del>\begin{}<Esc>Po\end{}<Esc>PO
+map <silent> ,o o\item 
+map <silent> ,O o\item 
+map <silent> ,i oitemize<Esc>,,\item 
+map <silent> ,I Oitemize<Esc>,,\item 
+map <silent> ,e Oenumerate<Esc>,,\item 
+map <silent> ,E Oenumerate<Esc>,,\item 
+map <silent> ,r Ienumerate <Esc>,,\item 
+map <silent> ,m oeqnarray* <Esc>,,
+map <silent> ,M Oeqnarray* <Esc>,,
+map <silent> ,n o$$<ESC>o$$<ESC>O
+map <silent> ,N O$$<ESC>o$$<ESC>O
+"map ,, yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
 
