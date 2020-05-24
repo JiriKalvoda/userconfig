@@ -242,7 +242,7 @@ function! Run(isVimRun,input)
 		"if a:isVimRun == 1
 		"execute "AddExec xdg-open ".NameNoE().".pdf ".RunArg()
 		"else
-		execute "AddExec ( xdg-open ".NameNoE().".pdf ".RunArg()" & )"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 		"endif
 	else
 		let script = GetVar("RunScript")
