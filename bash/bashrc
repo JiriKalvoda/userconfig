@@ -271,5 +271,7 @@ then
 	pNN
 fi
 
-
-
+for i in ~/bin/bashrc/*
+do
+	  . $i
+done 2>/dev/null
