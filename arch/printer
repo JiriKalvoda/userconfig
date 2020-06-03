@@ -1,0 +1,7 @@
+sudo pacman -S cups ghostscript gsfonts
+sudo pacman -S  gutenprint
+sudo pacman -S   foomatic-db-gutenprint-ppds
+aurman -S  samsung-unified-driver-printe
+sudo pacman -S print-manager
+
+system-config-printer
