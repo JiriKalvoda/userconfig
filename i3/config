@@ -253,6 +253,15 @@ mode "System modifikator"
 	bindsym f exec "amixer sset Master -q 2%+;  sleep 0.05; volumeGUI"
 	bindsym g exec "amixer sset Master -q 10%+; sleep 0.05; volumeGUI"
 
+	bindsym Shift+a exec "echo 0 > .config/micloop/volume;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) ; notify-send loopmic $(cat .config/micloop/volume) -h string:x-canonical-private-synchronous:anything"
+	bindsym Shift+s exec "echo $(( $(cat .config/micloop/volume)  - 20000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
+	bindsym Shift+d exec "echo $(( $(cat .config/micloop/volume)  -  5000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
+	bindsym Shift+f exec "echo $(( $(cat .config/micloop/volume)  +  5000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
+	bindsym Shift+g exec "echo $(( $(cat .config/micloop/volume)  + 20000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
+	bindsym Ctrl+a exec "pactl load-module module-loopback source=\\"alsa_input.pci-0000_00_1f.3.analog-stereo\\" latency_msec=1  "
+	bindsym Ctrl+s exec "pactl unload-module module-loopback"
+	bindsym Ctrl+d exec "echo $(( 1 - $(cat ~/.config/micloop/mute) )) > ~/.config/micloop/mute;pacmd set-sink-input-mute $(cat ~/.config/micloop/id) $(cat ~/.config/micloop/mute) ; notify-send 'loopmic mute' $(cat ~/.config/micloop/mute) -h string:x-canonical-private-synchronous:anything"
+
 	bindsym comma exec  xrandr --auto 
 	bindsym n exec xrand--auto; exec  xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0
 	bindsym m exec xrandr --auto; exec  xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500
@@ -282,7 +291,7 @@ mode "System modifikator"
         bindsym $mod+Return mode "default"
         bindsym $mod+Escape mode "default"
 
-	bindsym k exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
+	bindsym b exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
 
 	bindsym p exec cpuFGUI
 	bindsym o exec "cpuF 5000; cpuFGUI 'SET TO 5000'"
@@ -325,6 +334,9 @@ mode "System modifikator"
 	bindsym Ctrl+bracketright mode "default"; exec "gksudo -g gnome-disks"
 }
  
+bindcode 121 exec "echo $(( 1 - $(cat ~/.config/micloop/mute) )) > ~/.config/micloop/mute;pacmd set-sink-input-mute $(cat ~/.config/micloop/id) $(cat ~/.config/micloop/mute) ; notify-send 'loopmic mute' $(cat ~/.config/micloop/mute) -h string:x-canonical-private-synchronous:anything"
+bindcode 122 exec "echo $(( $(cat .config/micloop/volume)  - 10000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume)\\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) \\"$(cat .config/micloop/volume)\\" "
+bindcode 123 exec "echo $(( $(cat .config/micloop/volume)  + 10000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume)\\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
 
 #bindsym Print exec gnome-screenshot -w
 #bindsym Shift+Print exec gnome-screenshot
