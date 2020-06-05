@@ -126,10 +126,6 @@ function! ExecVimRun()
 	endif
 endfunction
 
-let g:Syntax = ""
-let w:Syntax = ""
-let t:Syntax = ""
-let b:Syntax = ""
 
 function! InitVar(name)
 	execute "let g:".a:name." = \"NONE\""
@@ -143,19 +139,19 @@ call InitVar("CompileScript")
 call InitVar("RunScript")
 
 function! GetVar(name)
-	let v = trim(execute("echo b:".a:name))
+	let v = trim(get(b:,a:name,"NONE"))
 	if v != "NONE"
 		return v
 	endif
-	let v = trim(execute("echo w:".a:name))
+	let v = trim(get(w:,a:name,"NONE"))
 	if v != "NONE"
 		return v
 	endif
-	let v = trim(execute("echo t:".a:name))
+	let v = trim(get(t:,a:name,"NONE"))
 	if v != "NONE"
 		return v
 	endif
-	let v = trim(execute("echo g:".a:name))
+	let v = trim(get(g:,a:name,"NONE"))
 	if v != "NONE"
 		return v
 	endif
@@ -163,17 +159,9 @@ function! GetVar(name)
 endfunction
 
 function! Syntax()
-	if b:Syntax != ""
-		return b:Syntax
-	endif
-	if w:Syntax != ""
-		return w:Syntax
-	endif
-	if t:Syntax != ""
-		return t:Syntax
-	endif
-	if g:Syntax != ""
-		return g:Syntax
+	let get = GetVar("Syntax")
+	if get != "EMPTY"
+		  return get
 	endif
 	let syntax = trim(split(execute("set syntax")." ","=")[1])
 	if syntax == "plaintex"
@@ -295,7 +283,7 @@ endfunction
 
 function! BasicFile()
 	let extension = Syntax()
-	execute "r .basicFile/basicFile." . extension
+	execute "r ~/.basicFile/basicFile." . extension
 endfunction
 
 map \c :call Compile(g:useVimRun)<CR>:call Exec()<CR>
@@ -378,7 +366,6 @@ vmap <silent> <C-x> "+d
 imap <silent> <C-v> <C-r>+
 
 set timeoutlen=100000000000000000
-set tabstop=6
 
 map ,, A <ESC>I <Esc>lvEdi<BS><Del>\begin{}<Esc>Po\end{}<Esc>PO
 map <silent> ,o o\item 
