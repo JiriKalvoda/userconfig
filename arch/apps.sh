@@ -43,4 +43,4 @@ sudo pacman -S wireshark-qt
  #arp
 
 
-
+ aurman -S gksu

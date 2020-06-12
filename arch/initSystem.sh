@@ -83,6 +83,7 @@ pacman -S udisks2
 # Sound support
 pacman -S alsa-lib alsa-utils
 pacman -S alsa-oss
+pacman -S pavucontrol
 
 # Work with zip files
 pacman -S zip unzip
