@@ -1,0 +1,11 @@
+sudo pacman -S bluez bluez-utils
+sudo pacman -S pulseaudio-bluetooth
+sudo pacman -S pulseaudio-alsa
+aurman -S bcm20702a1-firmware bcm20702b0-firmware
+
+ modprobe btusb
+sudo modprobe btusb
+systemctl start bluetooth.service
+sudo blueman-applet
+
+
