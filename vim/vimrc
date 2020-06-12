@@ -205,6 +205,8 @@ function! Compile(isVimRun)
 		execute "AddExec g++ -fdiagnostics-color ".NameAll()." -o ".NameNoE().".out ".CompileArg()
 	elseif s == "cmake"
 		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
+	elseif s == "arduino"
+		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	else
@@ -224,6 +226,8 @@ function! Run(isVimRun,input)
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
 	elseif s == "sh"
 		execute "AddExec bash ".NameAll()." ".RunArg()." ".a:input
+	elseif s == "arduino"
+		execute "AddExec arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()." ".a:input
 	elseif s == "cmake"
 		execute "AddExec ".NameDir()."/".split(NameDir(),"/")[-1]." ".RunArg()." ".a:input
 	elseif s == "tex"
