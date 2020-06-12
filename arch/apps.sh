@@ -44,3 +44,8 @@ sudo pacman -S wireshark-qt
 
 
  aurman -S gksu
+
+ # OpenCV lib
+sudo pacman -S opencv
+sudo pacman -S hdf5 gtkglext vtk
+sudo pacman -S glew
