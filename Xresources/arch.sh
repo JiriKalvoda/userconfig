@@ -11,7 +11,8 @@ then
 	exit;
 fi
 aurman -S urxvt-resize-font-git
-aurman -S urxvt-clipboard
+#aurman -S urxvt-clipboard
+aurman -S urxvt-perls
 #cd ~/tmp
 #git clone https://aur.archlinux.org/urxvt-resize-font-git.git
 #cd urxvt-resize-font-git
