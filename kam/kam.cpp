@@ -15,7 +15,7 @@ const int LEN = 1234;
 
 using ll = long long;
 char user [] = "jirikalvoda";
-char domain [] = "kam.mff.cuni.cz";
+char domain [300] = "kam.mff.cuni.cz";
 char help [] =
 "KAM - ssh driver for kam.mff.cuni.cz servers\n"
 "usage: kam [OPT] [SERVER/PORT]\n"
@@ -45,6 +45,7 @@ char serversList [][123] = {
 	"kaminka",
 	"kamna",
 	"lomikamen",
+	"_gimli",
 	"_nikam",
 	"_drahokam",
 	"__camellia",
@@ -157,6 +158,10 @@ int main(int argc,char ** argv)
 			else
 				par[string(argv[i]).substr(0,r)] = argv[i]+r+1;
 		}
+	}
+	if(strcmp(server,"gimli")==0)
+	{
+		strcpy(domain,"ms.mff.cuni.cz");
 	}
 	//D
 	//{

@@ -258,7 +258,7 @@ mode "System modifikator"
 	bindsym Shift+d exec "echo $(( $(cat .config/micloop/volume)  -  5000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
 	bindsym Shift+f exec "echo $(( $(cat .config/micloop/volume)  +  5000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
 	bindsym Shift+g exec "echo $(( $(cat .config/micloop/volume)  + 20000 )) > .config/micloop/volume; notify-send loopmic \\" $(cat .config/micloop/volume) \\" -h string:x-canonical-private-synchronous:anything;pacmd set-sink-input-volume $(cat .config/micloop/id) $(cat .config/micloop/volume) "
-	bindsym Ctrl+a exec "pactl load-module module-loopback source=\\"alsa_input.pci-0000_00_1f.3.analog-stereo\\" latency_msec=1  "
+	bindsym Ctrl+a exec "pactl load-module module-loopback source=\\"alsa_input.pci-0000_00_1f.3.analog-stereo\\" latency_msec=1 | ~/.config/micloop/grepId > ~/.config/micloop/id "
 	bindsym Ctrl+s exec "pactl unload-module module-loopback"
 	bindsym Ctrl+d exec "echo $(( 1 - $(cat ~/.config/micloop/mute) )) > ~/.config/micloop/mute;pacmd set-sink-input-mute $(cat ~/.config/micloop/id) $(cat ~/.config/micloop/mute) ; notify-send 'loopmic mute' $(cat ~/.config/micloop/mute) -h string:x-canonical-private-synchronous:anything"
 
