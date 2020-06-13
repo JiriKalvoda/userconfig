@@ -225,6 +225,7 @@ function! Run(isVimRun,input)
 	if s == "cpp"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
 	elseif s == "sh"
+		  w
 		execute "AddExec bash ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "arduino"
 		execute "AddExec arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()." ".a:input
