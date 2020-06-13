@@ -1,10 +1,14 @@
-if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
-apt install notify-osd
-g++ ./light.c -o /usr/bin/light
-chmod u+s /usr/bin/light
-g++ ./lightInfo.c -o /usr/bin/lightInfo
-chmod u+s /usr/bin/lightInfo
-cp ./lightGUI.sh  /usr/bin/lightGUI
-chmod o+x /usr/bin/lightGUI
+#!/bin/bash
+cd "$(dirname "$0")"
 
+sudo g++ ./light.c -o /usr/bin/light
+sudo chmod u+s /usr/bin/light
+sudo g++ ./lightInfo.c -o /usr/bin/lightInfo
+sudo chmod u+s /usr/bin/lightInfo
+sudo cp ./lightGUI.sh  /usr/bin/lightGUI
+sudo chmod o+x /usr/bin/lightGUI
 
+if [ "$1" == "mint" ]
+then 
+	sudo apt install notify-osd
+fi

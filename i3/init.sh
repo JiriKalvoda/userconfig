@@ -1,10 +1,22 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-if [[ $(id -u) -ne 0 ]] ; then echo "Please run as root" ; exit 1 ; fi
-apt install numlockx
-apt install jq
+
 cp config ~/.config/i3/config 
 cp toggle-border ~/.config/i3/i3-toggle-border
-cp printscreengimp /usr/bin/
+cp kill ~/.config/i3/i3-kill
+chmod o+x ~/.config/i3/i3-*
 
-chmod o+x /usr/bin/printscreengimp
+if [ "$1" == "mint" ];
+then
+	sudo apt install numlockx
+	sudo apt install jq
+	sudo cp printscreengimp /usr/bin/
+	sudo chmod o+x /usr/bin/printscreengimp
+fi
+if [ "$1" == "arch" ];
+then
+	sudo pacman -S xdotool
+	sudo pacman -S jq
+	sudo cp printscreengimp /usr/bin/
+	sudo chmod o+x /usr/bin/printscreengimp
+fi
