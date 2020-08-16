@@ -1,0 +1,7 @@
+server=kamna.kam.mff.cuni.cz
+user=jirikalvoda
+port=57022
+tunel="-R *:57020:localhost:22"
+okfile=/home/jiri/sshtuneltest
+checktime=10
+timeout=1
