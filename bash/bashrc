@@ -234,6 +234,10 @@ alias gil="git log --max-count=1"
 alias gia="git add"
 alias giaa="git add ."
 alias ms="movingssh"
+alias sys="sudo systemctl "
+alias syss="sudo systemctl start"
+alias syse="sudo systemctl stop"
+alias sysp="sudo systemctl status"
 giac() { git add $@;git commit; }
 giaac() { git add . $@;git commit; }
 giaca() { git add $@;git commit --amend; }
