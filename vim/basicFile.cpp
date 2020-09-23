@@ -6,6 +6,7 @@ using namespace std;
 #define D if(0)
 #endif
 
+#define fo(a,b) for(int a=0;a<(b);++a)
 using ll = long long;
 
 int main()
