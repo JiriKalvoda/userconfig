@@ -273,10 +273,10 @@ if [ "$SSH_CONNECTION" != "" ];
 then 
 	if [ "$LD_SSHTYPE" = "local" ];
 	then 
+		promt_color_user=96
+	else
 		promt_color_rvalue=32
 		promt_color_user=91
-	else
-		promt_color_user=96
 	fi
 fi
 if [ "$USER" == "root" ];
