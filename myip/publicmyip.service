@@ -1,0 +1,11 @@
+[Unit]
+Description=Publicmyip
+After=network.target
+
+[Service]
+User=jiri
+ExecStart=/usr/bin/publicmyip
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
