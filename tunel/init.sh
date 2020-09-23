@@ -11,6 +11,9 @@ sudo systemctl enable tunel
 mkdir ~/.tunel -p
 ln -s /usr/bin/ssh ~/.tunel/ssh-tunel
 ln -s /usr/bin/ssh ~/.tunel/ssh-check
-cp config ~/.tunel
+if [[ ! -f ~/.tunel/config ]]
+then
+	cp config ~/.tunel
+fi
 
 
