@@ -4,4 +4,7 @@ tllocalmgr install lastpage
 tllocalmgr install enumitem
 tllocalmgr install xstring
 tllocalmgr install a4wide
+tllocalmgr install ucs
+tllocalmgr install listingsutf8
 sudo texhash
+
