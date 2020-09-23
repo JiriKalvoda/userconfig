@@ -4,13 +4,20 @@ cd ~/.tunel
 
 . config
 
+if [[ "$1" == "-p" ]]
+then
+	echo ip$2=\"$server\"
+	echo port$2=\"$port\"
+	exit 0
+fi
+
 
 whileok()
 {
 	while true
 	do
 		sleep $checktime
-		./ssh-check $server -p $port "echo OK > $okfile" -oStrictHostKeyChecking=no -oServerAliveInterval=300&
+		./ssh-check $server -p $port "echo OK > $okfile" -oServerAliveInterval=300&
 		sleep $timeout
 		killall ssh-check -q
 		if [[ -f $okfile ]]
@@ -27,7 +34,7 @@ while true
 do
 	killall ssh-tunel -q
 	echo START
-	./ssh-tunel $tunel $user@$server -fN -oStrictHostKeyChecking=no -oServerAliveInterval=300 &
+	./ssh-tunel $tunel $user@$server -fN -oServerAliveInterval=300 &
 	whileok
 done
 
