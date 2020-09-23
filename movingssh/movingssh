@@ -1,0 +1,295 @@
+#!/bin/bash
+
+for var in "$@"
+do
+	if [[ "$name" == "" ]]
+	then
+		if [[ "$var" == -* ]]
+		then
+			minus="$minus$var"
+		else
+			name="$var"
+		fi
+	else
+		parametrs="$parametrs $var"
+	fi
+done
+
+if [[ "$name" == "" ]]
+then
+	echo NO ARGUMENTS
+	exit 0
+fi
+timeout=2
+sleepTime=10
+
+configFile=~/.movingssh/$name
+mountpoint=~/m/$name
+
+pipeFile=$(mktemp -u)
+mkfifo $pipeFile
+exec 3<>$pipeFile
+rm $pipeFile
+
+timeoutCMD="-o ConnectTimeout=$timeout"
+envCMD="-o SendEnv=LD_SSHTYPE"
+keyCMD="-o HostKeyAlias=$name"
+
+downloadServer="jirikalvoda@kam.mff.cuni.cz"
+
+
+
+debug()
+{
+	if [[ "$minus" == *"b"* ]]
+	then
+		echo DEBUG: $@ 
+	fi
+}
+
+kilrek()
+{
+	pgrep -P $1 | while read p;
+	do
+		kilrek $p;
+		#echo $p;
+		kill $p;
+	done
+}
+killallmy()
+{
+	pgrep -P $$ |  while read p;
+	do
+		name=$(ps -p $p -o comm=)
+		if [[ " $* " == *"$name"* ]]
+		then
+
+			debug KILL $p $name
+			kill $p
+		fi
+	done
+}
+
+
+parseConfig()
+{
+	debug PARSE CONFIG
+	#shopt -s extglob
+	declare -g -A config
+	if [ -f $configFile ]
+	then
+		while IFS='= ' read -r lhs rhs
+		do
+		    if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
+			rhs="${rhs%%\#*}"    # Del in line right comments
+			rhs="${rhs%%*( )}"   # Del trailing spaces
+			rhs="${rhs%\"*}"     # Del opening string quotes 
+			rhs="${rhs#\"*}"     # Del closing string quotes 
+			config[$lhs]="$rhs"
+		    fi
+		done < $configFile
+	else
+		debug NOCONFIG
+	fi
+}
+printAddres()
+{
+	if [[ "$minus" == *"p"* ]]
+	then
+		(
+		echo A: ${config[ipA]} ${config[portA]} 
+		echo B: ${config[ipB]} ${config[portB]} 
+		) | column -t -N \ ,ip,port
+	fi
+}
+download()
+{
+	if [[ "$minus" == *"D"* ]]
+	then
+		return 0
+	fi
+	debug DOWNLOAD
+	newConfigFile=$(mktemp)
+	ssh $downloadServer  $timeoutCMD "cat /home/jirikalvoda/.movingssh/$name" > $newConfigFile 2>/dev/null
+	if [[ $? = 0 ]]
+	then
+		debug DOWNLOAD OK
+		diff $configFile $newConfigFile -q >/dev/null
+		if [[ $? != 0 ]]
+		then
+			debug DIFF CONFIG
+			cat $newConfigFile > $configFile
+			parseConfig
+			printAddres
+			rm $newConfigFile
+			return 1
+		fi
+		rm $newConfigFile
+		return 0
+	else
+		debug NO NET
+		rm $newConfigFile
+		return 0
+	fi
+}
+tryLocal()
+{
+	debug TRY LOCAL
+	#declare -p config
+	if [[ "${config[portA]}" == "" ]]
+	then
+		config[portA]=22
+	fi
+	if [[ "${config[ipA]}" == "" ]]
+	then
+		ret=
+		debug LOCAL NO IPA
+	else
+		ret=$(LD_SSHTYPE=local ssh $envCMD ${config[ipA]} -p${config[portA]} $keyCMD $timeoutCMD echo OK 2>/dev/null)
+	fi
+	if [ "$ret" = "OK" ]
+	then
+		debug LOCAL OK
+		echo YES >&3
+		killallmy sleep ssh
+		return 1
+	fi
+	debug LOCAL NO
+	return 0
+}
+tryLocalDownload()
+{
+	tryLocal
+	if [[ $? == 1 ]]
+	then
+		return;
+	fi
+	if [[ "$minus" == *"d"* ]]
+	then
+		return;
+	fi
+	download
+	if [[ $? == 0 ]]
+	then
+		killallmy sleep
+		return
+	fi
+	tryLocal
+	killallmy sleep
+}
+
+remote()
+{
+	debug REMOTE
+	if [[ "${config[portB]}" == "" ]]
+	then
+		config[portB]=22
+	fi
+	if [[ "${config[ipB]}" == "" ]]
+	then
+		return 255
+	else
+		LD_SSHTYPE=remote ssh $envCMD ${config[ipB]} -p${config[portB]} $keyCMD $parametrs
+		return $?
+	fi
+}
+local()
+{
+	debug LOCAL
+	if [[ "${config[portA]}" == "" ]]
+	then
+		config[portA]=22
+	fi
+	if [[ "${config[ipA]}" == "" ]]
+	then
+		return 255
+	else
+		LD_SSHTYPE=local ssh $envCMD ${config[ipA]} -p${config[portA]} $keyCMD $parametrs
+		return $?
+	fi
+}
+
+parseConfig
+printAddres
+if [[ "$minus" == *"u"* || "$minus" == *"U"* ]]
+then
+	if [[ -d "$mountpoint"  ]]
+	then
+		if [[ "$minus" == *"U"* ]]
+		then
+			umount -l  $mountpoint
+		else
+			umount  $mountpoint
+		fi
+		if [ $? != 0 ]
+		then
+			echo UMOUNT FAILD
+			exit 100
+		fi
+		rmdir $mountpoint
+	else
+		echo DIRECTORY $mountpoint NOT EXISTS
+		exit 100
+	fi
+	exit 0
+fi
+if [[ "$minus" == *"d"* ]]
+then
+	download
+fi
+if [[ "$minus" == *"l"* ]]
+then
+	local
+elif [[ "$minus" == *"r"* ]]
+then
+	remote
+elif [[ "$minus" == *"x"* ]]
+then
+	tryLocalDownload
+	echo NO >&3
+	if [ "$(head -n1 <&3)" == "YES" ]
+	then
+		local
+	else
+		remote
+	fi
+elif [[ "$minus" == *"m"* ]]
+then
+	if [[ -d "$mountpoint" || -f "$mountpoint" ]]
+	then
+		echo DIRECTORY $mountpoint EXISTS
+		echo Unmout it first please
+		exit 100
+	fi
+	tryLocalDownload
+	echo NO >&3
+	mkdir ~/m/$name
+	if [ "$(head -n1 <&3)" == "YES" ]
+	then
+		echo LOCAL
+		LD_SSHTYPE=local sshfs ${config[ipA]}:/ -p ${config[portA]} $keyCMD ~/m/$name
+	else
+		echo '********REMOTE**********'
+		LD_SSHTYPE=remote sshfs ${config[ipB]}:/ -p ${config[portB]} $keyCMD ~/m/$name
+	fi
+else
+	tryLocalDownload &
+	remote
+	if [ $? = 255 ]
+	then
+		sleep $sleepTime
+	fi
+	echo NO >&3
+	if [ "$(head -n1 <&3)" == "YES" ]
+	then
+		parseConfig
+		local
+	fi
+fi
+
+
+exec 3>&-
+pgrep -P $BASHPID | while read p;
+do
+	kilrek $p;
+done
