@@ -1,6 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
+mkdir -p ~/.config/i3
 cp config ~/.config/i3/config 
 cp toggle-border ~/.config/i3/i3-toggle-border
 cp kill ~/.config/i3/i3-kill
@@ -15,6 +16,7 @@ then
 fi
 if [ "$1" == "arch" ];
 then
+	echo -e "exec i3" > ~/.xinitrc
 	sudo pacman -S xdotool
 	sudo pacman -S jq
 	sudo cp printscreengimp /usr/bin/
