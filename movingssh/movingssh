@@ -1,6 +1,9 @@
 #!/bin/bash
 
 username="$USER"
+mkdir -p ~/m
+mkdir -p ~/.movingssh
+
 for var in "$@"
 do
 	if [[ "$name" == "" ]]
@@ -15,7 +18,10 @@ do
 		parametrs="$parametrs $var"
 	fi
 done
-. ~/.movingssh/config
+if [[ -f ~/.movingssh/config ]]
+then
+	. ~/.movingssh/config
+fi
 if [[ "$minus" == *"h"* ]]
 then
 	cat <<EOF

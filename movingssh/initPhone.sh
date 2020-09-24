@@ -1,8 +1,8 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo chmod +x movingssh
-sudo cp movingssh ~/../usr/bin/
+chmod +x movingssh
+cp movingssh ~/../usr/bin/
 mkdir -p ~/.movingssh
 mkdir -p ~/m
 if [[ ! -f ~/.movingssh/config ]]
