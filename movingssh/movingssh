@@ -260,6 +260,7 @@ then
 		if [ $? != 0 ]
 		then
 			echo UMOUNT FAILD
+			rmdir $mountpoint
 			exit 100
 		fi
 		rmdir $mountpoint
