@@ -1,5 +1,6 @@
 #!/bin/bash
 
+username="$USER"
 for var in "$@"
 do
 	if [[ "$name" == "" ]]
@@ -14,11 +15,40 @@ do
 		parametrs="$parametrs $var"
 	fi
 done
+. ~/.movingssh/config
+if [[ "$minus" == *"h"* ]]
+then
+	cat <<EOF
+Auomatic ssh conect to device without private addrees by local ip starage at server or ssh tunel
+Usage:
+	movingssh [-parametrs] [user@]device [ssh command parametrs]
+
+Parametrs:
+	-h	print this help
+	-d	print debuging messages
+	-p	print addres and port to connect
+	-d	download new pozition just after run
+	-D	do not download new pozition
+	-x	do not run parralel
+	-l	force use local conection
+	-r	force use remote conection
+	-m	sshfs mount
+	-u	umount
+	-U	force umount
+
+EOF
+	exit 0
+fi
 
 if [[ "$name" == "" ]]
 then
 	echo NO ARGUMENTS
 	exit 0
+fi
+if [[ "$name" == *"@"* ]]
+then
+	username="$(echo "$name" | cut -d'@' -f1)"
+	name="$(echo "$name" | cut -d'@' -f2)"
 fi
 timeout=2
 sleepTime=10
@@ -145,7 +175,7 @@ tryLocal()
 		ret=
 		debug LOCAL NO IPA
 	else
-		ret=$(LD_SSHTYPE=local ssh $envCMD ${config[ipA]} -p${config[portA]} $keyCMD $timeoutCMD echo OK 2>/dev/null)
+		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyCMD $timeoutCMD echo OK 2>/dev/null)
 	fi
 	if [ "$ret" = "OK" ]
 	then
@@ -189,7 +219,7 @@ remote()
 	then
 		return 255
 	else
-		LD_SSHTYPE=remote ssh $envCMD ${config[ipB]} -p${config[portB]} $keyCMD $parametrs
+		LD_SSHTYPE=remote ssh $envCMD $username@${config[ipB]} -p${config[portB]} $keyCMD $parametrs
 		return $?
 	fi
 }
@@ -204,7 +234,7 @@ local()
 	then
 		return 255
 	else
-		LD_SSHTYPE=local ssh $envCMD ${config[ipA]} -p${config[portA]} $keyCMD $parametrs
+		LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyCMD $parametrs
 		return $?
 	fi
 }
@@ -249,8 +279,10 @@ then
 	echo NO >&3
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
+		echo LOCAL
 		local
 	else
+		echo '********REMOTE**********'
 		remote
 	fi
 elif [[ "$minus" == *"m"* ]]
@@ -267,10 +299,10 @@ then
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
 		echo LOCAL
-		LD_SSHTYPE=local sshfs ${config[ipA]}:/ -p ${config[portA]} $keyCMD ~/m/$name
+		LD_SSHTYPE=local sshfs $username@${config[ipA]}:/ -p ${config[portA]} $keyCMD ~/m/$name
 	else
 		echo '********REMOTE**********'
-		LD_SSHTYPE=remote sshfs ${config[ipB]}:/ -p ${config[portB]} $keyCMD ~/m/$name
+		LD_SSHTYPE=remote sshfs $username@${config[ipB]}:/ -p ${config[portB]} $keyCMD ~/m/$name
 	fi
 else
 	tryLocalDownload &
