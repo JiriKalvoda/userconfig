@@ -256,7 +256,7 @@ promt_color_rvalue=91
 promt_color_user=32
 promt_color_dir=34
 promt_color_git=93
-promt_color_dolar=97
+promt_color_dolar=39
 
 if [ "$device_name" = "localhost" ] ;
 then
@@ -300,7 +300,8 @@ PS1='${debian_chroot:+($debian_chroot)}\
 \[\033[01;${promt_color_user}m\]$(promt_usrCut)\
 \[\033[00m\]:\[\033[01;${promt_color_dir}m\]\w\
 \[\033[00m\]\[\033[01;${promt_color_git}m\]$(promt_parse_git_branch)\
-\[\033[21;${promt_color_dolar}m\]\
-$(promt_MakNewLine) \[\033[00;21m\]'
+\[\033[0m\]\
+\[\033[${promt_color_dolar}m\]\
+$(promt_MakNewLine)  \[\033[21m\]\[\033[0m\]'
 
 unset color_prompt force_color_prompt
