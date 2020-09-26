@@ -3,7 +3,7 @@ CLASS=$(i3-msg -t get_tree | jq -r '.. | .nodes? | .[]? | select(.window!=null a
 
 echo $CLASS
 if [ "$CLASS" = "Alacritty" ]; then
-	(sleep 0.1; xdotool key --clearmodifiers ctrl+d )&
+	(sleep 0.001; xdotool key --clearmodifiers ctrl+d;xdotool key --clearmodifiers ctrl+d )&
 else
   i3-msg kill
 fi
