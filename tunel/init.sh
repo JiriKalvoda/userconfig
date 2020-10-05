@@ -1,10 +1,10 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo cp tunel.sh /usr/bin/tunel
+sudo ln -sr tunel.sh /usr/bin/tunel
 sudo chmod +x /usr/bin/tunel
 
-sudo cp tunel.service /lib/systemd/system
+sudo ln -sr tunel.service /lib/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl enable tunel
 
