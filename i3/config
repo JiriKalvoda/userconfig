@@ -204,19 +204,20 @@ bindsym $mod+r mode "resize"
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
-        status_command i3status
+        status_command "i3status"
 }
 
 exec --no-startup-id synclient HorizEdgeScroll=1 VertEdgeScroll=1 VertScrollDelta=-111
 
 bindsym $mod+c exec chromium
-bindsym $mod+z exec zathura
+bindsym $mod+ctrl+z exec zathura
 bindsym $mod+Shift+comma workspace WUI;exec ~/dev/runWUI/run.sh
 bindsym $mod+comma workspace WUI
 bindsym $mod+Ctrl+comma move container to workspace  WUI; workspace  WUI
 for_window [title="WebUpdatingIndicator compare"] floating enable 
 bindsym $mod+Shift+m workspace MAIL; exec bash -c "start-mail"
 bindsym $mod+m workspace MAIL
+bindsym $mod+z workspace ZOOM
 bindsym $mod+Ctrl+m move container to workspace  MAIL; workspace  MAIL
 bindsym $mod+n exec nemo
 
@@ -375,3 +376,5 @@ bindsym $mod+o exec --no-startup-id bash -i -c "mate-session"
 bindsym $mod+Shift+o exec --no-startup-id killall -3 mate-session; exec --no-startup-id killall -3 mate-panel
 
 exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
+
+exec "osdd-run"
