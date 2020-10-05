@@ -1,4 +1,4 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-cp bashrc ~/.bashrc
+ln -sr bashrc ~/.bashrc
 mkdir -p ~/bin/bashrc
