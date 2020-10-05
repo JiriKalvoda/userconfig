@@ -1,9 +1,9 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-cp vimrc ~/.vimrc
-cp vimRun.sh ~/bin/vimRun
+ln -sr vimrc ~/.vimrc
+ln -sr vimRun.sh ~/bin/vimRun
 mkdir -p ~/.vimRun
 mkdir -p ~/.basicFile
-cp basicFile* ~/.basicFile
+ln -sr basicFile* ~/.basicFile
 
