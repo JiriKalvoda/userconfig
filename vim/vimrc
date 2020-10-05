@@ -210,6 +210,8 @@ function! Compile(isVimRun)
 		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
+	elseif s == "ptex"
+		execute "AddExec pdftex ".NameAll()." ".CompileArg()
 	elseif s == "asy"
 		execute "AddExec asy ".NameAll()." ".CompileArg()
 	elseif s == "make"
@@ -240,11 +242,9 @@ function! Run(isVimRun,input)
 	elseif s == "cmake"
 		execute "AddExec ".NameDir()."/".split(NameDir(),"/")[-1]." ".RunArg()." ".a:input
 	elseif s == "tex"
-		"if a:isVimRun == 1
-		"execute "AddExec xdg-open ".NameNoE().".pdf ".RunArg()
-		"else
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
-		"endif
+	elseif s == "ptex"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	else
 		let script = GetVar("RunScript")
 		if script == "EMPTY"
