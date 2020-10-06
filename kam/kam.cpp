@@ -33,6 +33,7 @@ char help [] =
 "       -home     mount ~/kam/home\n"
 "     -n=S        set SERVER_NAME to S manually (normal is used ask by ssh)\n"
 "     -X          add option -X to ssh command (tunnel X server)\n"
+"     -Y          add option -Y to ssh command (tunnel X server)\n"
 "     -t=COMMAND  run COMMAND instead of bash\n"
 "     -h --help   show this help\n"
 "     -htop       run htop on every computation server\n"
@@ -233,7 +234,7 @@ int main(int argc,char ** argv)
 	if(par["-c"]!="")
 	{
 		int portC=atoi(par["-c"].c_str());
-		sprintf(exe,"sudo ssh -L %d:%s:22"
+		sprintf(exe,"ssh -L %d:%s:22"
 				" %s@sneaky.%s -p 443 \" echo START OK;read -p run \"" 
 				,portC,server,user,domain);
 		
@@ -302,7 +303,10 @@ int main(int argc,char ** argv)
 	}
 	else
 	{
-		sprintf(exe,"ssh %s@%s -p %d %s%s%s",user,server,port,par["-X"]!=""?" -X":"",par["-t"]!=""?" -t ":"",par["-t"].c_str());
+		sprintf(exe,"ssh %s@%s -p %d %s%s%s%s",user,server,port,
+				par["-X"]!=""?" -X":"",
+				par["-Y"]!=""?" -Y":"",
+				par["-t"]!=""?" -t ":"",par["-t"].c_str());
 	}
 	system("bash -i -c promt");
 	puts(exe);

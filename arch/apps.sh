@@ -49,3 +49,5 @@ sudo pacman -S wireshark-qt
 sudo pacman -S opencv
 sudo pacman -S hdf5 gtkglext vtk
 sudo pacman -S glew
+
+sudo pacman -Syy youtube-dl

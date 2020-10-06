@@ -1,0 +1,5 @@
+server=kam.mff.cuni.cz
+user=jirikalvoda
+port=22
+name=tmp
+serverDir=/home/jirikalvoda/.movingssh

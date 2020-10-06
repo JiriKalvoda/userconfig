@@ -1,0 +1,14 @@
+arduino-cli
+===========
+
+https://arduino.github.io/arduino-cli/getting-started/
+
+aurman -S arduino-cli
+
+arduino-cli compile --fqbn arduino:avr:uno .
+arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno .
+
+
+
+stty 9600 -F /dev/ttyUSB0 raw -echo
+

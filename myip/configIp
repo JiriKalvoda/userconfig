@@ -1,0 +1,3 @@
+#!/bin/bash
+grepCMD="noprefixroute wlp"
+awkCMD='{print $2}'

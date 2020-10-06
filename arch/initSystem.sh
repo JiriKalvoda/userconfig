@@ -10,11 +10,11 @@ pacman -Syy
 # I need it to working WIFI
 pacman -S linux-firmware
 # wifi-menu
-pacman -S netctl dialog
+pacman -S netctl dialog nmap
 # nmtui
 pacman -S networkmanager
 # basic linux tools
-pacman -S base-devel
+pacman -S base-devel tree
 pacman -S wget
 
 # graphic

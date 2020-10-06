@@ -1,0 +1,33 @@
+#!/bin/bash
+
+cd ~/.publicmyip
+
+sleepTime=30
+. config
+
+
+
+
+while true
+do
+	echo START
+	while true;
+	do
+		myposition > new
+		diff new onServer -q >/dev/null
+		if [ $? = 0 ]
+		then
+			echo NO CHANGE
+		else
+			echo CHANGE:
+			cat new
+			ssh $user@$server -p$port "cat > $serverDir/$name"  < new
+			if [ $? == 0 ]
+			then
+				mv new onServer
+			fi
+		fi
+		sleep $sleepTime
+	done
+done
+

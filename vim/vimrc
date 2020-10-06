@@ -204,16 +204,23 @@ function! Compile(isVimRun)
 	if s == "cpp"
 		execute "AddExec g++ -fdiagnostics-color ".NameAll()." -o ".NameNoE().".out ".CompileArg()
 	elseif s == "cmake"
+		execute "AddExec cmake  ".NameDir()." ".CompileArg()
 		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
 	elseif s == "arduino"
 		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
+	elseif s == "ptex"
+		execute "AddExec pdftex ".NameAll()." ".CompileArg()
+	elseif s == "asy"
+		execute "AddExec asy ".NameAll()." ".CompileArg()
+	elseif s == "make"
+		execute "AddExec make"
 	else
 		let script = GetVar("CompileScript")
 		if script == "EMPTY"
 			execute "AddExec echo This sintax ".s." is not suported | lolcat"
-		elseif s="script"
+		elseif s=="script"
 			execute "AddExec ".script
 		else
 			execute "AddExec ".script." ".NameAll()." ".CompileArg()
@@ -225,25 +232,28 @@ function! Run(isVimRun,input)
 	if s == "cpp"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
 	elseif s == "sh"
-		  w
+		w
 		execute "AddExec bash ".NameAll()." ".RunArg()." ".a:input
+	elseif s == "python"
+		w
+		execute "AddExec python3 ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "arduino"
 		execute "AddExec arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()." ".a:input
 	elseif s == "cmake"
 		execute "AddExec ".NameDir()."/".split(NameDir(),"/")[-1]." ".RunArg()." ".a:input
 	elseif s == "tex"
-		"if a:isVimRun == 1
-		"execute "AddExec xdg-open ".NameNoE().".pdf ".RunArg()
-		"else
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
-		"endif
+	elseif s == "ptex"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	else
 		let script = GetVar("RunScript")
 		if script == "EMPTY"
 			execute "AddExec echo This sintax ".s." is not suported | lolcat"
-		elseif s="script"
+		elseif s=="script"
+			w
 			execute "AddExec ".script
 		else
+			w
 			execute "AddExec ".script." ".NameAll()." ".CompileArg()
 		endif
 	endif
