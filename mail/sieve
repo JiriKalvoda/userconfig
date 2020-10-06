@@ -1,0 +1,31 @@
+require ["include", "fileinto", "copy"];
+include :global "default";
+# This is a comment
+
+
+if address "From" "no-reply@piazza.com" {
+	fileinto "piazza";
+}
+
+#if address :matches "To" "*@ksp.mff.cuni.cz" {
+	#fileinto "ksp";
+#}
+#if address :matches "To" "ksp@mff.cuni.cz" {
+	#fileinto "ksp";
+#}
+if address "To" "ksp-commits@ksp.mff.cuni.cz" {
+	fileinto "ksp-git";
+}
+else
+{
+	if header :contains "List-Id" "ksp.mff.cuni.cz" {
+		fileinto "ksp";
+	}
+}
+
+if address "To" "xkalvo01@jaroska.cz" {
+	fileinto "jaroska";
+}
+if address "To" "jirik.kalvoda@seznam.cz" {
+	fileinto "seznam";
+}
