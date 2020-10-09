@@ -258,10 +258,6 @@ promt_color_dir=34
 promt_color_git=93
 promt_color_dolar=39
 
-if [ "$device_name" = "localhost" ] ;
-then
-	pNN
-fi
 
 if [ "$device_name" = "externalArch" ] ;
 then
@@ -281,6 +277,11 @@ then
 	else
 		promt_color_rvalue=32
 		promt_color_user=91
+	fi
+else
+	if [ "$device_name" = "localhost" ] ;
+	then
+		pNN
 	fi
 fi
 if [ "$USER" == "root" ];
