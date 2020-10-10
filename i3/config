@@ -380,7 +380,7 @@ bindsym $mod+Shift+o exec --no-startup-id killall -3 mate-session; exec --no-sta
 
 exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
 
-exec "sleep 2; osd-run & sleep 0.1;osdc --color=red START"
+exec --no-startup-id "sleep 2; osdd-run & sleep 0.1;osdc --color=red START"
 
 bindcode      94 exec "osdc --duration=1 --log=1 \\"\\""
 bindcode $mod+51 exec "osdc --duration=1 --log=1 \\"\\""
