@@ -46,7 +46,7 @@ void loadMail(char * out)
 	if(!f) ERR("Open f",);
 	ll lastUpTime=0;
 	int newMails=0;
-	if(fscanf(f,"%lld%d",&lastUpTime,&newMails)!=2) return;
+	if(fscanf(f,"%lld%d",&lastUpTime,&newMails)!=2) ERR("read",);
 	ll delay = t-lastUpTime;
 	if(-5 < delay && delay > 30)
 		if(newMails)
