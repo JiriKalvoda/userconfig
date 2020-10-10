@@ -1,0 +1,21 @@
+set mbox_type = "Maildir" 
+set folder="~/Maildir/"
+set spoolfile= "+/"
+set header_cache= "~/.cache/mutt"
+set sort = threads 
+set sort_aux = reverse-last-date-received
+set copy = yes
+set record = "+.Sent"
+set trash = "+.Trash"
+mailboxes "$HOME/Maildir/.*"
+#set mask=".*"
+set edit_headers=yes
+
+set attribution=""
+
+source $HOME/.config/neomutt/aliases
+source $HOME/.config/neomutt/aliases_ksp
+
+
+
+
