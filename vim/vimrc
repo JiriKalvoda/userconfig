@@ -56,6 +56,7 @@ se autoindent
 se mouse=a
 se showcmd
 se hlsearch
+se textwidth=80
 
 let g:toExec = ""
 let g:VimRun = ""
@@ -203,6 +204,8 @@ function! Compile(isVimRun)
 	let s = Syntax()
 	if s == "cpp"
 		execute "AddExec g++ -fdiagnostics-color ".NameAll()." -o ".NameNoE().".out ".CompileArg()
+	elseif s == "c"
+		execute "AddExec gcc -fdiagnostics-color ".NameAll()." -o ".NameNoE().".out ".CompileArg()
 	elseif s == "cmake"
 		execute "AddExec cmake  ".NameDir()." ".CompileArg()
 		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
@@ -230,6 +233,8 @@ endfunction
 function! Run(isVimRun,input)
 	let s = Syntax()
 	if s == "cpp"
+		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
+	elseif s == "c"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
 	elseif s == "sh"
 		w
@@ -268,6 +273,8 @@ function! ClearBin(isVimRun)
 	let s = Syntax()
 	if s == "cpp"
 		execute "AddExec rm ".NameNoE().".out "
+	elseif s == "c"
+		execute "AddExec rm ".NameNoE().".out "
 	elseif s == "tex"
 	else
 		echo "This sintax \"".s."\" is not suported!"
@@ -279,6 +286,10 @@ function! Debug(isVimRun)
 	if s == "cpp"
 		call ClearBin(a:isVimRun)
 		execute "AddExec g++ -g3 ".NameAll()." -o ".NameNoE().".out ".CompileArg()
+		execute "AddExec gdb ".NameNoE().".out ".RunArg()
+	elseif s == "c"
+		call ClearBin(a:isVimRun)
+		execute "AddExec gcc -g3 ".NameAll()." -o ".NameNoE().".out ".CompileArg()
 		execute "AddExec gdb ".NameNoE().".out ".RunArg()
 	else
 		echo "This sintax \"".s."\" is not suported!"
