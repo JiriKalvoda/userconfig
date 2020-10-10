@@ -382,8 +382,8 @@ exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
 
 exec "sleep 2; osd-run & sleep 0.1;osdc --color=red START"
 
-bindcode      94 exec "osdc --duration=1 \\"\\""
-bindcode $mod+51 exec "osdc --duration=1 \\"\\""
+bindcode      94 exec "osdc --duration=1 --log=1 \\"\\""
+bindcode $mod+51 exec "osdc --duration=1 --log=1 \\"\\""
 bindcode Shift+     94 exec "osdc --skip=1 --log=0 --duration=1 \\"\\""
 bindcode Shift+$mod+51 exec "osdc --skip=1 --log=0 --duration=1 \\"\\""
 bindcode Ctrl+     94 exec "osd-clock"
