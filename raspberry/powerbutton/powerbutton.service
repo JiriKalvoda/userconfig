@@ -1,0 +1,10 @@
+[Unit]
+Description=Powerbutton
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/powerbutton
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
