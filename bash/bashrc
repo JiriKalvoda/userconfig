@@ -303,6 +303,6 @@ PS1='${debian_chroot:+($debian_chroot)}\
 \[\033[00m\]\[\033[01;${promt_color_git}m\]$(promt_parse_git_branch)\
 \[\033[0m\]\
 \[\033[${promt_color_dolar}m\]\
-$(promt_MakNewLine)  \[\033[21m\]\[\033[0m\]'
+$(promt_MakNewLine)\[\033[21m\]\[\033[0m\] '
 
 unset color_prompt force_color_prompt
