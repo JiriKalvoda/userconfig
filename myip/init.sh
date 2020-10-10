@@ -1,12 +1,12 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo cp publicmyip.sh /usr/bin/publicmyip
+sudo ln -sr publicmyip.sh /usr/bin/publicmyip
 sudo chmod +x /usr/bin/publicmyip
-sudo cp myip.sh /usr/bin/myip
+sudo ln -sr myip.sh /usr/bin/myip
 sudo chmod +x /usr/bin/myip
 
-sudo cp publicmyip.service /lib/systemd/system
+sudo ln -sr publicmyip.service /lib/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl enable publicmyip
 
