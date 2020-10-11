@@ -1,0 +1,9 @@
+#!/usr/bin/bash
+
+if [[ "$2" == "T" ]];
+then
+	echo WAITING > ~/.offlineimap.log
+	echo $1 RUN > ~/.offlineimap.pipe
+else
+	timeout 1s $0 "$1" T
+fi
