@@ -1,7 +1,7 @@
 #!/bin/bash
 if [[ "$1" == "" ]]
 then
-	/home/jirikalvoda/bin/cm -c1 -C5 ~/Maildir/.* -od -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"echo terminal -e \~/bin/m %s \"&\" |/home/jirikalvoda/bin/osdc --to=stdout - " -r"to:stdout\n:(echo -e \"%t %n 1%b\" > ~/.cm;offlineimap-run if) & \n\n"
+	/home/jirikalvoda/bin/cm -c1 -C5 ~/Maildir/.* -od -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"echo terminal -e \~/bin/m %s \"&\" |/home/jirikalvoda/bin/osdc --to=stdout - " -r"to:stdout\n:(echo -e \"%t %n %m%b\" > ~/.cm;offlineimap-run if) & \n\n"
 	#/home/jirikalvoda/bin/cm -c1 -C15 -r "to:stdout\n:echo -e \"%t %n%b\" > ~/.cm;~/bin/offlineimap-run if\n\n" ~/Maildir/.* -od -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"echo terminal -e \~/bin/m %s \"&\" |/home/jirikalvoda/bin/osdc --to=stdout - "
 elif [[ "$1" == "h" ]]
 then
