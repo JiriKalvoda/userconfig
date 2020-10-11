@@ -51,3 +51,6 @@ sudo pacman -S hdf5 gtkglext vtk
 sudo pacman -S glew
 
 sudo pacman -Syy youtube-dl
+
+
+sudo pacman -Syy neomutt offlineimap
