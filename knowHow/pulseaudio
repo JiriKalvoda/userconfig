@@ -1,0 +1,9 @@
+load-module module-null-sink sink_name=null
+
+load-module module-remap-source source_name=record_mono master=alsa_input.pci-0000_00_1f.3.analog-stereo master_channel_map=left channel_map=mono
+set-default-source record_mono
+
+
+load-module module-loopback source=record_mono latency_msec=1
+
+
