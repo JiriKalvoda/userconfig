@@ -7,3 +7,5 @@ sudo g++ offlineimap-deamon.cpp -o /usr/bin/offlineimap-deamon
 sudo ln -sr offlineimap-jiri.service /lib/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl enable offlineimap-jiri
+
+ln -sr .neomuttrc ~/.config/neomutt

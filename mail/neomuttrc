@@ -1,3 +1,5 @@
+source $HOME/.config/neomutt/passwd
+set from = "jirikalvoda@kam.mff.cuni.cz"
 set mbox_type = "Maildir" 
 set folder="~/Maildir/"
 set spoolfile= "+/"
@@ -7,7 +9,7 @@ set sort_aux = reverse-last-date-received
 set copy = yes
 set record = "+.Sent"
 set trash = "+.Trash"
-mailboxes "$HOME/Maildir/.*"
+mailboxes "$HOME/Maildir/." "$HOME/Maildir/.Drafts" "$HOME/Maildir/.jaroska"  "$HOME/Maildir/.ksp" "$HOME/Maildir/.ksp-git" "$HOME/Maildir/.piazza" "$HOME/Maildir/.Sent" "$HOME/Maildir/.seznam" "$HOME/Maildir/.Spam"  "$HOME/Maildir/.Trash"
 #set mask=".*"
 set edit_headers=yes
 
@@ -19,3 +21,21 @@ source $HOME/.config/neomutt/aliases_ksp
 
 
 
+# colors
+color normal	white black
+color attachment brightyellow black
+color hdrdefault cyan black
+color indicator black cyan
+color markers	brightred black
+color quoted	green black
+color signature cyan black
+color status	brightgreen blue
+color tilde	blue black
+color tree	red black
+#color header	brightgreen black ^From:
+#color header	brightcyan black ^To:
+#color header	brightcyan black ^Reply-To:
+#color header	brightcyan black ^Cc:
+#color header	brightblue black ^Subject:
+#color body	brightred black [\-\.+_a-zA-Z0-9]+@[\-\.a-zA-Z0-9]+
+#color body	brightblue black (https?|ftp)://[\-\.,/%~_:?&=\#a-zA-Z0-9]+
