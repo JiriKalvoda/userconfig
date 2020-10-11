@@ -43,21 +43,36 @@ void loadMail(char * out)
 {
 	out[0]=0;
 	FILE * f = fopen(".cm","r");
-	if(!f) ERR("Open f",);
+	if(!f) ERR("Open f",",");
 	ll lastUpTime=0;
 	int newMails=0;
-	if(fscanf(f,"%lld%d",&lastUpTime,&newMails)!=2) ERR("read",);
+	if(fscanf(f,"%lld%d",&lastUpTime,&newMails)!=2) ERR("read",",");
 	ll delay = t-lastUpTime;
 	if(-5 < delay && delay > 30)
 		if(newMails)
-			sprintf(out,"{\"name\":\"mail\",\"color\":\"#%s\",\"full_text\":\"NO CONNECTION " TIME_P " [%d]\"}",t%2?"FF0000":"3333FF",TIME(delay),newMails);
+			out += sprintf(out,"{\"name\":\"mail\",\"color\":\"#%s\",\"full_text\":\"NO CONNECTION " TIME_P " [%d]\"},",t%2?"FF0000":"3333FF",TIME(delay),newMails);
 		else
-			sprintf(out,"{\"name\":\"mail\",\"color\":\"#FF0000\",\"full_text\":\"NO CONNECTION " TIME_P "\"}",TIME(delay));
+			out += sprintf(out,"{\"name\":\"mail\",\"color\":\"#FF0000\",\"full_text\":\"NO CONNECTION " TIME_P "\"},",TIME(delay));
 	else 
 		if(newMails)
-			sprintf(out,"{\"name\":\"mail\",\"color\":\"#%s\",\"full_text\":\"[%d NEW]\"}",t%2?"FF7000":"3333FF",newMails);
+			out += sprintf(out,"{\"name\":\"mail\",\"color\":\"#%s\",\"full_text\":\"[%d NEW]\"},",t%2?"FF7000":"3333FF",newMails);
 		else
-			sprintf(out,"{\"name\":\"mail\",\"color\":\"#00FF00\",\"full_text\":\"OK\"}");
+			out += sprintf(out,"{\"name\":\"mail\",\"color\":\"#00FF00\",\"full_text\":\"OK\"},");
+	fclose(f);
+	f = fopen(".offlineimap.log","r");
+	if(!f) ERR("Open IMAP log",",");
+	char in [123];
+	if(fscanf(f,"%100s",in)!=1) ERR("read",",");
+	if(strcmp(in,"DOING")==0)
+		out += sprintf(out,"{\"name\":\"imap\",\"color\":\"#%s\",\"full_text\":\"%s\"},","00FF00","IMAP");
+	if(strcmp(in,"WAITING")==0)
+		out += sprintf(out,"{\"name\":\"imap\",\"color\":\"#%s\",\"full_text\":\"%s\"},","FF0000","IMAP");
+	int val;
+	if(sscanf(in,"%d",&val))
+	{
+		if(val)
+		out += sprintf(out,"{\"name\":\"imap\",\"color\":\"#%s\",\"full_text\":\"IMAP %d\"},","FF0000",val);
+	}
 	fclose(f);
 
 }
@@ -89,8 +104,8 @@ int main()
 			if(i3status[0]=='[') {putc(*i3status,stderr);putchar(i3status++[0]);}
 			loadMail(mail);
 			loadOsdd(osdd);
-			printf("%s%s,%s",osdd,mail,i3status);
-			fprintf(stderr,"%s%s,%s",osdd,mail,i3status);
+			printf("%s%s%s",osdd,mail,i3status);
+			fprintf(stderr,"%s%s%s",osdd,mail,i3status);
 		}
 		fflush(stdout);
 		fflush(stderr);
