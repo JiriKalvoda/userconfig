@@ -11,3 +11,17 @@ sudo systemctl enable offlineimap-jiri
 
 ln -sr .neomuttrc ~/.config/neomutt
 ln -sr m ~/bin
+
+
+ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
+(
+	cd ~/Maildir-no-dot
+	for i in *;
+	do
+		if [[ "$i" != "INBOX" ]]
+		then 
+			ln -sr $i INBOX/.$i
+		fi
+	done 
+
+)
