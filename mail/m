@@ -1,0 +1,16 @@
+#!/bin/bash
+
+if [[ "$1" == "l" ]]
+then
+	cm -c1  ~/Maildir/.* -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"$0 %s"
+elif [[ "$1" == "" ]]
+then
+	kam -Y -t="/home/jirikalvoda/bin/m $1"
+elif [[ "$1" == "h" ]]
+then
+	kam -Y -t="/home/jirikalvoda/bin/m $1"
+else
+	file=$HOME/${1:17}
+	neomutt -f $file
+	offlineimap-run $file
+fi
