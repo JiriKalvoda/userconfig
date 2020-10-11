@@ -9,7 +9,8 @@ sudo ln -sr mailcap /etc/
 sudo systemctl daemon-reload
 sudo systemctl enable offlineimap-jiri
 
-ln -sr .neomuttrc ~/.config/neomutt
+mkdir -p ~/.config/neomutt
+ln -sr neomuttrc ~/.config/neomutt/
 ln -sr m ~/bin
 
 
