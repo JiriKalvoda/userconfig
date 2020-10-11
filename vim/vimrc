@@ -57,6 +57,7 @@ se mouse=a
 se showcmd
 se hlsearch
 se textwidth=80
+se nolinebreak
 
 let g:toExec = ""
 let g:VimRun = ""
