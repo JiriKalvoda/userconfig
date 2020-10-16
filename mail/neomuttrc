@@ -32,6 +32,7 @@ color signature cyan black
 color status	brightgreen blue
 color tilde	blue black
 color tree	red black
+source $HOME/.config/neomutt/color
 #color header	brightgreen black ^From:
 #color header	brightcyan black ^To:
 #color header	brightcyan black ^Reply-To:
