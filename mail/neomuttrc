@@ -1,5 +1,5 @@
 source $HOME/.config/neomutt/passwd
-set from = "jirikalvoda@kam.mff.cuni.cz"
+set from = "Jiří Kalvoda <jirikalvoda@kam.mff.cuni.cz>"
 set mbox_type = "Maildir" 
 set folder="~/Maildir/"
 set spoolfile= "+/"
@@ -20,6 +20,11 @@ source $HOME/.config/neomutt/aliases_ksp
 
 
 
+bind index,pager x entire-thread
+bind index,pager  previous-line
+
+set pager_index_lines   = 10    # number of index lines to show
+set pager_context       = 3     # number of context lines to show
 
 # colors
 color normal	white black
