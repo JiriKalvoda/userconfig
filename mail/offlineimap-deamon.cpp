@@ -25,6 +25,32 @@ void initPipe()
 	open(fileName, O_WRONLY);
 }
 
+#include <dirent.h>
+#include <stdio.h>
+
+struct Maildir
+{
+	char name[1000];
+	int ctotal=-1;
+	int cnew=-1;
+	bool needAct=1;
+};
+void getDir
+{
+    DIR *d;
+    struct dirent *dir;
+    d = opendir(".");
+    if (d)
+    {
+        while ((dir = readdir(d)) != NULL)
+        {
+            printf("%s\n", dir->d_name);
+        }
+        closedir(d);
+    }
+    return(0);
+}
+
 int ret=0;
 int main()
 {

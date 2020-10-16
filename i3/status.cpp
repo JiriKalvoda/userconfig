@@ -48,7 +48,7 @@ void loadMail(char * out)
 	int newMails=0;
 	if(fscanf(f,"%lld%d",&lastUpTime,&newMails)!=2) ERR("read",",");
 	ll delay = t-lastUpTime;
-	if(-5 < delay && delay > 30)
+	if(-5 < delay && delay > 90)
 		if(newMails)
 			out += sprintf(out,"{\"name\":\"mail\",\"color\":\"#%s\",\"full_text\":\"NO CONNECTION " TIME_P " [%d]\"},",t%2?"FF0000":"3333FF",TIME(delay),newMails);
 		else

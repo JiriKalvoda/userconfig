@@ -223,7 +223,6 @@ bindsym $mod+n exec nemo
 
 exec --no-startup-id /usr/bin/gnome-keyring-deamon --start --components=secrets
 exec numlockx on
-exec dunst
 
 floating_modifier $mod
 

@@ -13,7 +13,9 @@ else
 	file=$1
 	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
 	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
-	file=$HOME/$file
-	neomutt -f $file
+	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
+	file=$(echo ${file:1})
+	if [[ "$file" = "." ]]; then file=""; fi
+	neomutt -f "notmuch://?query=folder:\"$file\""
 	offlineimap-run $file
 fi
