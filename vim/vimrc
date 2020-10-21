@@ -56,8 +56,8 @@ se autoindent
 se mouse=a
 se showcmd
 se hlsearch
-se textwidth=80
-se nolinebreak
+" se textwidth=80
+" se nolinebreak
 
 let g:toExec = ""
 let g:VimRun = ""
@@ -72,7 +72,7 @@ command! -nargs=* AddBashG  AddBashF bash -i -c <q-args>;
 command!  AddBash  execute "AddBashG ".g:toExec
 command! -nargs=+ AddLessF  let g:toExec = <q-args>
 command! -nargs=* AddLessG  AddLessF bash -i -c <q-args>;
-command!  AddLess  execute "AddLessF (".g:toExec."  )2>/dev/stdout | less -r"
+command!  AddLess  execute "AddLessF (".g:toExec."  )2>&1 | less -r"
 function! B(in)
 	execute "AddExec ".a:in
 	call Exec()
@@ -215,7 +215,10 @@ function! Compile(isVimRun)
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	elseif s == "ptex"
-		execute "AddExec pdftex ".NameAll()." ".CompileArg()
+		execute "AddExec pdfcsplain ".NameAll()." ".CompileArg()
+	elseif s == "ltex"
+		execute "AddExec luatex ".NameAll()." ".CompileArg()
+	elseif s == "asy"
 	elseif s == "asy"
 		execute "AddExec asy ".NameAll()." ".CompileArg()
 	elseif s == "make"
@@ -250,6 +253,8 @@ function! Run(isVimRun,input)
 	elseif s == "tex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ptex"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
+	elseif s == "ltex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	else
 		let script = GetVar("RunScript")
