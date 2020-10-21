@@ -3,6 +3,7 @@ cd "$(dirname "$0")"
 
 chmod +x movingssh
 cp movingssh ~/../usr/bin/
+cp gitea ~/../usr/bin/
 mkdir -p ~/.movingssh
 mkdir -p ~/m
 if [[ ! -f ~/.movingssh/config ]]
