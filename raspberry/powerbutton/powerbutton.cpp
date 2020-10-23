@@ -11,7 +11,7 @@ using namespace std;
 #define fo(a,b) for(int a=0;a<(b);++a)
 using ll = long long;
 
-const int pin=27;
+const int pin=9;
 int main()
 {
 	wiringPiSetup();			// Setup the library
