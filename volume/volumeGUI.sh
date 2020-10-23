@@ -1,1 +1,2 @@
-notify-send "ZVUK" "`volumeInfo`" -h string:x-canonical-private-synchronous:anything
+volumeInfo
+#notify-send "ZVUK" "`volumeInfo`" -h string:x-canonical-private-synchronous:anything
