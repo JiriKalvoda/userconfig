@@ -1,2 +1,0 @@
-#!/bin/bash
-movingssh -dx rpi0 -L3001:localhost:3001 -L3002:localhost:22
