@@ -220,7 +220,7 @@ sepLine()
 }
 rmHARD()
 {
-	rm $@
+	rm "$@"
 }
 alias rm='trash '
 alias cp='cp -i '
