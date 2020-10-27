@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 
 mkdir -p ~/.config/i3
-ln -sr config.global ~/.config/i3/config
+ln -sr config ~/.config/i3/config.global
 ln -sr toggle-border ~/.config/i3/i3-toggle-border
 ln -sr kill ~/.config/i3/i3-kill
 ln -sr i3status.conf ~/.config/i3/
