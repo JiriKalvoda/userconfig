@@ -9,10 +9,9 @@ case $- in
 esac
 
 PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD}\007"'
-if [[ -f ~/.cd ]];
+if [[ "$LC_CD" != "" ]];
 then
-	cd "$(cat ~/.cd)";
-	rm ~/.cd
+	cd "$LC_CD";
 fi
 
 # don't put duplicate lines or lines starting with space in the history.
