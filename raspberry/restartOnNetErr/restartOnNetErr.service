@@ -1,0 +1,11 @@
+[Unit]
+Description=Tunel
+After=network.target
+
+[Service]
+User=root
+ExecStart=/usr/bin/tunel
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
