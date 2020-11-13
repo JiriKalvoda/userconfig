@@ -2,7 +2,7 @@
 
 whileok()
 {
-	for ((i=0;i<3;i++))
+	for ((i=0;i<10;i++))
 	do
 		sleep 10
 		ping 8.8.8.8 -c 1 >/dev/null && i=0
