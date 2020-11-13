@@ -8,6 +8,13 @@ case $- in
       *) return;;
 esac
 
+PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD}\007"'
+if [[ -f ~/.cd ]];
+then
+	cd "$(cat ~/.cd)";
+	rm ~/.cd
+fi
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
