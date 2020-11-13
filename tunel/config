@@ -2,6 +2,7 @@
 server=kamna.kam.mff.cuni.cz
 user=jirikalvoda
 port=57022
+name="PLEASE SET NAME"
 tunel="-R *:$port:localhost:22"
 okfile=/tmp/sshtuneltest
 checktime=60
