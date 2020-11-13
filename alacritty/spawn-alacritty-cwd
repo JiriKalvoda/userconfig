@@ -8,28 +8,81 @@
 # If the script is run with a non-Alacritty window in focus or a non-compliant
 # version of Alacritty, an instance will be spawned in the user's $HOME.
 
+findSSH()
+{
+	if [[ "$(ps -p $1 -o comm=)" == 'ssh' ]]
+	then
+		echo $1
+	fi
+	if [[ $2 > 0 ]];
+	then
+	pgrep -P $1 | while read p;
+do
+	findSSH $p $(( $2-1 ));
+done
+	fi
+}
+
+get_title(){(
+        set -e
+        ss=`stty -g`; trap 'exit 11' INT QUIT TERM; trap 'stty "$ss"' EXIT
+        e=`printf '\033'`; st=`printf '\234'`; t=
+        stty -echo -icanon min 0 time "${2:-2}"
+        printf "${1:-\033[21t}" > "`tty`"
+        while c=`dd bs=1 count=1 2>/dev/null` && [ "$c" ]; do
+                t="$t$c"
+                case "$t" in
+                $e*$e\\|$e*$st)
+                        t=${t%$e\\}; t=${t%$st}; printf '%s\n' "${t#$e\][lL]}";
+                        exit 0;;
+                $e*);;
+                *) break;;
+                esac
+        done
+        printf %s "$t"; exit 1
+)}
+#get_title
+
 ACTIVE_WINDOW=$(xdotool getactivewindow)
 ACTIVE_WM_CLASS=$(xprop -id $ACTIVE_WINDOW | grep WM_CLASS)
 if [[ $ACTIVE_WM_CLASS == *"Alacritty"* ]]
 then
-    # Get PID. If _NET_WM_PID isn't set, bail.
-    PID=$(xprop -id $ACTIVE_WINDOW | grep _NET_WM_PID | grep -oP "\d+")
-    if [[ "$PID" == "" ]]
-    then
-        alacritty
-    fi
-    # Get first child of terminal
-    CHILD_PID=$(pgrep -P $PID)
-    if [[ "$PID" == "" ]]
-    then
-        alacritty
-    fi
-    # Get current directory of child. The first child should be the shell.
-    pushd "/proc/${CHILD_PID}/cwd"
-    SHELL_CWD=$(pwd -P)
-    popd
-    # Start alacritty with the working directory
-    alacritty --working-directory $SHELL_CWD
+	# Get PID. If _NET_WM_PID isn't set, bail.
+	PID=$(xprop -id $ACTIVE_WINDOW | grep _NET_WM_PID | grep -oP "\d+")
+	if [[ "$PID" == "" ]]
+	then
+		alacritty
+	fi
+	# Get first child of terminal
+	CHILD_PID=$(pgrep -P $PID)
+	if [[ "$PID" == "" ]]
+	then
+		alacritty
+	fi
+	# Get current directory of child. The first child should be the shell.
+	pushd "/proc/${CHILD_PID}/cwd"
+	SHELL_CWD=$(pwd -P)
+	ssh="$(findSSH $CHILD_PID 10)"
+	#osdc SSH SSH SSH "$ssh"
+
+	popd
+	# Start alacritty with the working directory
+	if [[ "$ssh" == "" ]];
+	then
+	#//osdc $SHELL_CWD
+		while IFS= read -rd '' var; do export "$var"; done </proc/$CHILD_PID/environ
+		alacritty --working-directory $SHELL_CWD
+	else
+		sshCom="$(ps -p $ssh -o command | sed -n 2p)"
+		ssh_cwd="$(xdotool getwindowfocus getwindowname)"
+		ssh_cwd="$(printf "%s\n" "${ssh_cwd##*:}")"
+		#osdc $ssh_cwd
+		#echo "$sshCom" > ~/.tmpSSH
+		export LC_CD="$ssh_cwd"
+		sshCom="${sshCom::3} -o SendEnv=LC_CD ${sshCom:3}"
+		while IFS= read -rd '' var; do export "$var"; done </proc/$ssh/environ
+		alacritty --working-directory $SHELL_CWD -e bash -i -c "$sshCom"
+	fi
 else
-    alacritty
+	alacritty
 fi
