@@ -4,8 +4,8 @@ whileok()
 {
 	for ((i=0;i<3;i++))
 	do
+		sleep 10
 		ping 8.8.8.8 -c 1 >/dev/null && i=0
-		sleep 1
 	done
 }
 

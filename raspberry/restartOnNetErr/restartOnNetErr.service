@@ -1,10 +1,10 @@
 [Unit]
-Description=Tunel
+Description=Restart On Net Err
 After=network.target
 
 [Service]
 User=root
-ExecStart=/usr/bin/tunel
+ExecStart=/usr/bin/restartOnNetErr
 Restart=on-failure
 
 [Install]
