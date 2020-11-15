@@ -12,6 +12,7 @@ PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD}\007"'
 if [[ "$LC_CD" != "" ]];
 then
 	cd "$LC_CD";
+	export -n LC_CD
 fi
 
 # don't put duplicate lines or lines starting with space in the history.
