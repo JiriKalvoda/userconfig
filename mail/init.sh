@@ -12,6 +12,7 @@ sudo systemctl enable offlineimap-jiri
 mkdir -p ~/.config/neomutt
 ln -sr neomuttrc ~/.config/neomutt/
 ln -sr m ~/bin
+ln -sr m-daemon ~/bin
 
 
 ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
@@ -21,7 +22,7 @@ ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
 	do
 		if [[ "$i" != "INBOX" ]]
 		then 
-			ln -sr $i INBOX/.$i
+			ln -sr $i INBOX/
 		fi
 	done 
 

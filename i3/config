@@ -346,7 +346,7 @@ bindcode 123 exec "echo $(( $(cat .config/micloop/volume)  + 10000 )) > .config/
 #bindsym Control+Print exec gnome-screenshot -i
 #bindsym $mod+Print exec printscreengimp
 
-bindsym Print exec "maim -suo | xclip -selection clipboard -t image/png"
+bindsym Print exec "maim -suo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"
 bindsym Shift+Print exec "maim -suo > ~/screenshot.png ; convert ~/screenshot.png $(zenity --file-selection --save --file-filter='Picture | *.png *.jpg *.gif *.bmp' --confirm-overwrite)"
 bindsym Ctrl+Shift+Print exec "maim -uo | convert png:- `zenity --file-selection --save --file-filter='Picture | *.png *.jpg *.gif *.bmp' --confirm-overwrite`"
 bindsym Ctrl+Print exec " maim -uo | xclip -selection clipboard -t image/png"
@@ -356,6 +356,7 @@ exec --no-startup-id /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agen
 
 for_window [class=".*"] border pixel 1
 for_window [class="zoom"] move container to workspace ZOOM
+for_window [title="MAIL"] move container to workspace MAIL
 
 for_window [title="Jitsi Meet"] floating enable 
 
@@ -380,6 +381,7 @@ bindsym $mod+Shift+o exec --no-startup-id killall -3 mate-session; exec --no-sta
 exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
 
 exec --no-startup-id "sleep 2; osdd-run & sleep 1;osdc --color=red START"
+exec --no-startup-id "sleep 5; terminal -e m-daemon"
 
 bindcode      94 exec "osdc --duration=1 --log=1 \\"\\""
 bindcode $mod+51 exec "osdc --duration=1 --log=1 \\"\\""
