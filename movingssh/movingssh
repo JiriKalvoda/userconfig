@@ -61,6 +61,9 @@ sleepTime=10
 
 configFile=~/.movingssh/$name
 mountpoint=~/m/$name
+servermountpoint=/
+[[ "$MS_MOUNTPOINT" != "" ]] && mountpoint="$MS_MOUNTPOINT"
+[[ "$MS_SERVERMOUNTPOINT" != "" ]] && servermountpoint="$MS_SERVERMOUNTPOINT"
 
 pipeFile=$(mktemp -u)
 mkfifo $pipeFile
@@ -302,14 +305,14 @@ then
 	fi
 	tryLocalDownload
 	echo NO >&3
-	mkdir ~/m/$name
+	mkdir $mountpoint
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
 		echo LOCAL
-		LD_SSHTYPE=local sshfs $username@${config[ipA]}:/ -p ${config[portA]} $keyCMD ~/m/$name
+		LD_SSHTYPE=local sshfs $username@${config[ipA]}:$servermountpoint -p ${config[portA]} $keyCMD $mountpoint
 	else
 		echo '********REMOTE**********'
-		LD_SSHTYPE=remote sshfs $username@${config[ipB]}:/ -p ${config[portB]} $keyCMD ~/m/$name
+		LD_SSHTYPE=remote sshfs $username@${config[ipB]}:$servermountpoint -p ${config[portB]} $keyCMD $mountpoint
 	fi
 else
 	tryLocalDownload &
