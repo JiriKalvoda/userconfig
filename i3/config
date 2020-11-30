@@ -111,40 +111,85 @@ bindsym $mod+Shift+a focus child
 #bindsym $mod+d focus child
 
 # switch to workspace
-bindsym $mod+1 workspace 1
-bindsym $mod+2 workspace 2
-bindsym $mod+3 workspace 3
-bindsym $mod+4 workspace 4
-bindsym $mod+5 workspace 5
-bindsym $mod+6 workspace 6
-bindsym $mod+7 workspace 7
-bindsym $mod+8 workspace 8
-bindsym $mod+9 workspace 9
-bindsym $mod+0 workspace 10
+bindcode $mod+49  workspace 0
+bindsym  $mod+1   workspace 1
+bindsym  $mod+2   workspace 2
+bindsym  $mod+3   workspace 3
+bindsym  $mod+4   workspace 4
+bindsym  $mod+5   workspace 5
+bindsym  $mod+6   workspace 6
+bindsym  $mod+7   workspace 7
+bindsym  $mod+8   workspace 8
+bindsym  $mod+9   workspace 9
+bindsym  $mod+0   workspace 10
+bindcode $mod+20  workspace 11
+bindcode $mod+21  workspace 12
+bindsym  $mod+F1  workspace 21
+bindsym  $mod+F2  workspace 22
+bindsym  $mod+F3  workspace 23
+bindsym  $mod+F4  workspace 24
+bindsym  $mod+F5  workspace 25
+bindsym  $mod+F6  workspace 26
+bindsym  $mod+F7  workspace 27
+bindsym  $mod+F8  workspace 28
+bindsym  $mod+F9  workspace 29
+bindsym  $mod+F10 workspace 30
+bindsym  $mod+F11 workspace 31
+bindsym  $mod+F12 workspace 32
 
 # move focused container to workspace
-bindsym $mod+Shift+1 move container to workspace 1
-bindsym $mod+Shift+2 move container to workspace 2
-bindsym $mod+Shift+3 move container to workspace 3
-bindsym $mod+Shift+4 move container to workspace 4
-bindsym $mod+Shift+5 move container to workspace 5
-bindsym $mod+Shift+6 move container to workspace 6
-bindsym $mod+Shift+7 move container to workspace 7
-bindsym $mod+Shift+8 move container to workspace 8
-bindsym $mod+Shift+9 move container to workspace 9
-bindsym $mod+Shift+0 move container to workspace 10
+bindcode $mod+Shift+49  move container to workspace 0
+bindsym  $mod+Shift+1   move container to workspace 1
+bindsym  $mod+Shift+2   move container to workspace 2
+bindsym  $mod+Shift+3   move container to workspace 3
+bindsym  $mod+Shift+4   move container to workspace 4
+bindsym  $mod+Shift+5   move container to workspace 5
+bindsym  $mod+Shift+6   move container to workspace 6
+bindsym  $mod+Shift+7   move container to workspace 7
+bindsym  $mod+Shift+8   move container to workspace 8
+bindsym  $mod+Shift+9   move container to workspace 9
+bindsym  $mod+Shift+0   move container to workspace 10
+bindcode $mod+Shift+20  move container to workspace 11
+bindcode $mod+Shift+21  move container to workspace 12
+bindsym  $mod+Shift+F1  move container to workspace 21
+bindsym  $mod+Shift+F2  move container to workspace 22
+bindsym  $mod+Shift+F3  move container to workspace 23
+bindsym  $mod+Shift+F4  move container to workspace 24
+bindsym  $mod+Shift+F5  move container to workspace 25
+bindsym  $mod+Shift+F6  move container to workspace 26
+bindsym  $mod+Shift+F7  move container to workspace 27
+bindsym  $mod+Shift+F8  move container to workspace 28
+bindsym  $mod+Shift+F9  move container to workspace 29
+bindsym  $mod+Shift+F10 move container to workspace 30
+bindsym  $mod+Shift+F11 move container to workspace 31
+bindsym  $mod+Shift+F12 move container to workspace 32
 
 # move and switch to workspace
-bindsym $mod+Ctrl+1 move container to workspace  1; workspace  1
-bindsym $mod+Ctrl+2 move container to workspace  2; workspace  2
-bindsym $mod+Ctrl+3 move container to workspace  3; workspace  3
-bindsym $mod+Ctrl+4 move container to workspace  4; workspace  4
-bindsym $mod+Ctrl+5 move container to workspace  5; workspace  5
-bindsym $mod+Ctrl+6 move container to workspace  6; workspace  6
-bindsym $mod+Ctrl+7 move container to workspace  7; workspace  7
-bindsym $mod+Ctrl+8 move container to workspace  8; workspace  8
-bindsym $mod+Ctrl+9 move container to workspace  9; workspace  9
-bindsym $mod+Ctrl+0 move container to workspace 10; workspace 10
+bindcode $mod+Ctrl+49  move container to workspace 0;  workspace 0
+bindsym  $mod+Ctrl+1   move container to workspace 1;  workspace 1
+bindsym  $mod+Ctrl+2   move container to workspace 2;  workspace 2
+bindsym  $mod+Ctrl+3   move container to workspace 3;  workspace 3
+bindsym  $mod+Ctrl+4   move container to workspace 4;  workspace 4
+bindsym  $mod+Ctrl+5   move container to workspace 5;  workspace 5
+bindsym  $mod+Ctrl+6   move container to workspace 6;  workspace 6
+bindsym  $mod+Ctrl+7   move container to workspace 7;  workspace 7
+bindsym  $mod+Ctrl+8   move container to workspace 8;  workspace 8
+bindsym  $mod+Ctrl+9   move container to workspace 9;  workspace 9
+bindsym  $mod+Ctrl+0   move container to workspace 10; workspace 10
+bindcode $mod+Ctrl+20  move container to workspace 11; workspace 11
+bindcode $mod+Ctrl+21  move container to workspace 12; workspace 12
+bindsym  $mod+Ctrl+F1  move container to workspace 21; workspace 21
+bindsym  $mod+Ctrl+F2  move container to workspace 22; workspace 22
+bindsym  $mod+Ctrl+F3  move container to workspace 23; workspace 23
+bindsym  $mod+Ctrl+F4  move container to workspace 24; workspace 24
+bindsym  $mod+Ctrl+F5  move container to workspace 25; workspace 25
+bindsym  $mod+Ctrl+F6  move container to workspace 26; workspace 26
+bindsym  $mod+Ctrl+F7  move container to workspace 27; workspace 27
+bindsym  $mod+Ctrl+F8  move container to workspace 28; workspace 28
+bindsym  $mod+Ctrl+F9  move container to workspace 29; workspace 29
+bindsym  $mod+Ctrl+F10 move container to workspace 30; workspace 30
+bindsym  $mod+Ctrl+F11 move container to workspace 31; workspace 31
+bindsym  $mod+Ctrl+F12 move container to workspace 32; workspace 32
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
