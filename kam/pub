@@ -25,6 +25,13 @@ do
 	fi
 done
 
+if [[ $deleteTime != "" ]]
+then
+	echo Wil be deleted at $deleteTime
+	echo 
+	ssh $host -p $port  "echo $deleteTime > $dir/$rcode.delete; chmod 600 $dir/$rcode.delete" || exit 100
+fi
+
 if [[ $file == "" ]]
 then
 	cat << EOF
@@ -60,7 +67,7 @@ do
 	else
 		if [[ $f != "" ]];
 		then
-			scp -P $port $f $host:$dir/$rcode/$toName || exit 100
+			scp -r -P $port $f $host:$dir/$rcode/$toName || exit 100
 			[[ "$toName" == "" ]] && links="$links\n$printprefix/$rcode/$f"
 			[[ "$toName" == "" ]] || links="$links\n$printprefix/$rcode/$toName"
 		fi
@@ -75,11 +82,5 @@ echo -e $links
 echo
 echo "$printprefix/$rcode/"
 
-if [[ $deleteTime != "" ]]
-then
-	echo 
-	echo Wil be deleted at $deleteTime
-	ssh $host -p $port  "echo $deleteTime > $dir/$rcode.delete; chmod 600 $dir/$rcode.delete" || exit 100
-fi
 
 
