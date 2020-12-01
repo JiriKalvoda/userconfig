@@ -1,0 +1,85 @@
+#!/bin/bash
+
+for var in "$@"
+do
+	if [[ "$var" == -* ]]
+	then
+		if [[ "$var" == -t* ]]
+		then
+			echo >/dev/null
+		elif [[ "$var" == -d* ]]
+		then
+			v=${var:2}
+			deleteTime="$(date -d"$v")"
+		else
+			echo "option $var not valid"
+			exit 2
+		fi
+	else
+		if [[ ! ( -f "$var" ||  -d  "$var"  ) ]]
+		then
+			file not exists
+		fi
+		file="$file $var"
+		
+	fi
+done
+
+if [[ $file == "" ]]
+then
+	cat << EOF
+Usage:
+
+	pub [-options] file <[-options2] file2 < ... > >
+
+Options:
+	-dDATE delete at date
+	-tNAME name this file as NAME
+EOF
+	exit 1
+fi
+
+[[ $port == "" ]] && [[ $host == "" ]] && port=443
+[[ $port == "" ]] && port=80
+[[ $host == "" ]] && host=jirikalvoda@sneaky.kam.mff.cuni.cz
+[[ $dir == "" ]] && dir=WWW/priv
+[[ $printprefix == "" ]] && printprefix="https://kam.mff.cuni.cz/~jirikalvoda/priv"
+
+rcode=$(head /dev/random -c100 |  sha224sum | head -c30)
+
+ssh $host -p $port  mkdir $dir/$rcode || exit 100
+f=""
+for var in "$@" "end"
+do
+	if [[ "$var" == -* ]]
+	then
+		if [[ "$var" == -t* ]]
+		then
+			toName="${var:2}"
+		fi
+	else
+		if [[ $f != "" ]];
+		then
+			scp -P $port $f $host:$dir/$rcode/$toName || exit 100
+			[[ "$toName" == "" ]] && links="$links\n$printprefix/$rcode/$f"
+			[[ "$toName" == "" ]] || links="$links\n$printprefix/$rcode/$toName"
+		fi
+		toName=""
+		f="$var"
+		
+	fi
+done
+ssh $host -p $port  "chmod -R ugo-x,u+rwX,go+rX,go-w $dir/$rcode/" || exit 100
+
+echo -e $links
+echo
+echo "$printprefix/$rcode/"
+
+if [[ $deleteTime != "" ]]
+then
+	echo 
+	echo Wil be deleted at $deleteTime
+	ssh $host -p $port  "echo $deleteTime > $dir/$rcode.delete; chmod 600 $dir/$rcode.delete" || exit 100
+fi
+
+
