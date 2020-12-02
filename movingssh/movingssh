@@ -41,6 +41,8 @@ Parametrs:
 	-m	sshfs mount
 	-u	umount
 	-U	force umount
+	-t	Make tunel
+	-T	Delete tunel route
 
 EOF
 	exit 0
@@ -127,6 +129,19 @@ parseConfig()
 			config[$lhs]="$rhs"
 		    fi
 		done < $configFile
+		if [[ "$1" != "notunel" ]] && [ -f $configFile-tunel ] 
+		then
+			while IFS='= ' read -r lhs rhs
+			do
+			    if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
+				rhs="${rhs%%\#*}"    # Del in line right comments
+				rhs="${rhs%%*( )}"   # Del trailing spaces
+				rhs="${rhs%\"*}"     # Del opening string quotes 
+				rhs="${rhs#\"*}"     # Del closing string quotes 
+				config[$lhs]="$rhs"
+			    fi
+			done < $configFile-tunel
+		fi
 	else
 		debug NOCONFIG
 	fi
@@ -248,6 +263,11 @@ local()
 	fi
 }
 
+if [[ "$minus" == *"T"* ]]
+then
+	rm $configFile-tunel
+fi
+
 parseConfig
 printAddres
 if [[ "$minus" == *"u"* || "$minus" == *"U"* ]]
@@ -277,6 +297,17 @@ if [[ "$minus" == *"d"* ]]
 then
 	download
 fi
+if [[ "$minus" == *"t"* ]]
+then
+	parseConfig notunel
+	tunelPort=$(( 40000 + $RANDOM % 10000 ))
+	echo -e "ipB=localhost\nportB=$tunelPort" > $configFile-tunel
+	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m"
+	ssh -p 443 jirikalvoda@sneaky.kam.mff.cuni.cz -L $tunelPort:${config[ipB]}:${config[portB]} "read"
+	echo END
+	rm $configFile-tunel
+	exit 0
+fi
 if [[ "$minus" == *"l"* ]]
 then
 	local
@@ -297,6 +328,10 @@ then
 	fi
 elif [[ "$minus" == *"m"* ]]
 then
+	if [[ -d "$mountpoint" || -f "$mountpoint" ]]
+	then
+		rmdir $mountpoint
+	fi
 	if [[ -d "$mountpoint" || -f "$mountpoint" ]]
 	then
 		echo DIRECTORY $mountpoint EXISTS
