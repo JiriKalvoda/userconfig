@@ -25,6 +25,14 @@ do
 	fi
 done
 
+[[ $port == "" ]] && [[ $host == "" ]] && port=443
+[[ $port == "" ]] && port=80
+[[ $host == "" ]] && host=jirikalvoda@sneaky.kam.mff.cuni.cz
+[[ $dir == "" ]] && dir=WWW/priv
+[[ $printprefix == "" ]] && printprefix="https://kam.mff.cuni.cz/~jirikalvoda/priv"
+
+rcode=$(head /dev/random -c100 |  sha224sum | head -c30)
+
 if [[ $deleteTime != "" ]]
 then
 	echo Wil be deleted at $deleteTime
@@ -46,13 +54,6 @@ EOF
 	exit 1
 fi
 
-[[ $port == "" ]] && [[ $host == "" ]] && port=443
-[[ $port == "" ]] && port=80
-[[ $host == "" ]] && host=jirikalvoda@sneaky.kam.mff.cuni.cz
-[[ $dir == "" ]] && dir=WWW/priv
-[[ $printprefix == "" ]] && printprefix="https://kam.mff.cuni.cz/~jirikalvoda/priv"
-
-rcode=$(head /dev/random -c100 |  sha224sum | head -c30)
 
 ssh $host -p $port  mkdir $dir/$rcode || exit 100
 f=""
