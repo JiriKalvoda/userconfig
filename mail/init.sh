@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 
 sudo ln -sr offlineimap-run /usr/bin
-sudo g++ offlineimap-deamon.cpp -o /usr/bin/offlineimap-deamon
+sudo g++ offlineimap-deamon.cpp -o /usr/bin/offlineimap-deamon -pthread
 
 sudo cp offlineimap-jiri.service /lib/systemd/system
 sudo ln -sr mailcap /etc/
@@ -22,7 +22,13 @@ ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
 	do
 		if [[ "$i" != "INBOX" ]]
 		then 
-			ln -sr $i INBOX/
+			unlink $i/$i 
+			unlink INBOX/$i 
+
+			if [[ ! -L INBOX/.$i ]]
+			then
+				ln -sr $i INBOX/.$i
+			fi
 		fi
 	done 
 
