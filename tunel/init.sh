@@ -10,6 +10,7 @@ sudo systemctl enable tunel
 
 mkdir ~/.tunel -p
 ln -s /usr/bin/ssh ~/.tunel/ssh-tunel
+ln -s /usr/bin/ssh ~/.tunel/ssh-sleep
 ln -s /usr/bin/ssh ~/.tunel/ssh-check
 if [[ ! -f ~/.tunel/config ]]
 then
