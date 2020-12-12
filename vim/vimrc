@@ -215,10 +215,11 @@ function! Compile(isVimRun)
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	elseif s == "ptex"
+		execute "AddExec pdftex ".NameAll()." ".CompileArg()
+	elseif s == "ctex"
 		execute "AddExec pdfcsplain ".NameAll()." ".CompileArg()
 	elseif s == "ltex"
 		execute "AddExec luatex ".NameAll()." ".CompileArg()
-	elseif s == "asy"
 	elseif s == "asy"
 		execute "AddExec asy ".NameAll()." ".CompileArg()
 	elseif s == "make"
@@ -245,7 +246,7 @@ function! Run(isVimRun,input)
 		execute "AddExec bash ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "python"
 		w
-		execute "AddExec python3 ".NameAll()." ".RunArg()." ".a:input
+		execute "AddExec bpython ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "arduino"
 		execute "AddExec arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()." ".a:input
 	elseif s == "cmake"
@@ -253,6 +254,8 @@ function! Run(isVimRun,input)
 	elseif s == "tex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ptex"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
+	elseif s == "ctex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ltex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
