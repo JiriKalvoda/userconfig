@@ -76,8 +76,7 @@ timeoutCMD="-o ConnectTimeout=$timeout"
 envCMD="-o SendEnv=LD_SSHTYPE"
 keyCMD="-o HostKeyAlias=$name"
 
-downloadServer="jirikalvoda@kam.mff.cuni.cz"
-
+[[ "$downloadServer" == "" ]] && downloadServer="jirikalvoda@kam.mff.cuni.cz"
 
 
 debug()
