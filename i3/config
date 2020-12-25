@@ -439,4 +439,7 @@ bindcode Ctrl+Shift+$mod+51 exec "terminal -e bash -i -c \\"cat ~/.osdd_log;read
 
 bindcode $mod+94 exec "terminal"
 
-bindcode $mod+61 exec "vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f"
+bindcode $mod+61 exec "vlc http://192.168.1.191:9981/playlist/channels"
+bindcode $mod+Shift+61 exec "vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f"
+bindcode $mod+Ctrl+61 exec "vlc http://localhost:9981/playlist/channels"
+bindcode $mod+Ctrl+Shift+61 exec "vlc http://localhost:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://localhost:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://localhost:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f"
