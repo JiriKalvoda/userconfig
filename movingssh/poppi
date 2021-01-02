@@ -1,0 +1,4 @@
+#!/bin/bash
+echo localhost:3103 > ~/.secret/mqtt/poppi-all.tunel
+movingssh -dx poppi  -L3103:localhost:1883
+rm ~/.secret/mqtt/poppi-all.tunel

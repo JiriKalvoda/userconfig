@@ -1,0 +1,2 @@
+#!/bin/bash
+movingssh -dx rpi4 -L9981:localhost:9981
