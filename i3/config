@@ -234,17 +234,17 @@ mode "resize" {
         bindsym Shift+Right resize grow   width  $smallResize px or $smallResize ppt
 
         # back to normal: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
+        bindsym Return mode "default"; exec i3-mode-log default
+        bindsym Escape mode "default"; exec i3-mode-log default
 
         # back  $mod+o normal: Enter or Escape
-        bindsym $mod+Return mode "default"
-        bindsym $mod+Escape mode "default"
+        bindsym $mod+Return mode "default"; exec i3-mode-log default
+        bindsym $mod+Escape mode "default"; exec i3-mode-log default
 
 
 }
 
-bindsym $mod+r mode "resize"
+bindsym $mod+r mode "resize"; exec i3-mode-log resize
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
@@ -272,18 +272,18 @@ exec numlockx on
 floating_modifier $mod
 
 
-bindsym $mod+Escape mode "LOCK MOD+ESC"
+bindsym $mod+Escape mode "LOCK MOD+ESC"; exec i3-mode-log LOCK-MOD+ESC
 mode "LOCK MOD+ESC"
 {
-        bindsym $mod+Escape mode "default"
+        bindsym $mod+Escape mode "default"; exec i3-mode-log default
 }
-bindsym $mod+Shift+Escape mode "LOCK MOD+Shift+ESC"
+bindsym $mod+Shift+Escape mode "LOCK MOD+Shift+ESC"; exec i3-mode-log LOCK-MOD-Shift-ESC
 mode "LOCK MOD+Shift+ESC"
 {
-        bindsym $mod+Shift+Escape mode "default"
+        bindsym $mod+Shift+Escape mode "default"; exec i3-mode-log default
 }
 
-bindsym $mod+x mode "System modifikator"
+bindsym $mod+x mode "System modifikator"; exec i3-mode-log System-modifikator
 mode "System modifikator"
 {
 	bindsym w exec light - 0.9 ; exec lightGUI
@@ -312,8 +312,8 @@ mode "System modifikator"
 	bindsym m exec xrandr --auto; exec  xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500
 
         # back to normal: Enter or Escape
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
+        bindsym Return mode "default"; exec i3-mode-log default
+        bindsym Escape mode "default"; exec i3-mode-log default
 
 
 	bindsym $mod+w exec light - 0.9 ; exec lightGUI
@@ -333,8 +333,8 @@ mode "System modifikator"
 	bindsym $mod+m exec xrandr --auto; exec  xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500
 
         # back  $mod+o normal: Enter or Escape
-        bindsym $mod+Return mode "default"
-        bindsym $mod+Escape mode "default"
+        bindsym $mod+Return mode "default"; exec i3-mode-log default
+        bindsym $mod+Escape mode "default"; exec i3-mode-log default
 
 	bindsym b exec "setxkbmap us,cz -variant ,ucw -option grp:caps_switch"
 
@@ -375,8 +375,8 @@ mode "System modifikator"
 	bindsym Ctrl+Shift+apostrophe exec "diskSleepGUI sdd umount"
 
 	bindsym bracketright exec "notify-send \\"$(lsblk)\\""
-	bindsym Shift+bracketright mode "default"; exec "gksudo -g gparted"
-	bindsym Ctrl+bracketright mode "default"; exec "gksudo -g gnome-disks"
+	bindsym Shift+bracketright mode "default"; exec "gksudo -g gparted"; exec i3-mode-log default
+	bindsym Ctrl+bracketright mode "default"; exec "gksudo -g gnome-disks"; exec i3-mode-log default
 
 	bindcode      94 exec --no-startup-id "osdd-run & sleep 1;osdc --color=red RESTART"
 	bindcode $mod+51 exec --no-startup-id "osdd-run & sleep 1;osdc --color=red RESTART"
