@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh ksp-web@gimli.ms.mff.cuni.cz  -L 13306:localhost:3306

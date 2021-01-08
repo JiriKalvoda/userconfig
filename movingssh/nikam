@@ -1,0 +1,2 @@
+#!/bin/bash
+ssh -D 3128 kam.mff.cuni.cz 
