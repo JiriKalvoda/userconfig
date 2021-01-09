@@ -43,7 +43,14 @@ do
 	whileok $pid &
 	echo -ne "\033]0;MAIL\007"
 	osdc --log=2 --color=red "TRY START MAIL"
+	startTime=$(date +%s)
 	m
+	timer=$(( $(date +%s) - $startTime )) 
+	if (( timer < 60 ))
+	then
+		echo STOP, BUT WAITING
+		sleep $(( 60 - timer ))
+	fi
 	(
 		pidwok=$BASHPID
 		kilrek $pid $pidwok 5
