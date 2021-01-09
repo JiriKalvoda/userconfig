@@ -9,9 +9,9 @@ sudo systemctl daemon-reload
 sudo systemctl enable tunel
 
 mkdir ~/.tunel -p
-ln -s /usr/bin/ssh ~/.tunel/ssh-tunel
-ln -s /usr/bin/sleep ~/.tunel/ssh-sleep
-ln -s /usr/bin/ssh ~/.tunel/ssh-check
+ln -s `which ssh` ~/.tunel/ssh-tunel
+ln -s `which sleep` ~/.tunel/ssh-sleep
+ln -s `which ssh` ~/.tunel/ssh-check
 if [[ ! -f ~/.tunel/config ]]
 then
 	cp config ~/.tunel
