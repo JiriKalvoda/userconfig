@@ -11,6 +11,7 @@ do
 		then
 			v=${var:2}
 			deleteTime="$(date -d"$v")"
+			if [[ $? == 1 ]]; then exit 1; fi;
 		else
 			echo "option $var not valid"
 			exit 2
