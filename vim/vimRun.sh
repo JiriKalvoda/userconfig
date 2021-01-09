@@ -2,12 +2,14 @@
 set -m
 kilrek()
 {
+	echo kilrek $1
 	pgrep -P $1 | while read p;
 	do
 		kilrek $p;
-		#echo $p;
-		kill $p;
+		echo $p;
+		kill -n 9 $p;
 	done
+	echo ENDrek $1
 
 }
 wdel()
@@ -18,23 +20,23 @@ while true;
 do
 	sleep 0.02
 	run="$(cat $1 2>/dev/null)";
-	#echo run:$run
+	echo run:$run
 	if [ "$run" != "" ]
 	then
 		break;
 	fi
-	kill -0 $2 2>/dev/null
-	if [[ $? = 1 ]]
-	then
-		#echo NO PROCES  BREAK | lolcat
-		break;
-	fi
-	kill -0 $3 2>/dev/null
-	if [[ $? = 1 ]]
-	then
-		#echo NO MAIN PROCES  BREAK | lolcat
-		break;
-	fi
+	#kill -0 $2 2>/dev/null 
+	#if [[ $? = 1 ]]
+	#then
+		##echo NO PROCES  BREAK | lolcat
+		#break;
+	#fi
+	#kill -0 $3 2>/dev/null
+	#if [[ $? = 1 ]]
+	#then
+		##echo NO MAIN PROCES  BREAK | lolcat
+		#break;
+	#fi
 done
 		#echo BREAK WDEL | lolcat
 		kilrek $2
@@ -53,6 +55,7 @@ fi
 while true;
 do
 	run="$(cat $1 2>/dev/null)";
+	echo ZDE2
 	if [ "$run" != "" ]
 	then
 		#echo START | lolcat
@@ -67,12 +70,14 @@ do
 		fi
 		lastBash=1;
 	fi
+	echo ZDE3
 	kill -0 $2 2>/dev/null
 	if [[ $? = 1 ]]
 	then
 		#echo NO PROCES  BREAK | lolcat
 		break;
 	fi
+	echo ZDE4
 	i=$(( i  + 1))
 	#echo  run X$run X
 	(ISBREAKEBLE=1  bash -c "sleep 0.1;$run" ) &
@@ -81,5 +86,7 @@ do
 	#echo $p $$
 	#(sleep 2; pkill -P $p ) &
 	wdel $1 $p $mainProces &
+	echo ZDE0
 	fg $(( 2 * i + 1 )) 1>/dev/null
+	echo ZDE1
 done
