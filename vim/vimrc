@@ -68,10 +68,10 @@ let g:useVimRun = 0
 command! -nargs=+ AddExecF  let g:toExec = g:toExec . <q-args>
 command! -nargs=+ AddExec  AddExecF promt; echo <q-args>; <args>;
 command! -nargs=+ AddBashF  let g:toExec = <q-args>
-command! -nargs=* AddBashG  AddBashF bash -i -c <q-args>;
+command! -nargs=* AddBashG  AddBashF bash-rc -i <q-args>;
 command!  AddBash  execute "AddBashG ".g:toExec
 command! -nargs=+ AddLessF  let g:toExec = <q-args>
-command! -nargs=* AddLessG  AddLessF bash -i -c <q-args>;
+command! -nargs=* AddLessG  AddLessF bash-rc -i <q-args>;
 command!  AddLess  execute "AddLessF (".g:toExec."  )2>&1 | less -r"
 function! B(in)
 	execute "AddExec ".a:in
@@ -216,6 +216,8 @@ function! Compile(isVimRun)
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	elseif s == "ptex"
 		execute "AddExec pdftex ".NameAll()." ".CompileArg()
+	elseif s == "ksptex"
+		execute "AddExec ~/org/ksp/bin/tex2pdf ".CompileArg()." ".NameAll()." ".NameNoE().".pdf"
 	elseif s == "ctex"
 		execute "AddExec pdfcsplain ".NameAll()." ".CompileArg()
 	elseif s == "ltex"
@@ -247,11 +249,16 @@ function! Run(isVimRun,input)
 	elseif s == "python"
 		w
 		execute "AddExec bpython ".NameAll()." ".RunArg()." ".a:input
+	elseif s == "python3"
+		w
+		execute "AddExec python3 ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "arduino"
 		execute "AddExec arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()." ".a:input
 	elseif s == "cmake"
 		execute "AddExec ".NameDir()."/".split(NameDir(),"/")[-1]." ".RunArg()." ".a:input
 	elseif s == "tex"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
+	elseif s == "ksptex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ptex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
