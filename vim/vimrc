@@ -68,10 +68,10 @@ let g:useVimRun = 0
 command! -nargs=+ AddExecF  let g:toExec = g:toExec . <q-args>
 command! -nargs=+ AddExec  AddExecF promt; echo <q-args>; <args>;
 command! -nargs=+ AddBashF  let g:toExec = <q-args>
-command! -nargs=* AddBashG  AddBashF bash-rc -i <q-args>;
+command! -nargs=* AddBashG  AddBashF bash-rc -i -c <q-args>;
 command!  AddBash  execute "AddBashG ".g:toExec
 command! -nargs=+ AddLessF  let g:toExec = <q-args>
-command! -nargs=* AddLessG  AddLessF bash-rc -i <q-args>;
+command! -nargs=* AddLessG  AddLessF bash-rc -i -c <q-args>;
 command!  AddLess  execute "AddLessF (".g:toExec."  )2>&1 | less -r"
 function! B(in)
 	execute "AddExec ".a:in
