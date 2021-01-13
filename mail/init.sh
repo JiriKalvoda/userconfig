@@ -15,7 +15,11 @@ ln -sr m ~/bin
 ln -sr m-daemon ~/bin
 
 
-ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
+if [[ ! -L ~/Maildir ]]
+then
+	ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
+fi
+
 (
 	cd ~/Maildir-no-dot
 	for i in *;
