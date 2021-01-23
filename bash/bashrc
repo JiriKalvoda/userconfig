@@ -5,7 +5,8 @@
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
-      *) return;;
+      *) 
+	      [[ "$use_bashrc" = "" ]] && return;;
 esac
 
 PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD}\007"'
