@@ -423,3 +423,7 @@ map <silent> ,n o$$<ESC>o$$<ESC>O
 map <silent> ,N O$$<ESC>o$$<ESC>O
 "map ,, yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
 
+
+
+se shiftwidth=4
+se tabstop=4
