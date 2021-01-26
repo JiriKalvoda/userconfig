@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo -e "$1" > ~/.cm
+offlineimap-run if
+
+if [[ -f ~/bin/m-repeat-notification-devspec ]]
+then 
+	~/bin/m-repeat-notification-devspec "$1"
+fi
+
