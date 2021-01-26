@@ -9,8 +9,12 @@ then
 elif [[ "$1" == "h" ]]
 then
 	kam -Y -t="/home/jirikalvoda/bin/m $1"
-else
-	file=$1
+elif [[ "$1" == "rf" ]]
+then
+	kam -Y -t="/home/jirikalvoda/bin/m $2"
+elif [[ "$1" == "lf" ]]
+then
+	file=$2
 	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
 	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
 	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
