@@ -13,6 +13,8 @@ mkdir -p ~/.config/neomutt
 ln -sr neomuttrc ~/.config/neomutt/
 ln -sr m ~/bin
 ln -sr m-daemon ~/bin
+ln -sr m-daemon ~/bin
+ln -sr m-repeat-notification ~/bin
 
 
 if [[ ! -L ~/Maildir ]]
