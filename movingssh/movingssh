@@ -116,7 +116,7 @@ parseConfig()
 	debug PARSE CONFIG
 	#shopt -s extglob
 	declare -g -A config
-	if [ -f $configFile ]
+	if [ -f "$configFile" ]
 	then
 		while IFS='= ' read -r lhs rhs
 		do
