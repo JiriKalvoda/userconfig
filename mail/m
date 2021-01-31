@@ -1,5 +1,10 @@
 #!/bin/bash
 
+active_window()
+{
+	(echo { ;i3-msg -t get_tree | jq | grep focused\":\ true -B1550|  grep \"id\": | tail -n1 ; echo '"a":"b"}') | jq .id
+}
+
 if [[ "$1" == "l" ]]
 then
 	cm -c1  ~/Maildir/.* -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"$0 %s"
@@ -22,4 +27,14 @@ then
 	if [[ "$file" = "." ]]; then file=""; fi
 	neomutt -f "notmuch://?query=folder:\"$file\""
 	offlineimap-run $file
+elif [[ "$1" == "t" ]]
+then
+	shift
+	window="$(active_window)"
+	terminal -e $0 $@ &
+	for i in {0..5}
+	do
+		sleep 0.1
+		i3-msg "[con_id=\"$window\"] resize set 450 px"
+	done
 fi
