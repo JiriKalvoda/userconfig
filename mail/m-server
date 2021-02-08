@@ -1,11 +1,16 @@
 #!/bin/bash
 if [[ "$1" == "" ]]
 then
-	/home/jirikalvoda/bin/cm -c1 -C60 ~/Maildir/.* -od -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"echo terminal -e \~/bin/m %s \"&\" |/home/jirikalvoda/bin/osdc --to=stdout - " -r"to:stdout\n:(echo -e \"%t %n %m%B\" > ~/.cm;offlineimap-run if) & \n\n" -R"\\\\n<%a> %n %m"
-	#/home/jirikalvoda/bin/cm -c1 -C15 -r "to:stdout\n:echo -e \"%t %n%b\" > ~/.cm;~/bin/offlineimap-run if\n\n" ~/Maildir/.* -od -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"echo terminal -e \~/bin/m %s \"&\" |/home/jirikalvoda/bin/osdc --to=stdout - "
+	CM_COLOR=red $HOME/bin/cm -c1 -C60 ~/Maildir/.* -od -ob -oo -op -ol1  -os -k -K -Ll2\
+		-sduration=6000 -smin-duration=3000 -scolor=orange\
+		-m" $HOME/bin/osdc --to=exec m t lf %s "\
+		-a]"$HOME/bin/osdc --to=exec m t rf %s"\
+		-a\\"$0 %s"\
+		-a="mutt -f %s"\
+		-r"to:exec\n:m-repeat-notification\n:%t %n %m%B\n\n" -R"\\\\n<%a> %n %m"
 elif [[ "$1" == "h" ]]
 then
-	/home/jirikalvoda/bin/cm -c1  ~/Maildir/.* -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"$0 %s"
+	$HOME/bin/cm -c1  ~/Maildir/.* -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"$0 %s"
 else
 	neomutt -f $1
 fi
