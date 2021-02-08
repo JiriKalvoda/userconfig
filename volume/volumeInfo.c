@@ -19,7 +19,7 @@ int main(int argc,char ** argv)
 	//for(double i=0;i<100;i+=5)
 		//printf("%s",act<=i?"−":"+");
 	//printf("]");
-	sprintf(out,"osdc --color=red --log=0 --duration=500 --min-duration=1 \"%d%% %.1lfdB\" --percent=%d",act,realAct,act);
+	sprintf(out,"osdc --color=red --output=display --duration=500 --min-duration=1 \"%d%% %.1lfdB\" --percent=%d",act,realAct,act);
 	system(out);
 	fclose(f);
 }

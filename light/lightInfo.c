@@ -24,7 +24,7 @@ int main(int argc,char ** argv)
 			//for(double i=0;i<log(lightMax);i+=0.3)
 				//printf("%s",act<i?"−":"+");
 			//printf("]");
-			sprintf(out,"osdc --log=0 --color=red --duration=500 --min-duration=1 \"%d%% %d\" --percent=%d",int(100*act/log(lightMax)+0.5),realAct,int(100*act/log(lightMax)+0.5));
+			sprintf(out,"osdc --output=display --color=red --duration=500 --min-duration=1 \"%d%% %d\" --percent=%d",int(100*act/log(lightMax)+0.5),realAct,int(100*act/log(lightMax)+0.5));
 			system(out);
 			fclose(f);
 			return 0;
