@@ -32,9 +32,9 @@ then
 	shift
 	window="$(active_window)"
 	terminal -e $0 $@ &
-	for i in {0..5}
+	for i in {0..10}
 	do
 		sleep 0.1
-		i3-msg "[con_id=\"$window\"] resize set 450 px"
+		i3-msg "[con_id=\"$window\"] resize set 450 px" 2>/dev/null >/dev/null
 	done
 fi
