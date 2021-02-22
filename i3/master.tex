@@ -1,0 +1,283 @@
+\IiiiLine{set $mod Mod4}%$
+
+%%%%%%%%%%%%%% Local vars %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcount\countI
+\newcount\countJ
+\def\Iter{}
+
+%%%%%%%%%%%%%% Config functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\WorkspaceAll#1#2#3{
+	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoWorkspace{#3}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContWorkspace{#3}}
+	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoWorkspace{#3}}
+}
+
+\def\BindArrUp#1#2{
+	\BindKey{\Key{#1}{3}{8}}{#2}
+	\BindKey{\Key{#1}{9}{0}}{#2}
+}
+
+\def\BindArrDown#1#2{
+	\BindKey{\Key{#1}{3}{7}}{#2}
+	\BindKey{\Key{#1}{10}{1}}{#2}
+}
+
+\def\BindArrLeft#1#2{
+	\BindKey{\Key{#1}{3}{6}}{#2}
+	\BindKey{\Key{#1}{10}{0}}{#2}
+}
+
+\def\BindArrRight#1#2{
+	\BindKey{\Key{#1}{3}{9}}{#2}
+	\BindKey{\Key{#1}{10}{2}}{#2}
+}
+
+\def\StandardReturn
+{
+	\BindKey{\Key{}{2}{13}}{\GoMode{\UpModeName}}
+	\BindKey{\Key{}{0}{0}}{\GoMode{default}}
+	\BindKey{\Key{\Super}{2}{13}}{\GoMode{\UpModeName}}
+	\BindKey{\Key{\Super}{0}{0}}{\GoMode{default}}
+}
+
+\def\AppWorkspace#1#2#3#4{
+	\BindKey{\Key{\Super}{#1}{#2}}{\GoWorkspace{#3}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{\Cmd{i3-msg workspace "#3"; #4}}
+	\BindKey{\Key{\Ctrl\Super}{#1}{#2}}{\ContGoWorkspace{#3}}
+}
+
+%%%%%%%%%%%%%% On start run %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\RunCmd{xrdb ~/.Xresources}
+\RunCmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}
+\RunCmd{sleep 2; osdd-run & sleep 1;osdc --color=red START}
+\RunCmd{/usr/bin/gnome-keyring-deamon --start --components=secrets}
+\RunCmd{numlockx on}
+\RunCmd{sleep 5; terminal -e m-daemon}
+
+%%%%%%%%%%%%%% View option %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\catcode`#11
+% class                 border  bground text    indicator child_border
+\IiiiLine{client.focused          #FF0000 #285577 #FFFFFF #FF0000   #FF0000}
+\IiiiLine{client.focused_inactive #000000 #000000 #FFFFFF #000000   #000000}
+\IiiiLine{client.unfocused        #000000 #000000 #888888 #000000   #000000}
+\IiiiLine{client.urgent           #2F343A #900000 #FFFFFF #900000   #900000}
+\IiiiLine{client.placeholder      #000000 #0C0C0C #FFFFFF #000000   #000000}
+\IiiiLine{client.background       #FFFFFF}
+\catcode`#6
+\IiiiLine{for_window [class=".*"] border pixel 1}
+\IiiiLine{font pango:monospace 9}
+
+\IiiiLine{%
+bar \{%
+        status_command "~/.config/i3/status.out 2>~/.status.log"%
+\}%
+}
+
+
+%%%%%%%%%%%%%% Mouse %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\IiiiLine{floating_modifier $mod} %$
+
+%%%%%%%%%%%%%% Standard workspaces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\for{I}{0}{13}{\countJ\countI
+\WorkspaceAll{1}{\the\countI}{\the\countJ}
+}
+\for{I}{1}{13}{\countJ\countI \advance\countJ 20\relax
+\WorkspaceAll{0}{\the\countI}{\the\countJ}
+}
+
+%%%%%%%%%%%%%% WM Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\for{Iter}\in{{Left}{Right}{Up}{Down}}{
+\csname BindArr\Iter\endcsname{\Super}{\FocusWind{\Iter}}
+\csname BindArr\Iter\endcsname{\Shift\Super}{\MoveCont{\Iter}}
+\csname BindArr\Iter\endcsname{\Ctrl\Super}{\MoveWorkspace{\Iter}}
+}
+
+\BindKey{\Key{\Super}{4}{5}}{\SplitContV}
+\BindKey{\Key{\Super}{3}{5}}{\SplitContH}
+\BindKey{\Key{\Super}{2}{5}}{\SplitContT}
+
+\BindKey{\Key{\Super}{3}{4}}{\FullscreenContToggle}
+
+\BindKey{\Key{\Super}{3}{2}}{\LayoutCont{stacking}}
+\BindKey{\Key{\Super}{2}{2}}{\LayoutCont{tabbed}}
+\BindKey{\Key{\Super}{2}{3}}{\LayoutCont{toggle split}}
+
+\BindKey{\Key{\Shift\Super}{5}{3}}{\FloatingToggleCont}
+\BindKey{\Key{\Super}{5}{3}}{\FocusWind{mode_toggle}}
+
+\BindKey{\Key{\Super}{3}{1}}{\FocusWind{parent}}
+\BindKey{\Key{\Shift\Super}{3}{1}}{\FocusWind{child}}
+
+\BindKey{\Key{\Shift\Super}{2}{4}}{\RestartProg}
+
+% kill window
+\BindKey{\Key{\Super}{2}{1}}{\Cmd{~/.config/i3/i3-kill}}
+\BindKey{\Key{\Shift\Super}{2}{1}}{\IiiiInline{ --release }\Cmd{xkill}}
+\BindKey{\Key{\Ctrl\Super}{2}{1}}{\IiiiInline{ --release }\Cmd{killall xkill}}
+
+% resize window (you can also use the mouse for that)
+\BindKey{\Key{\Super}{2}{4}}{\GoMode{resize}}
+\Mode{resize}{
+	\StandardReturn
+	\def\ResizeContSGLeft{shrink}
+	\def\ResizeContSGRight{grow}
+	\def\ResizeContSGUp{shrink}
+	\def\ResizeContSGDown{grow}
+	\def\ResizeContWHLeft{width}
+	\def\ResizeContWHRight{width}
+	\def\ResizeContWHUp{height}
+	\def\ResizeContWHDown{height}
+	\for{Iter}\in{{Left}{Right}{Up}{Down}}{
+		\csname BindArr\Iter\endcsname{}
+			{\ResizeCont{\csname ResizeContSG\Iter\endcsname}{\csname ResizeContWH\Iter\endcsname}{12}}
+		\csname BindArr\Iter\endcsname{\Shift}
+			{\ResizeCont{\csname ResizeContSG\Iter\endcsname}{\csname ResizeContWH\Iter\endcsname}{2}}
+	}
+}
+
+\BindKey{\Key{\Super}{2}{10}}{\Cmd{~/.config/i3/i3-toggle-border}}
+
+% Locks
+\BindKey{\Key{\Super}{0}{0}}{\GoMode{LOCK-MOD-ESC}}
+\Mode{LOCK-MOD-ESC}{
+	\BindKey{\Key{\Super}{0}{0}}{\GoMode{\UpModeName}}
+}
+
+\BindKey{\Key{\Shift\Super}{0}{0}}{\GoMode{LOCK-MOD-SHIFT-ESC}}
+\Mode{LOCK-MOD-SHIFT-ESC}{
+	\BindKey{\Key{\Shift\Super}{0}{0}}{\GoMode{\UpModeName}}
+}
+
+%%%%%%%%%%%%%% App binding %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% start a terminal
+\BindKey{\Key{\Super}{2}{13}}{\Cmd{xdg-terminal}}
+\BindKey{\Key{\Super}{4}{1}}{\Cmd{terminal}}
+
+% app launcher
+\BindKey{\Key{\Shift\Super}{3}{3}}{\Cmd{dmenu_run}}
+\BindKey{\Key{\Ctrl\Shift\Super}{3}{3}}{\Cmd{xdg-terminal $(dmenu_path | dmenu)}} %$
+\BindKey{\Key{\Super}{3}{3}}{\Cmd{rofi -show combi}}
+\BindKey{\Key{\Ctrl\Super}{3}{3}}{\Cmd{xfce4-appfinder}}
+
+% web brouwsers
+\BindKey{\Key{\Super}{4}{4}}{\Cmd{chromium}}
+
+\BindKey{\Key{\Ctrl\Shift\Super}{4}{2}}{\Cmd{zathura}}
+
+\AppWorkspace{4}{9}{WUI}{~/dev/runWUI/run.sh}
+\IiiiLine{for_window [title="WebUpdatingIndicator compare"] floating enable}
+
+\AppWorkspace{4}{8}{MAIL}{start-mail}
+\IiiiLine{for_window [title="MAIL"] move container to workspace MAIL}
+
+\AppWorkspace{4}{2}{ZOOM}{zoom}
+\IiiiLine{for_window [class="zoom"] move container to workspace ZOOM}
+
+\IiiiLine{for_window [title="Jitsi Meet"] floating enable}
+
+\BindKey{\Key{\Super}{4}{7}}{\Cmd{nemo}}
+
+
+\IiiiLine{floating_modifier $mod} %$
+
+\BindKey{\Key{}{6}{0}}{\Cmd{maim -suo | tee ~/screenshot.png | xclip -selection clipboard -t image/png}}
+\BindKey{\Key{\Shift}{6}{0}}{\Cmd{maim -suo > ~/screenshot.png ; convert ~/screenshot.png $(zenity --file-selection --save --file-filter='Picture | *.png *.jpg *.gif *.bmp' --confirm-overwrite)}} %$
+\BindKey{\Key{\Ctrl}{6}{0}}{\Cmd{maim -uo | convert png:- $(zenity --file-selection --save --file-filter='Picture | *.png *.jpg *.gif *.bmp' --confirm-overwrite)}} %$
+\BindKey{\Key{\Ctrl\Shift}{6}{0}}{\Cmd{maim -uo | xclip -selection clipboard -t image/png}}
+\BindKey{\Key{\Super}{6}{0}}{\Cmd{maim -uo > ~/screenshot.png ;gimp ~/screenshot.png}}
+
+
+% TV
+\BindKey{\Key{\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/playlist/channels}}
+\BindKey{\Key{\Shift\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
+\BindKey{\Key{\Ctrl\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/playlist/channels}}
+\BindKey{\Key{\Ctrl\Shift\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://localhost:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://localhost:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
+
+
+
+
+%%%%%%%%%%%%%% OSD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\OsdEmpty{\Cmd{osdc --duration=1 --output=loglast ""}}
+\def\OsdSkip{\Cmd{osdc --cmd-now=skip --do-not-que --output=no --duration=1 ""}}
+\def\OsdClock{\Cmd{osd-clock --output=display}}
+\def\OsdLog{\Cmd{terminal -e bash -i -c "tail -n500 ~/.osdd_log;read"}}
+\def\OsdRestart{\Cmd{osdd-run & sleep 1;osdc --color=red RESTART}}
+\def\OsdDisable#1{\Cmd{osdc --cmd-after=disable:#1 --color=red Disable #1 }}
+\def\OsdEnable#1{\Cmd{osdc --cmd-now=enable:#1 --color=red Enable #1 }}
+\def\OsdTest{\Cmd{osdc --color=red test --color=blue 123456789 --color=green  123456789123456789123456789123456789123456789123456789 --color=white 123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789  }}
+
+\BindKey{\Key{}{4}{1}}{\OsdEmpty}
+\BindKey{\Key{\Super}{3}{12}}{\OsdEmpty}
+\BindKey{\Key{\Shift}{4}{1}}{\OsdSkip}
+\BindKey{\Key{\Shift\Super}{3}{12}}{\OsdSkip}
+\BindKey{\Key{\Ctrl}{4}{1}}{\OsdClock}
+\BindKey{\Key{\Ctrl\Super}{3}{12}}{\OsdClock}
+\BindKey{\Key{\Ctrl\Shift}{4}{1}}{\OsdLog}
+\BindKey{\Key{\Ctrl\Shift\Super}{3}{12}}{\OsdLog}
+
+
+
+
+
+%%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\BindKey{\Key{\Shift\Super}{2}{3}}{\ExitProg}
+\BindKey{\Key{\Shift\Super}{3}{2}}{\ExitShutdown}
+\BindKey{\Key{\Ctrl\Super}{3}{2}}{\ExitSuspend}
+\BindKey{\Key{\Ctrl\Shift\Super}{2}{4}}{\ExitRestart}
+\BindKey{\Key{\Super}{4}{3}}{\GoMode{System-modifikator}}
+
+\Mode{System-modifikator}{
+	\StandardReturn
+	\BindKey{\Key{}{2}{1}}{\Light{H}{0}}
+	\BindKey{\Key{}{2}{2}}{\Light{-}{0.9}}
+	\BindKey{\Key{}{2}{3}}{\Light{-}{0.15}}
+	\BindKey{\Key{}{2}{4}}{\Light{+}{0.15}}
+	\BindKey{\Key{}{2}{5}}{\Light{+}{0.9}}
+
+	\BindKey{\Key{}{3}{1}}{\Volume{ }{0}}
+	\BindKey{\Key{}{3}{2}}{\Volume{-}{10}}
+	\BindKey{\Key{}{3}{3}}{\Volume{-}{2}}
+	\BindKey{\Key{}{3}{4}}{\Volume{+}{2}}
+	\BindKey{\Key{}{3}{5}}{\Volume{+}{10}}
+
+	\BindKey{\Key{2}{9}{}}{\Cmd{xrandr --auto }}
+	\BindKey{\Key{2}{7}{}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0}}
+	\BindKey{\Key{2}{8}{}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500}}
+
+	\BindKey{\Key{}{4}{6}}{\Cmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}}
+
+	\BindKey{\Key{}{2}{6}}{\CpuFSet{400}}
+	\BindKey{\Key{}{2}{7}}{\CpuFSet{800}}
+	\BindKey{\Key{}{2}{8}}{\CpuFSet{1500}}
+	\BindKey{\Key{}{2}{9}}{\CpuFSet{5000}}
+	\BindKey{\Key{}{2}{10}}{\CpuF}
+	\for{Iter}\in{{sda}{sdb}{sdc}{sdd}}{
+		\def\DiskSleepModsda{}
+		\def\DiskSleepModsdb{\Shift}
+		\def\DiskSleepModsdc{\Ctrl}
+		\def\DiskSleepModsdd{\Ctrl\Shift}
+		\letcs{DiskSleepMod}{DiskSleepMod\Iter}
+		\BindKey{\Key{\DiskSleepMod}{3}{9}}{\DiskSleep{\Iter}{1}}
+		\BindKey{\Key{\DiskSleepMod}{3}{8}}{\DiskSleep{\Iter}{30}}
+		\BindKey{\Key{\DiskSleepMod}{3}{7}}{\DiskSleep{\Iter}{0}}
+		\BindKey{\Key{\DiskSleepMod}{3}{10}}{\DiskSleep{\Iter}{Y}}
+		\BindKey{\Key{\DiskSleepMod}{3}{11}}{\DiskSleep{\Iter}{umount}}
+		\BindKey{\Key{\DiskSleepMod}{3}{12}}{\DiskSleep{\Iter}{off}}
+	}
+	\BindKey{\Key{}{2}{12}}{\Cmd{notify-send "$(lsblk)"}}%$
+	\BindKey{\Key{\Shift}{2}{12}}{\AndII{\GoMode{default}}{\Cmd{gksudo -g gparted}}}
+	\BindKey{\Key{\Ctrl}{2}{12}}{\AndII{\GoMode{default}}{\Cmd{gksudo -g gnome-disks}}}
+
+	\BindKey{\Key{      }{4}{1}}{\OsdRestart}
+	\BindKey{\Key{\Shift}{4}{1}}{\OsdTest}
+	\BindKey{\Key{      }{4}{2}}{\OsdEnable{led}}
+	\BindKey{\Key{\Shift}{4}{2}}{\OsdDisable{led}}
+	\BindKey{\Key{      }{4}{3}}{\OsdEnable{loglast}}
+	\BindKey{\Key{\Shift}{4}{3}}{\OsdDisable{loglast}}
+	\BindKey{\Key{      }{4}{4}}{\OsdEnable{display0}}
+	\BindKey{\Key{\Shift}{4}{4}}{\OsdDisable{display0}}
+	\BindKey{\Key{      }{4}{5}}{\OsdEnable{display1}}
+	\BindKey{\Key{\Shift}{4}{5}}{\OsdDisable{display1}}
+}
+
+\input led.tex
