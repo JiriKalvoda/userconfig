@@ -62,7 +62,7 @@ then
 	# Get current directory of child. The first child should be the shell.
 	pushd "/proc/${CHILD_PID}/cwd"
 	SHELL_CWD=$(pwd -P)
-	ssh="$(findSSH $CHILD_PID 10)"
+	ssh="$(findSSH $CHILD_PID 10 | head -n1)"
 	#osdc SSH SSH SSH "$ssh"
 
 	popd
