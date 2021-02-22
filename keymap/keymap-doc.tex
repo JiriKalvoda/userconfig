@@ -1,0 +1,208 @@
+\def\OutputMode{doc}
+\input keymap-utils.tex
+\input keymap-abstract.tex
+
+%%%%%%%%%%%%%% Working vars %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcount\counti
+\newcount\countj
+
+%%% Colors %%% (from ucwmac (c) MJ)
+\chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
+\def\colorset#1{\pdfcolorstack\colorstk set #1}
+\def\colorpush#1{\pdfcolorstack\colorstk push #1}
+\def\colorpop{\pdfcolorstack\colorstk pop}
+\def\colorlocal{\aftergroup\colorpop\colorpush}
+\def\rgb#1{{#1 rg #1 RG}}
+\def\gray#1{{#1 g #1 G}}
+\def\cmyk#1{{#1 k #1 K}}
+\def\cwhite{\rgb{1 1 1}}
+
+%%%%%%%%%%%%%% Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\parindent=0pt
+\pdfpagewidth=85cm
+\pdfpageheight=85cm
+\hsize=78cm
+\vsize=78cm
+\font\hhdfont csbx17
+\font\smallfont cmr8
+\font\basicfont cmr10\basicfont
+\font\smallsmallfont cmr5 at 5pt
+\newbox\autofontBox
+\def\autofont#1{{%
+\setbox\autofontBox=\hbox{#1}%
+\ifdim\wd\autofontBox<100pt\relax\basicfont\else%
+\ifdim\wd\autofontBox<300pt\relax\baselineskip 1pt\smallfont\else%
+\fi\baselineskip 1pt\smallsmallfont\fi%
+#1%
+}}
+
+%%%%%%%%%%%%%% Chars and catcodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\\{$\scriptscriptstyle \backslash$}
+\def\nl{\par}
+
+
+%%%%%%%%%%%%%% general commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\GoMode#1{\printkey{\rgb{0 0 1}}{MODE\nl\smallfont#1}}
+\def\Cmd#1{\printkey{\rgb{1 0 1}}{\autofont{#1}}}
+\def\UndefKey{\printkey{\rgb{1 0 0}}{UNDEF}}
+
+%%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% workspaces
+\def\GoWorkspace#1{\printkey{\rgb{0 1 1}}{Workspace\nl#1}}
+\def\ContWorkspace#1{\printkey{\rgb{0 1 1}}{Move to workspace\nl#1}}
+\def\ContGoWorkspace#1{\printkey{\rgb{0 1 1}}{Move and go to wsp.\nl#1}}
+\def\MoveWorkspace#1{\printkey{\rgb{0 1 0}}{Move worksp. #1}}
+% Container
+\def\FocusWind#1{\printkey{\rgb{0 1 0}}{Focus #1}}
+\def\MoveCont#1{\printkey{\rgb{0 1 0}}{Move #1}}
+\def\SplitContV{\printkey{\rgb{0.85 1 0}}{Split vertical}}
+\def\SplitContH{\printkey{\rgb{0.85 1 0}}{Split horizontal}}
+\def\SplitContT{\printkey{\rgb{0.85 1 0}}{Split tabbed}}
+\def\FullscreenContToggle{\printkey{\rgb{0.85 1 0}}{}}
+% Restart i3
+\def\RestartProg{\printkey{\rgb{1 0 0}}{Restart WM}}
+
+%%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\ExitProg{\printkey{\rgb{1 0 0}}{Exit}}
+\def\ExitShutdown{\printkey{\rgb{1 0 0}}{Shutdown}}
+\def\ExitSuspend{\printkey{\rgb{1 0 0}}{Suspend}}
+\def\ExitRestart{\printkey{\rgb{1 0 0}}{Restart}}
+
+%%%%%%%%%%%%%% Kernel %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newdimen\keyw
+\newdimen\keyh
+\newdimen\skipBefore
+
+\def\Key#1#2#3{%
+#1@#2@#3%
+}
+
+\input keymap-doc-keyboard.tex
+\def\BindKey#1#2{
+\defcs{keymapK#1}{#2}
+}
+\def\getkey#1{%
+\csname keymapK#1\endcsname%
+}
+
+% mods
+\def\allmod{{x}{x\Shift}{x\Ctrl}{x\Ctrl\Shift}{x\Super}{x\Shift\Super}{x\Ctrl\Super}{x\Ctrl\Shift\Super}}
+\defcs{modNameM}{No mod}
+\defcs{modNameM\Shift}{Shift}
+\defcs{modNameM\Ctrl}{Ctrl}
+\defcs{modNameM\Ctrl\Shift}{Ctrl+Shift}
+\defcs{modNameM\Super}{Super}
+\defcs{modNameM\Shift\Super}{Shift+Super}
+\defcs{modNameM\Ctrl\Super}{Ctrl+Super}
+\defcs{modNameM\Ctrl\Shift\Super}{Ctrl+Shift+Super}
+
+\def\nullkey{\printkey{\cwhite}{}}
+\def\nullkeyin{\nullkey} % For comparing
+\def\bindnullkey#1#2{%
+\for{iter}\in\allmod{\BindKey{\Key{\ex\eat\iter}{#1}{#2}}{\nullkey}}%
+}
+
+\def\getUsedMod#1#2{
+\for{iter}\in\allmod{\letcs{tmp}{keymapK\Key{\ex\eat\iter}{#1}{#2}}\ifx\tmp\nullkeyin\else\defcs{activeModM\ex\eat\iter}{1}\fi}%
+}
+
+
+\def\printkey#1#2{%
+\hrule \hbox{%
+\vrule\relax%
+\hbox to 0pt{\colorlocal{#1}\vrule width \keyw height \keyh\hskip -\keyw}%
+\vbox to \keyh{%
+\hsize\keyw%
+\leftskip 0pt plus 1fill%
+\rightskip 0pt plus 1fill%
+\vskip 0pt plus 1fil\relax%
+\keyname%
+#2%
+\hskip 0pt\hbox{}\vskip 0pt plus 1fil\relax\hrule height 0pt
+}\vrule%
+}\hrule%
+}
+
+\def\printkeybymap#1#2{%
+\skipBefore \csname skipBeforeK\Key{}{#1}{#2}\endcsname%
+\kern \skipBefore\vbox{%
+\keyw \csname keywK\Key{}{#1}{#2}\endcsname%
+\keyh \csname keyhK\Key{}{#1}{#2}\endcsname%
+\advance\keyw -0.4pt%
+\advance\keyh -0.4pt%
+\def\keyname{\csname keyNameK\Key{}{#1}{#2}\endcsname\nl}%
+\def\printkeybymapIsFirst{1}
+\for{iter}\in\allmod{%
+\letcs{tmp}{activeModM\ex\eat\iter}
+\if\tmp1%
+\getkey{\Key{\ex\eat\iter}{#1}{#2}}%
+\if \printkeybymapIsFirst1\relax%
+\advance\keyh -10pt%
+\vskip-0.4pt%
+\def\keyname{}%
+\def\printkeybymapIsFirst{0}%
+\fi%
+\fi%
+}%
+}%
+\hskip -0.4pt
+}
+
+
+\def\printline#1{\hbox{\for j 0 {\csname keyLineLen\the\counti\endcsname} {\printkeybymap{#1}{\the\countj}}}\vskip 10pt}
+
+\long\def\Mode#1#2{
+{
+\let\UpModeName\ModeName
+\def\ModeName{#1}
+\for i 0 {16}{\for j 0 {14} {\bindnullkey{\the\counti}{\the\countj}}}
+#2
+\for{iter}\in\allmod{\defcs{activeModM\ex\eat\iter}{0}}%
+\for i 0 {16}{\for j 0 {14} {\getUsedMod{\the\counti}{\the\countj}}}%
+{\hhdfont #1 (%
+\def\isFirst{1}%
+\for{iter}\in\allmod{%
+\letcs{tmp}{activeModM\ex\eat\iter}%
+\if\tmp1%
+\if \isFirst1\def\isFirst{0}\else, \fi%
+\csname modNameM\ex\eat\iter\endcsname%
+\fi%
+})}
+\vskip 10pt\relax
+\hbox{
+\vbox{
+\for i 0 1{\printline{\the\counti}}
+\vskip\afterEscSkip\relax
+\for i 1 6{\printline{\the\counti}}
+}\hskip \afterAlphaSkip
+\vbox{
+\for i 6 7{\printline{\the\counti}}
+\vskip\afterEscSkip\relax
+\for i 7 9{\printline{\the\counti}}
+{ \setbox5=\vbox{\printkeybymap{0}{0}}\vskip\ht5}
+\for i 9 {11}{\printline{\the\counti}}
+}\hskip \afterAlphaSkip
+\vbox{
+\for i {11} {16}{\printline{\the\counti}}
+}
+}
+}
+\vfil \break
+}
+
+%%%%%%%%%%%%%% Chars and catcodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\catcode`&=11
+\catcode`"=11
+\catcode`'=11
+\catcode`_=11
+\catcode`~=11
+\catcode`$=11 %$
+
+%%%%%%%%%%%%%% Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Mode{default}{
+\input master.tex
+}
+
+
+\bye
+

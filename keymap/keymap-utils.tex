@@ -1,0 +1,28 @@
+\let\ex=\expandafter
+\def\eat#1{}
+\def\letcs#1#2{\ex\ex\ex \let\ex\ex \csname#1\endcsname \csname#2\endcsname}
+\def\defcs#1#2{\def\defcstmp{#2}\letcs{#1}{defcstmp}}
+
+\def\for#1#2#3#4{%
+\if\in#2%
+\defcs{endloop#1}{}%
+\ex\def\csname loop#1\endcsname##1{%
+\ex\if\csname endloop#1\endcsname##1\else%
+\defcs{#1}{##1}%
+#4\relax%
+\letcs{looptmp}{loop#1}%
+\ex\ex\ex\looptmp\fi}%
+\letcs{looptmp}{loop#1}%
+\ex\looptmp#3\csname endloop#3\endcsname%
+\else%
+\csname count#1\endcsname #2\relax%
+\defcs{loop#1}{%
+#4\relax%
+\advance\csname count#1\endcsname 1\relax%
+\ifnum\csname count#1\endcsname<#3%
+\letcs{looptmp}{loop#1}%
+\ex\ex\ex\looptmp\fi}\csname loop#1\endcsname%
+\fi%
+}
+
+

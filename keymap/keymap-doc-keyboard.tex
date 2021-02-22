@@ -1,0 +1,70 @@
+\def\setkeywh#1#2#3#4{%
+\defcs{keywK#1}{#2}%
+\defcs{keyhK#1}{#3}%
+\defcs{skipBeforeK#1}{#4}%
+}
+\newdimen\standkeyw\standkeyw 100pt\relax%
+\newdimen\standkeyh\standkeyh 35pt\relax%
+\for i 0 {16}{\for j 0 {13} {\setkeywh{\Key{}{\the\counti}{\the\countj}}{\standkeyw}{\standkeyh}{0pt}}}
+\setkeywh{\Key{}{0}{1}}{\standkeyw}{\standkeyh}{\standkeyw}
+\setkeywh{\Key{}{0}{5}}{\standkeyw}{\standkeyh}{0.5\standkeyw}
+\setkeywh{\Key{}{0}{9}}{\standkeyw}{\standkeyh}{0.5\standkeyw}
+\setkeywh{\Key{}{1}{13}}{2\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{2}{0}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{2}{13}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{3}{0}}{2\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{4}{0}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{4}{12}}{2.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{0}}{2\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{1}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{2}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{3}}{5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{4}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{5}}{1.5\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{5}{6}}{2\standkeyw}{\standkeyh}{0pt}
+\setkeywh{\Key{}{9}{0}}{\standkeyw}{\standkeyh}{\standkeyw}
+\setkeywh{\Key{}{15}{0}}{2\standkeyw}{\standkeyh}{0pt}
+\defcs{keyLineLen0}{13}
+\defcs{keyLineLen1}{14}
+\defcs{keyLineLen2}{14}
+\defcs{keyLineLen3}{13}
+\defcs{keyLineLen4}{13}
+\defcs{keyLineLen5}{07}
+\defcs{keyLineLen6}{03}
+\defcs{keyLineLen7}{03}
+\defcs{keyLineLen8}{03}
+\defcs{keyLineLen9}{01}
+\defcs{keyLineLen10}{03}
+\defcs{keyLineLen11}{04}
+\defcs{keyLineLen12}{04}
+\defcs{keyLineLen13}{03}
+\defcs{keyLineLen14}{04}
+\defcs{keyLineLen15}{02}
+
+\def\setKeyNames#1#2#3{%
+\countj#2%
+\for{iter}\in{#3}{\ex\edef\csname keyNameK\Key{}{#1}{\the\countj}\endcsname{\iter}\advance\countj1}%
+}
+\setKeyNames{0}{0}{{Esc}}
+\for i 1 {13}{\setKeyNames{0}{\counti}{{F\the\counti}}}
+\setKeyNames{1}{0}{`1234567890-={Backspace}}
+\setKeyNames{2}{0}{{Tab}qwertyuiop[]{Entr}}
+\setKeyNames{3}{0}{{CapsLk}asdfghjkl;'}
+\ex\def\csname keyNameK\Key{}{3}{12}\endcsname{\\}
+\setKeyNames{4}{0}{{Shift}{NOT}zxcvbnm,./{Shift}}
+\setKeyNames{5}{0}{{Ctrl}{Super}{Alt}{Space}{AltGr}{Super}{Ctrl}}
+\setKeyNames{6}{0}{{PrtSc}{ScrLock}{Pause}}
+\setKeyNames{7}{0}{{Insert}{Home}{PgUp}}
+\setKeyNames{8}{0}{{Delete}{End}{PgDown}}
+\setKeyNames{9}{0}{{Up}}
+\setKeyNames{10}{0}{{Left}{Down}{Right}}
+\setKeyNames{11}{0}{{NumLock}/*-}
+\setKeyNames{12}{0}{789+}
+\setKeyNames{13}{0}{456}
+\setKeyNames{14}{0}{123{Enter}}
+\setKeyNames{15}{0}{0.}
+
+\newdimen\afterEscSkip
+\afterEscSkip 30pt
+\newdimen\afterAlphaSkip
+\afterAlphaSkip 30pt

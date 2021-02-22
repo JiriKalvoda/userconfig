@@ -1,0 +1,59 @@
+{
+\newcount\counti
+\newcount\countj
+\def\defKeyCode#1#2#3{\ex\global\ex\edef\csname keyCodeK#1K#2\endcsname{#3}}
+\defKeyCode{0}{0}{9}
+		%if(row==0 && col==0) return 9;
+\for i{11}{13}{\countj 95 \advance\countj\counti \advance\countj -11 \defKeyCode{0}{\the\counti}{\the\countj}}
+		%if(row==0 && col>=11) return 95+col-11;
+\for i{1}{11}{\countj 67 \advance\countj\counti \advance\countj -1 \defKeyCode{0}{\the\counti}{\the\countj}}
+		%if(row==0) return col+67-1;
+\defKeyCode{1}{0}{49}
+		%if(row==1 && col==0) return 49;
+\for i{1}{14}{\countj 10 \advance\countj\counti \advance\countj -1 \defKeyCode{1}{\the\counti}{\the\countj}}
+		%if(row==1) return col+10-1;
+\for i{0}{14}{\countj 23 \advance\countj\counti \advance\countj 0 \defKeyCode{2}{\the\counti}{\the\countj}}
+		%if(row==2) return col+23;
+\defKeyCode{3}{0}{66}
+		%if(row==3 && col==0) return 66;
+\defKeyCode{3}{12}{51}
+		%if(row==3 && col==12) return 51;
+\for i{1}{12}{\countj 38 \advance\countj\counti \advance\countj -1 \defKeyCode{3}{\the\counti}{\the\countj}}
+		%if(row==3) return col+38-1;
+\for i{0}{12}{\countj 50 \advance\countj\counti \advance\countj 0 \defKeyCode{4}{\the\counti}{\the\countj}}
+		%if(row==4) return col+50;
+\defKeyCode{4}{1}{94}
+		%if(row==4 && col==1) return 94;
+\defKeyCode{5}{0}{37}
+\defKeyCode{5}{1}{133}
+\defKeyCode{5}{2}{64}
+\defKeyCode{5}{3}{65}
+\defKeyCode{5}{4}{108}
+\defKeyCode{5}{5}{105}
+		%if(row==5) return std::vector<int>{37,133,64,65,108,105}[col];
+%
+\defKeyCode{6}{0}{107}
+\defKeyCode{6}{1}{78}
+\defKeyCode{6}{2}{127}
+		%if(row==6) return std::vector<int>{107,78,127}[col];
+\defKeyCode{7}{0}{118}
+\defKeyCode{7}{1}{110}
+\defKeyCode{7}{2}{112}
+		%if(row==7) return std::vector<int>{118,110,112}[col];
+\defKeyCode{8}{0}{119}
+\defKeyCode{8}{1}{115}
+\defKeyCode{8}{2}{116}
+		%if(row==8) return std::vector<int>{119,115,116}[col];
+\defKeyCode{9}{0}{111}
+		%if(row==9) return std::vector<int>{111}[col];
+\defKeyCode{10}{0}{113}
+\defKeyCode{10}{1}{116}
+\defKeyCode{10}{2}{114}
+		%if(row==10) return std::vector<int>{113,116,114}[col];
+% TODO
+		%if(row==11) return std::vector<int>{77,106,63,82}[col];
+		%if(row==12) return std::vector<int>{79,80,81,86}[col];
+		%if(row==13) return std::vector<int>{83,84,85}[col];
+		%if(row==14) return std::vector<int>{87,88,89,104}[col];
+		%if(row==15) return std::vector<int>{90,91}[col];
+}
