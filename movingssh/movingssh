@@ -231,7 +231,7 @@ tryLocalDownload()
 	killallmy sleep
 }
 
-vnc()
+x11vnc()
 {
 	vncTunelPort=$(( 40000 + $RANDOM % 10000 ))
 	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
@@ -245,7 +245,28 @@ vnc()
 	vncviewerOpt=""
 	[[ "$minus" == *"V"* ]] || vncviewerOpt="-ViewOnly"
 	(sleep 1; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer $vncviewerOpt localhost::$vncTunelPort ; done ) &
-	cat $passwdFile | ssh $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c "\"cat | x11vnc -localhost -display $VNCDISPLAY -autoport  $vncTunelPort -forever -passwdfile /dev/stdin\""
+	cat $passwdFile | ssh -t $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c "\"cat | x11vnc -localhost -display $VNCDISPLAY -autoport  $vncTunelPort -forever -passwdfile /dev/stdin\""
+	r=$(ssh -t $envCMD $username@$1 -p$2 $keyCMD $sudoCmd bash -c" \"pkill -f autoport\\\" $vncTunelPort\\\" ; echo -n OK\$?\"")
+	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m"
+	rm $passwdFile
+	killallmy movingssh
+}
+
+vncserver()
+{
+	vncDisplay=$(( $RANDOM % 900 + 100 ))
+	vncTunelPort=$(( 5900 + $vncDisplay ))
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+	echo "XXX              PORT $vncTunelPort             XXX"
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+	sudoCmd=""
+	passwdFile=$(mktemp)
+	head -c100 /dev/random | shasum | head -c30 > $passwdFile
+	[[ "$SUDO" != "" ]] && sudoCmd="sudo -u $SUDO" 
+	(sleep 0.5; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer  localhost::$vncTunelPort ; done ) &
+	( cat $passwdFile; echo; cat $passwdFile; echo ;echo n; cat ) | ssh -t $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c " \"vncpasswd ; vncserver :$vncDisplay\""
+	r=$(ssh -t $envCMD $username@$1 -p$2 $keyCMD $sudoCmd bash -c" \"pkill -f Xvnc\\\" :$vncDisplay -auth\\\" ; echo -n OK\$?\"")
+	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m"
 	rm $passwdFile
 	killallmy movingssh
 }
@@ -254,7 +275,11 @@ conect()
 {
 	if [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]]
 	then
-		vnc $@
+		x11vnc $@
+		return $?
+	elif [[ "$minus" == *"c"* ]]
+	then
+		vncserver $@
 		return $?
 	else
 		ssh $envCMD $username@$1 -p$2 $keyCMD $parametrs
@@ -344,7 +369,7 @@ then
 elif [[ "$minus" == *"r"* ]]
 then
 	remote
-elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]]
+elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]]
 
 then
 	tryLocalDownload
