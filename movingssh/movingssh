@@ -103,7 +103,7 @@ killallmy()
 		name=$(ps -p $p -o comm=)
 		if [[ " $* " == *"$name"* ]]
 		then
-
+			echo KILL $p $name
 			debug KILL $p $name
 			kill $p
 		fi
@@ -231,6 +231,37 @@ tryLocalDownload()
 	killallmy sleep
 }
 
+vnc()
+{
+	vncTunelPort=$(( 40000 + $RANDOM % 10000 ))
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+	echo "XXX              PORT $vncTunelPort             XXX"
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+	sudoCmd=""
+	passwdFile=$(mktemp)
+	head -c100 /dev/random | shasum | head -c30 > $passwdFile
+	[[ "$SUDO" != "" ]] && sudoCmd="sudo -u $SUDO" 
+	[[ "$VNCDISPLAY" == "" ]] && VNCDISPLAY=":0"
+	vncviewerOpt=""
+	[[ "$minus" == *"V"* ]] || vncviewerOpt="-ViewOnly"
+	(sleep 1; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer $vncviewerOpt localhost::$vncTunelPort ; done ) &
+	cat $passwdFile | ssh $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c "\"cat | x11vnc -localhost -display $VNCDISPLAY -autoport  $vncTunelPort -forever -passwdfile /dev/stdin\""
+	rm $passwdFile
+	killallmy movingssh
+}
+
+conect()
+{
+	if [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]]
+	then
+		vnc $@
+		return $?
+	else
+		ssh $envCMD $username@$1 -p$2 $keyCMD $parametrs
+		return $?
+	fi
+}
+
 remote()
 {
 	debug REMOTE
@@ -242,7 +273,7 @@ remote()
 	then
 		return 255
 	else
-		LD_SSHTYPE=remote ssh $envCMD $username@${config[ipB]} -p${config[portB]} $keyCMD $parametrs
+		LD_SSHTYPE=remote conect ${config[ipB]} ${config[portB]}
 		return $?
 	fi
 }
@@ -257,7 +288,7 @@ local()
 	then
 		return 255
 	else
-		LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyCMD $parametrs
+		LD_SSHTYPE=local conect ${config[ipA]} ${config[portA]}
 		return $?
 	fi
 }
@@ -313,7 +344,8 @@ then
 elif [[ "$minus" == *"r"* ]]
 then
 	remote
-elif [[ "$minus" == *"x"* ]]
+elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]]
+
 then
 	tryLocalDownload
 	echo NO >&3
