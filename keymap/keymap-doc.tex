@@ -16,12 +16,16 @@
 \def\cwhite{\rgb{1 1 1}}
 
 %%%%%%%%%%%%%% Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newinsert\marg
+\newcount\margCount
+\def\pagebody{\vbox{\boxmaxdepth\maxdepth \pagecontents}}
+
 \parindent=0pt
+\hsize=81cm
 \pdfpagewidth=85cm
-\vsize=78cm
-\pdfpageheight=55cm
-\hsize=50cm
-\font\hhdfont csbx17
+\vsize=123cm
+\pdfpageheight=0cm
+\font\hhdfont csbx32
 \font\smallfont cmr8
 \font\basicfont cmr10\basicfont
 \def\basebaselineskip{12pt} \baselineskip\basebaselineskip
@@ -75,37 +79,43 @@
 \newdimen\keyh
 \newdimen\skipBefore
 
+\def\Ctrl{\def\ctrl{1}}
+\def\Shift{\def\shift{1}}
+\def\Super{\def\super{1}}
+\def\Alt{\def\alt{1}}
+
+\def\key{\keyBase @\keyMod}
+\def\keyBase{}
+\def\keyMod{}
+\def\setKeyBase#1#2{\edef\keyBase{#1@#2}}
+\def\setKeyMod#1{%
+\def\ctrl{0}\def\shift{0}\def\super{0}\def\alt{0}%
+#1%
+\edef\keyMod{\ctrl\shift\super\alt}%
+}
 \def\Key#1#2#3{%
-#1@#2@#3%
+\setKeyMod{#1}%
+\setKeyBase{#2}{#3}%
 }
 
 \input keymap-doc-keyboard.tex
 \def\BindKey#1#2{
-\defcs{keymapK#1}{#2}
+#1\defcs{keymapK\key}{#2}
 }
+
 \def\getkey#1{%
 \csname keymapK#1\endcsname%
 }
 
-% mods
-\def\allmod{{x}{x\Shift}{x\Ctrl}{x\Ctrl\Shift}{x\Super}{x\Shift\Super}{x\Ctrl\Super}{x\Ctrl\Shift\Super}}
-\defcs{modNameM}{No mod}
-\defcs{modNameM\Shift}{Shift}
-\defcs{modNameM\Ctrl}{Ctrl}
-\defcs{modNameM\Ctrl\Shift}{Ctrl+Shift}
-\defcs{modNameM\Super}{Super}
-\defcs{modNameM\Shift\Super}{Shift+Super}
-\defcs{modNameM\Ctrl\Super}{Ctrl+Super}
-\defcs{modNameM\Ctrl\Shift\Super}{Ctrl+Shift+Super}
 
 \def\nullkey{\printkey{\cwhite}{}}
 \def\nullkeyin{\nullkey} % For comparing
 \def\bindnullkey#1#2{%
-\for{iter}\in\allmod{\BindKey{\Key{\ex\eat\iter}{#1}{#2}}{\nullkey}}%
+\for{iter}\in\allmod{\BindKey{\Key{\iter}{#1}{#2}}{\nullkey}}%
 }
 
 \def\getUsedMod#1#2{
-\for{iter}\in\allmod{\letcs{tmp}{keymapK\Key{\ex\eat\iter}{#1}{#2}}\ifx\tmp\nullkeyin\else\defcs{activeModM\ex\eat\iter}{1}\fi}%
+\for{iter}\in\allmod{\Key{\iter}{#1}{#2}\letcs{tmp}{keymapK\key}\ifx\tmp\nullkeyin\else\defcs{activeModM\keyMod}{1}\fi}%
 }
 
 
@@ -125,24 +135,25 @@
 }\hrule%
 }
 
-\def\printkeybymap#1#2{%
-\skipBefore \csname skipBeforeK\Key{}{#1}{#2}\endcsname%
+\def\printActKey{%
+\skipBefore \csname skipBeforeK\keyBase\endcsname%
 \kern \skipBefore\vbox{%
-\keyw \csname keywK\Key{}{#1}{#2}\endcsname%
-\keyh \csname keyhK\Key{}{#1}{#2}\endcsname%
+\keyw \csname keywK\keyBase\endcsname%
+\keyh \csname keyhK\keyBase\endcsname%
 \advance\keyw -0.4pt%
 \advance\keyh -0.4pt%
-\def\keyname{\csname keyNameK\Key{}{#1}{#2}\endcsname\nl}%
-\def\printkeybymapIsFirst{1}
+\def\keyname{\csname keyNameK\keyBase\endcsname\nl}%
+\def\printActKeyIsFirst{1}
 \for{iter}\in\allmod{%
-\letcs{tmp}{activeModM\ex\eat\iter}
+\setKeyMod{\iter}
+\letcs{tmp}{activeModM\keyMod}
 \if\tmp1%
-\getkey{\Key{\ex\eat\iter}{#1}{#2}}%
-\if \printkeybymapIsFirst1\relax%
-\advance\keyh -10pt%
+\csname keymapK\key\endcsname%
 \vskip-0.4pt%
+\if \printActKeyIsFirst1\relax%
+\advance\keyh -10pt%
 \def\keyname{}%
-\def\printkeybymapIsFirst{0}%
+\def\printActKeyIsFirst{0}%
 \fi%
 \fi%
 }%
@@ -151,7 +162,15 @@
 }
 
 
-\def\printline#1{\hbox{\for j 0 {\csname keyLineLen\the\counti\endcsname} {\printkeybymap{#1}{\the\countj}}}\vskip 10pt}
+\def\printLine#1{%
+\hbox{%
+\for j 0 {\csname keyLineLen\the\counti\endcsname}%
+{\setKeyBase{#1}{\the\countj}\printActKey}%
+}%
+\vskip 10pt%
+}
+
+\newbox\outbox
 
 \long\def\Mode#1#2{
 {
@@ -159,35 +178,36 @@
 \def\ModeName{#1}
 \for i 0 {16}{\for j 0 {14} {\bindnullkey{\the\counti}{\the\countj}}}
 #2
-\for{iter}\in\allmod{\defcs{activeModM\ex\eat\iter}{0}}%
+\for{iter}\in\allmod{\setKeyMod{\iter}\defcs{activeModM\keyMod}{0}}%
 \for i 0 {16}{\for j 0 {14} {\getUsedMod{\the\counti}{\the\countj}}}%
-{\hhdfont #1 (%
-\def\isFirst{1}%
-\for{iter}\in\allmod{%
-\letcs{tmp}{activeModM\ex\eat\iter}%
-\if\tmp1%
-\if \isFirst1\def\isFirst{0}\else, \fi%
-\csname modNameM\ex\eat\iter\endcsname%
-\fi%
-})}
+{\hhdfont #1 %
+%\def\isFirst{1}%
+%\for{iter}\in\allmod{%
+%\letcs{tmp}{activeModM\iter}%
+%\if\tmp1%
+%\if \isFirst1\def\isFirst{0}\else, \fi%
+%\csname modNameM\iter\endcsname%
+%\fi}%
+}
 \vskip 10pt\relax
 \hbox{
 \vbox{
-\for i 0 1{\printline{\the\counti}}
+\for i 0 1{\printLine{\the\counti}}
 \vskip\afterEscSkip\relax
-\for i 1 6{\printline{\the\counti}}
+\for i 1 6{\printLine{\the\counti}}
 }\hskip \afterAlphaSkip
 \vbox{
-\for i 6 7{\printline{\the\counti}}
+\for i 6 7{\printLine{\the\counti}}
 \vskip\afterEscSkip\relax
-\for i 7 9{\printline{\the\counti}}
-{ \setbox5=\vbox{\printkeybymap{0}{0}}\vskip\ht5}
-\for i 9 {11}{\printline{\the\counti}}
+\for i 7 9{\printLine{\the\counti}}
+{ \setbox5=\vbox{\Key{}{0}{0}\printActKey}\vskip\ht5}
+\for i 9 {11}{\printLine{\the\counti}}
 }\hskip \afterAlphaSkip
 \vbox{
-\for i {11} {16}{\printline{\the\counti}}
+\for i {11} {16}{\printLine{\the\counti}}
 }
 }
+\box\outbox
 }
 \vfil \break
 }

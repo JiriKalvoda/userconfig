@@ -1,7 +1,7 @@
-\def\setkeywh#1#2#3#4{%
-\defcs{keywK#1}{#2}%
-\defcs{keyhK#1}{#3}%
-\defcs{skipBeforeK#1}{#4}%
+\def\setkeywh#1#2#3#4{#1%
+\defcs{keywK\keyBase}{#2}%
+\defcs{keyhK\keyBase}{#3}%
+\defcs{skipBeforeK\keyBase}{#4}%
 }
 \newdimen\standkeyw\standkeyw 100pt\relax%
 \newdimen\standkeyh\standkeyh 35pt\relax%
@@ -47,4 +47,18 @@
 \newdimen\afterAlphaSkip
 \afterAlphaSkip 30pt
 
+% mods
+\def\allmod{{\relax}{\relax\Shift}{\Ctrl}{\Ctrl\Shift}{\Super}{\Shift\Super}{\Ctrl\Super}{\Ctrl\Shift\Super}}
+\defcs{modNameM0000}{No mod}
+\defcs{modNameM}{Shift}
+\defcs{modNameM}{Ctrl}
+\defcs{modNameM}{Ctrl+Shift}
+\defcs{modNameM}{Super}
+\defcs{modNameM}{Shift+Super}
+\defcs{modNameM}{Ctrl+Super}
+\defcs{modNameM}{Ctrl+Shift+Super}
+
+\def\setKeyName#1#2#3{%
+\Key{}{#1}{#2}\ex\edef\csname keyNameK\keyBase\endcsname{#3}%
+}
 \input keymap-keyboard.tex

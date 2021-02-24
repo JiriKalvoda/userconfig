@@ -12,13 +12,13 @@
 \if\in#2%
 \defcs{endloop#1}{}%
 \ex\def\csname loop#1\endcsname##1{%
-\ex\if\csname endloop#1\endcsname##1\else%
+\ex\ifx\csname endloop#1\endcsname##1\else%
 \defcs{#1}{##1}%
 #4\relax%
 \letcs{looptmp}{loop#1}%
 \ex\ex\ex\looptmp\fi}%
 \letcs{looptmp}{loop#1}%
-\ex\looptmp#3\csname endloop#3\endcsname%
+\ex\looptmp#3\csname endloop#1\endcsname%
 \else%
 \csname count#1\endcsname #2\relax%
 \defcs{loop#1}{%
