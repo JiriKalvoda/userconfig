@@ -41,30 +41,10 @@
 \defcs{keyLineLen14}{04}
 \defcs{keyLineLen15}{02}
 
-\def\setKeyNames#1#2#3{%
-\countj#2%
-\for{iter}\in{#3}{\ex\edef\csname keyNameK\Key{}{#1}{\the\countj}\endcsname{\iter}\advance\countj1}%
-}
-\setKeyNames{0}{0}{{Esc}}
-\for i 1 {13}{\setKeyNames{0}{\counti}{{F\the\counti}}}
-\setKeyNames{1}{0}{`1234567890-={Backspace}}
-\setKeyNames{2}{0}{{Tab}qwertyuiop[]{Entr}}
-\setKeyNames{3}{0}{{CapsLk}asdfghjkl;'}
-\ex\def\csname keyNameK\Key{}{3}{12}\endcsname{\\}
-\setKeyNames{4}{0}{{Shift}{NOT}zxcvbnm,./{Shift}}
-\setKeyNames{5}{0}{{Ctrl}{Super}{Alt}{Space}{AltGr}{Super}{Ctrl}}
-\setKeyNames{6}{0}{{PrtSc}{ScrLock}{Pause}}
-\setKeyNames{7}{0}{{Insert}{Home}{PgUp}}
-\setKeyNames{8}{0}{{Delete}{End}{PgDown}}
-\setKeyNames{9}{0}{{Up}}
-\setKeyNames{10}{0}{{Left}{Down}{Right}}
-\setKeyNames{11}{0}{{NumLock}/*-}
-\setKeyNames{12}{0}{789+}
-\setKeyNames{13}{0}{456}
-\setKeyNames{14}{0}{123{Enter}}
-\setKeyNames{15}{0}{0.}
 
 \newdimen\afterEscSkip
 \afterEscSkip 30pt
 \newdimen\afterAlphaSkip
 \afterAlphaSkip 30pt
+
+\input keymap-keyboard.tex

@@ -2,14 +2,14 @@
 \def\Ctrl{c}
 \def\Shift{s}
 \def\Super{w}
+
+
 %%%%%%%%%%%%%% Undef key %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\UndefKey{}
+
 %%%%%%%%%%%%%% general Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\GoMode#1{\UndefKey}
 \def\Cmd#1{\UndefKey}
-\def\LayoutCont#1{\UndefKey}
-\def\ResizeCont#1#2#3{\UndefKey}
-\def\FloatingToggleCont{\UndefKey}
 
 %%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % workspaces
@@ -24,14 +24,18 @@
 \def\SplitContH{\UndefKey}
 \def\SplitContT{\UndefKey}
 \def\FullscreenContToggle{\UndefKey}
+\def\LayoutCont#1{\UndefKey}
+\def\ResizeCont#1#2#3{\UndefKey}
+\def\FloatingToggleCont{\UndefKey}
 % Restart i3
 \def\RestartProg{\UndefKey}
+\def\RestartProgII{\RestartProg}
 
 %%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\ExitProg{\UndefKey}
-\def\ExitShutdown{\UndefKey}
-\def\ExitSuspend{\UndefKey}
-\def\ExitRestart{\UndefKey}
+\def\ExitShutdown{\Cmd{poweroff}}
+\def\ExitSuspend{\Cmd{systemctl suspend}}
+\def\ExitRestart{\Cmd{reboot}}
 \def\Light#1#2{\Cmd{light #1 #2; lightGUI}}
 \catcode37=11
 \def\Volume#1#2{\Cmd{amixer sset Master -q #2%#1;   sleep 0.05; volumeGUI}}

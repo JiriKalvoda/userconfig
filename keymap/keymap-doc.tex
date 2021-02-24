@@ -1,10 +1,8 @@
 \def\OutputMode{doc}
+%%%%%%%%%%%%%% Include %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \input keymap-utils.tex
 \input keymap-abstract.tex
 
-%%%%%%%%%%%%%% Working vars %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newcount\counti
-\newcount\countj
 
 %%% Colors %%% (from ucwmac (c) MJ)
 \chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
@@ -20,21 +18,22 @@
 %%%%%%%%%%%%%% Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \parindent=0pt
 \pdfpagewidth=85cm
-\pdfpageheight=85cm
-\hsize=78cm
 \vsize=78cm
+\pdfpageheight=55cm
+\hsize=50cm
 \font\hhdfont csbx17
 \font\smallfont cmr8
 \font\basicfont cmr10\basicfont
+\def\basebaselineskip{12pt} \baselineskip\basebaselineskip
 \font\smallsmallfont cmr5 at 5pt
 \newbox\autofontBox
-\def\autofont#1{{%
+\def\autofont#1{%
 \setbox\autofontBox=\hbox{#1}%
-\ifdim\wd\autofontBox<100pt\relax\basicfont\else%
-\ifdim\wd\autofontBox<300pt\relax\baselineskip 1pt\smallfont\else%
-\fi\baselineskip 1pt\smallsmallfont\fi%
-#1%
-}}
+\ifdim\wd\autofontBox<120pt\relax\basicfont\else%
+\ifdim\wd\autofontBox<330pt\relax\baselineskip 1pt\smallfont\else%
+\baselineskip 1pt\smallsmallfont\fi\fi%
+#1\basicfont%
+}%
 
 %%%%%%%%%%%%%% Chars and catcodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\\{$\scriptscriptstyle \backslash$}
@@ -42,7 +41,7 @@
 
 
 %%%%%%%%%%%%%% general commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\def\GoMode#1{\printkey{\rgb{0 0 1}}{MODE\nl\smallfont#1}}
+\def\GoMode#1{\printkey{\rgb{0.4 0.4 1}}{MODE\nl\smallfont#1}}
 \def\Cmd#1{\printkey{\rgb{1 0 1}}{\autofont{#1}}}
 \def\UndefKey{\printkey{\rgb{1 0 0}}{UNDEF}}
 
@@ -58,7 +57,10 @@
 \def\SplitContV{\printkey{\rgb{0.85 1 0}}{Split vertical}}
 \def\SplitContH{\printkey{\rgb{0.85 1 0}}{Split horizontal}}
 \def\SplitContT{\printkey{\rgb{0.85 1 0}}{Split tabbed}}
-\def\FullscreenContToggle{\printkey{\rgb{0.85 1 0}}{}}
+\def\FullscreenContToggle{\printkey{\rgb{0.85 1 0}}{Fullscreen}}
+\def\LayoutCont#1{\printkey{\rgb{0.85 1 0}}{Layout #1}}
+\def\ResizeCont#1#2#3{\printkey{\rgb{0.85 1 0}}{Resize #1 #2 #3}}
+\def\FloatingToggleCont{\printkey{\rgb{0.85 1 0}}{Floating toggle}}
 % Restart i3
 \def\RestartProg{\printkey{\rgb{1 0 0}}{Restart WM}}
 

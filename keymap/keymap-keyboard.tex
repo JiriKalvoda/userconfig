@@ -1,0 +1,35 @@
+\expandafter \ifx \csname Key\endcsname \relax
+\def\Key#1#2#3{}
+\fi
+\def\setKeyName#1#2#3{%
+\ex\edef\csname keyNameK\Key{}{#1}{#2}\endcsname{\iter}%
+\ex\edef\csname Key#3Row\endcsname{#1}%
+\ex\edef\csname Key#3Col\endcsname{#2}%
+\edef\tmp##1{\noexpand\Key{##1}{#1}{#2}}%
+\letcs{Key#3}{tmp}
+}
+\def\setKeyNames#1#2#3{%
+\countj#2%
+\for{iter}\in{#3}{%
+\setKeyName{#1}{\the\countj}{\iter}%
+\advance\countj1}%
+}
+
+\setKeyNames{0}{0}{{Esc}}
+\for i 1 {13}{\setKeyNames{0}{\counti}{{F\the\counti}}}
+\setKeyNames{1}{0}{`1234567890-={Backspace}}
+\setKeyNames{2}{0}{{Tab}QWERTYUIOP[]{Entr}}
+\setKeyNames{3}{0}{{CapsLk}ASDFGHJKL;'}
+\ex\def\csname keyNameK\Key{}{3}{12}\endcsname{\\}
+\setKeyNames{4}{0}{{Shift}{Not}ZXCVBNM,./{Shift}}
+\setKeyNames{5}{0}{{Ctrl}{Super}{Alt}{Space}{AltGr}{Super}{Ctrl}}
+\setKeyNames{6}{0}{{PrtSc}{ScrLock}{Pause}}
+\setKeyNames{7}{0}{{Insert}{Home}{PgUp}}
+\setKeyNames{8}{0}{{Delete}{End}{PgDown}}
+\setKeyNames{9}{0}{{Up}}
+\setKeyNames{10}{0}{{Left}{Down}{Right}}
+\setKeyNames{11}{0}{{NumLock}/*-}
+\setKeyNames{12}{0}{{N7}{N8}{N9}+}
+\setKeyNames{13}{0}{{N4}{N5}{N6}}
+\setKeyNames{14}{0}{{N1}{N2}{N3}{Enter}}
+\setKeyNames{15}{0}{0.}

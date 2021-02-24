@@ -1,6 +1,7 @@
 \def\OutputMode{i3}
 \input keymap-utils.tex
 \input keymap-abstract.tex
+\input keymap-keyboard.tex
 
 \catcode`p=1
 \catcode`q=2
@@ -56,9 +57,6 @@ qcatcode92=0
 %%%%%%%%%%%%%% general Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\GoMode#1{\addoutput{mode "#1"; }\Cmd{i3-mode-log "#1"}}
 \def\Cmd#1{\addoutput{exec "}\beginCmdEsc\addoutput{#1}\endEsc\addoutput{"}}
-\def\LayoutCont#1{\addoutput{ layout #1 }}
-\def\ResizeCont#1#2#3{\addoutput{ resize #1 #2 #3 px or #3 ppt }}
-\def\FloatingToggleCont{\addoutput{floating toggle}}
 
 %%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % workspaces
@@ -73,8 +71,12 @@ qcatcode92=0
 \def\SplitContH{\addoutput{ split h }}
 \def\SplitContT{\addoutput{ split v; layout tabbed }}
 \def\FullscreenContToggle{\addoutput{ fullscreen toggle }}
+\def\LayoutCont#1{\addoutput{ layout #1 }}
+\def\ResizeCont#1#2#3{\addoutput{ resize #1 #2 #3 px or #3 ppt }}
+\def\FloatingToggleCont{\addoutput{floating toggle}}
 % Restart i3
 \def\RestartProg{\Cmd{terminal -e ~/.config/i3/i3-restart}}
+\def\RestartProgII{\addoutput{restart}}
 
 %%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\ExitProg{\confirmCmd{Do you really want to EXIT i3 }{i3-msg exit}}
