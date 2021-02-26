@@ -21,8 +21,8 @@
 \def\pagebody{\vbox{\boxmaxdepth\maxdepth \pagecontents}}
 
 \parindent=0pt
-\hsize=81cm
-\pdfpagewidth=85cm
+\hsize=86cm
+\pdfpagewidth=87cm
 \vsize=123cm
 \pdfpageheight=0cm
 \font\hhdfont csbx32
@@ -39,7 +39,138 @@
 #1\basicfont%
 }%
 
+%%%%%%%%%%%%%% Kernel %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newdimen\keyw
+\newdimen\keyh
+\newdimen\skipBefore
+
+\def\nullkey{\printkey{\cwhite}{}}
+
+\input keymap-map.tex
+\input keymap-doc-keyboard.tex
+
+
+
+
+
+\def\printkey#1#2{%
+\hrule \hbox{%
+\vrule\relax%
+\hbox to 0pt{\colorlocal{#1}\vrule width \keyw height \keyh\hskip -\keyw}%
+\vbox to \keyh{%
+\hsize\keyw%
+\leftskip 0pt plus 1fill%
+\rightskip 0pt plus 1fill%
+\vskip 0pt plus 1fil\relax%
+\keyname%
+#2%
+\hskip 0pt\hbox{}\vskip 0pt plus 1fil\relax\hrule height 0pt
+}\vrule%
+}\hrule%
+}
+
+\def\printActKey{%
+\skipBefore \csname skipBeforeK\keyBase\endcsname%
+\kern \skipBefore\vbox{%
+\keyw \csname keywK\keyBase\endcsname%
+\keyh \csname keyhK\keyBase\endcsname%
+\advance\keyw -0.4pt%
+\advance\keyh -0.4pt%
+\def\keyname{\csname keyNameK\keyBase\endcsname\nl}%
+\def\printActKeyIsFirst{1}
+\for{iter}\in\localAllMod{%
+\setKeyMod{\iter}
+\letcs{tmp}{activeModM\keyMod}
+\if\tmp1%
+\csname keymapK\key\endcsname%
+\vskip-0.4pt%
+\if \printActKeyIsFirst1\relax%
+\advance\keyh -10pt%
+\def\keyname{}%
+\def\printActKeyIsFirst{0}%
+\fi%
+\fi%
+}%
+}%
+\hskip -0.4pt
+}
+
+\def\printModList{%
+\kern \skipBefore\vbox{%
+\keyw 0.4\standkeyw%
+\keyh \standkeyh%
+\advance\keyw -0.4pt%
+\advance\keyh -0.4pt%
+\def\keyname{}%
+\def\printActKeyIsFirst{1}
+\for{iter}\in\localAllMod{%
+\setKeyMod{\iter}
+\letcs{tmp}{activeModM\keyMod}
+\if\tmp1%
+\printkey{\rgb{1 1 1}}{\csname modNameM\keyMod\endcsname}%
+\vskip-0.4pt%
+\if \printActKeyIsFirst1\relax%
+\advance\keyh -10pt%
+\def\printActKeyIsFirst{0}%
+\fi%
+\fi%
+}%
+}%
+\hskip -0.4pt
+\hskip 20pt
+}
+
+
+\def\printLine#1#2{%
+\hbox{#2%
+\for j 0 {\csname keyLineLen\the\counti\endcsname}%
+{\setKeyBase{#1}{\the\countj}\printActKey}%
+}%
+\vskip 10pt%
+}
+
+\newbox\outbox
+
+\def\PrintKeyboard#1{
+\ex\def\ex\localAllMod\ex{#1}
+\if\isFirstPrintKeyboard 1
+\def\isFirstPrintKeyboard{0}
+\for{iter}\in\allmod{\setKeyMod{\iter}\defcs{activeModM\keyMod}{0}}%
+\getUsedMod
+{\hhdfont \ModeName }%
+\vskip 15pt\relax
+\else
+\vskip 50pt\relax
+\fi
+\hbox{
+\vbox{
+\for i 0 1{\printLine{\the\counti}{\printModList}}
+\vskip\afterEscSkip\relax
+\for i 1 6{\printLine{\the\counti}{\printModList}}
+}\hskip \afterAlphaSkip
+\vbox{
+\for i 6 7{\printLine{\the\counti}{}}
+\vskip\afterEscSkip\relax
+\for i 7 9{\printLine{\the\counti}{}}
+{ \setbox5=\vbox{\Key{}{0}{0}\printActKey}\vskip\ht5}
+\for i 9 {11}{\printLine{\the\counti}{}}
+}\hskip \afterAlphaSkip
+\vbox{
+\for i {11} {16}{\printLine{\the\counti}{}}
+}
+}
+}
+
+\def\onModeEnd{\vfil \break}
+
+
 %%%%%%%%%%%%%% Chars and catcodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\catcode`&=11
+\catcode`"=11
+\catcode`'=11
+\catcode`_=11
+\catcode`~=11
+\catcode`$=11 %$
 \def\\{$\scriptscriptstyle \backslash$}
 \def\nl{\par}
 
@@ -74,151 +205,6 @@
 \def\ExitSuspend{\printkey{\rgb{1 0 0}}{Suspend}}
 \def\ExitRestart{\printkey{\rgb{1 0 0}}{Restart}}
 
-%%%%%%%%%%%%%% Kernel %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newdimen\keyw
-\newdimen\keyh
-\newdimen\skipBefore
-
-\def\Ctrl{\def\ctrl{1}}
-\def\Shift{\def\shift{1}}
-\def\Super{\def\super{1}}
-\def\Alt{\def\alt{1}}
-
-\def\key{\keyBase @\keyMod}
-\def\keyBase{}
-\def\keyMod{}
-\def\setKeyBase#1#2{\edef\keyBase{#1@#2}}
-\def\setKeyMod#1{%
-\def\ctrl{0}\def\shift{0}\def\super{0}\def\alt{0}%
-#1%
-\edef\keyMod{\ctrl\shift\super\alt}%
-}
-\def\Key#1#2#3{%
-\setKeyMod{#1}%
-\setKeyBase{#2}{#3}%
-}
-
-\input keymap-doc-keyboard.tex
-\def\BindKey#1#2{
-#1\defcs{keymapK\key}{#2}
-}
-
-\def\getkey#1{%
-\csname keymapK#1\endcsname%
-}
-
-
-\def\nullkey{\printkey{\cwhite}{}}
-\def\nullkeyin{\nullkey} % For comparing
-\def\bindnullkey#1#2{%
-\for{iter}\in\allmod{\BindKey{\Key{\iter}{#1}{#2}}{\nullkey}}%
-}
-
-\def\getUsedMod#1#2{
-\for{iter}\in\allmod{\Key{\iter}{#1}{#2}\letcs{tmp}{keymapK\key}\ifx\tmp\nullkeyin\else\defcs{activeModM\keyMod}{1}\fi}%
-}
-
-
-\def\printkey#1#2{%
-\hrule \hbox{%
-\vrule\relax%
-\hbox to 0pt{\colorlocal{#1}\vrule width \keyw height \keyh\hskip -\keyw}%
-\vbox to \keyh{%
-\hsize\keyw%
-\leftskip 0pt plus 1fill%
-\rightskip 0pt plus 1fill%
-\vskip 0pt plus 1fil\relax%
-\keyname%
-#2%
-\hskip 0pt\hbox{}\vskip 0pt plus 1fil\relax\hrule height 0pt
-}\vrule%
-}\hrule%
-}
-
-\def\printActKey{%
-\skipBefore \csname skipBeforeK\keyBase\endcsname%
-\kern \skipBefore\vbox{%
-\keyw \csname keywK\keyBase\endcsname%
-\keyh \csname keyhK\keyBase\endcsname%
-\advance\keyw -0.4pt%
-\advance\keyh -0.4pt%
-\def\keyname{\csname keyNameK\keyBase\endcsname\nl}%
-\def\printActKeyIsFirst{1}
-\for{iter}\in\allmod{%
-\setKeyMod{\iter}
-\letcs{tmp}{activeModM\keyMod}
-\if\tmp1%
-\csname keymapK\key\endcsname%
-\vskip-0.4pt%
-\if \printActKeyIsFirst1\relax%
-\advance\keyh -10pt%
-\def\keyname{}%
-\def\printActKeyIsFirst{0}%
-\fi%
-\fi%
-}%
-}%
-\hskip -0.4pt
-}
-
-
-\def\printLine#1{%
-\hbox{%
-\for j 0 {\csname keyLineLen\the\counti\endcsname}%
-{\setKeyBase{#1}{\the\countj}\printActKey}%
-}%
-\vskip 10pt%
-}
-
-\newbox\outbox
-
-\long\def\Mode#1#2{
-{
-\let\UpModeName\ModeName
-\def\ModeName{#1}
-\for i 0 {16}{\for j 0 {14} {\bindnullkey{\the\counti}{\the\countj}}}
-#2
-\for{iter}\in\allmod{\setKeyMod{\iter}\defcs{activeModM\keyMod}{0}}%
-\for i 0 {16}{\for j 0 {14} {\getUsedMod{\the\counti}{\the\countj}}}%
-{\hhdfont #1 %
-%\def\isFirst{1}%
-%\for{iter}\in\allmod{%
-%\letcs{tmp}{activeModM\iter}%
-%\if\tmp1%
-%\if \isFirst1\def\isFirst{0}\else, \fi%
-%\csname modNameM\iter\endcsname%
-%\fi}%
-}
-\vskip 10pt\relax
-\hbox{
-\vbox{
-\for i 0 1{\printLine{\the\counti}}
-\vskip\afterEscSkip\relax
-\for i 1 6{\printLine{\the\counti}}
-}\hskip \afterAlphaSkip
-\vbox{
-\for i 6 7{\printLine{\the\counti}}
-\vskip\afterEscSkip\relax
-\for i 7 9{\printLine{\the\counti}}
-{ \setbox5=\vbox{\Key{}{0}{0}\printActKey}\vskip\ht5}
-\for i 9 {11}{\printLine{\the\counti}}
-}\hskip \afterAlphaSkip
-\vbox{
-\for i {11} {16}{\printLine{\the\counti}}
-}
-}
-\box\outbox
-}
-\vfil \break
-}
-
-%%%%%%%%%%%%%% Chars and catcodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\catcode`&=11
-\catcode`"=11
-\catcode`'=11
-\catcode`_=11
-\catcode`~=11
-\catcode`$=11 %$
 
 %%%%%%%%%%%%%% Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \Mode{default}{

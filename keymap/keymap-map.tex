@@ -1,0 +1,55 @@
+\def\maph{16}
+\def\mapw{14}
+
+\def\Ctrl{\def\ctrl{1}}
+\def\Shift{\def\shift{1}}
+\def\Super{\def\super{1}}
+\def\Alt{\def\alt{1}}
+
+\def\key{\keyBase @\keyMod}
+\def\keyBase{}
+\def\keyMod{}
+\def\setKeyBase#1#2{\edef\keyBase{#1@#2}}
+\def\setKeyMod#1{%
+\def\ctrl{0}\def\shift{0}\def\super{0}\def\alt{0}%
+#1%
+\edef\keyMod{\ctrl\shift\super\alt}%
+}
+
+
+
+\def\Key#1#2#3{%
+\setKeyMod{#1}%
+\setKeyBase{#2}{#3}%
+}
+
+\def\BindKey#1#2{
+#1\defcs{keymapK\key}{#2}
+}
+
+\def\nullkeyin{\nullkey} % For comparing
+\def\bindnullkey#1#2{%
+\for{iter}\in\allmod{\BindKey{\Key{\iter}{#1}{#2}}{\nullkey}}%
+}
+\def\bindnullkeys{%
+\for i 0 {16}{\for j 0 {14} {\bindnullkey{\the\counti}{\the\countj}}}%
+}
+
+\def\getUsedModTmp#1#2{
+\for{iter}\in\allmod{\Key{\iter}{#1}{#2}\letcs{tmp}{keymapK\key}\ifx\tmp\nullkeyin\else\defcs{activeModM\keyMod}{1}\fi}%
+}
+\def\getUsedMod{%
+\for i 0 {16}{\for j 0 {14} {\getUsedModTmp{\the\counti}{\the\countj}}}%
+}
+
+\long\def\Mode#1#2{
+{
+\def\isFirstPrintKeyboard{1}
+\let\UpModeName\ModeName
+\def\ModeName{#1}
+\bindnullkeys
+#2
+\if\isFirstPrintKeyboard 1 \PrintKeyboard{\allmod} \fi
+\csname onModeEnd\endcsname
+}
+}

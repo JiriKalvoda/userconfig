@@ -48,15 +48,14 @@
 \afterAlphaSkip 30pt
 
 % mods
-\def\allmod{{\relax}{\relax\Shift}{\Ctrl}{\Ctrl\Shift}{\Super}{\Shift\Super}{\Ctrl\Super}{\Ctrl\Shift\Super}}
-\defcs{modNameM0000}{No mod}
-\defcs{modNameM}{Shift}
-\defcs{modNameM}{Ctrl}
-\defcs{modNameM}{Ctrl+Shift}
-\defcs{modNameM}{Super}
-\defcs{modNameM}{Shift+Super}
-\defcs{modNameM}{Ctrl+Super}
-\defcs{modNameM}{Ctrl+Shift+Super}
+\setKeyMod{}\defcs{modNameM\keyMod}{No}
+\setKeyMod{\Shift}\defcs{modNameM\keyMod}{Shift}
+\setKeyMod{\Ctrl}\defcs{modNameM\keyMod}{Ctrl}
+\setKeyMod{\Ctrl\Shift}\defcs{modNameM\keyMod}{Ctrl\nl Shift}
+\setKeyMod{\Super}\defcs{modNameM\keyMod}{Super}
+\setKeyMod{\Super\Shift}\defcs{modNameM\keyMod}{Shift\nl Super}
+\setKeyMod{\Ctrl\Super}\defcs{modNameM\keyMod}{Ctrl\nl Super}
+\setKeyMod{\Ctrl\Super\Shift}\defcs{modNameM\keyMod}{Ct+Sh\nl Super}
 
 \def\setKeyName#1#2#3{%
 \Key{}{#1}{#2}\ex\edef\csname keyNameK\keyBase\endcsname{#3}%

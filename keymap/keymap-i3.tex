@@ -3,47 +3,42 @@
 \input keymap-abstract.tex
 \input keymap-keyboard.tex
 
-\catcode`p=1
-\catcode`q=2
-\catcode`{=11
-\catcode`}=11
-\def\SimLeftCurlip{q
-\def\SimRightCurlip}q
-\catcode`{=1
-\catcode`}=2
-\catcode`p=11
-\catcode`q=11
+\input keymap-i3-keyboard.tex
 
-\catcode113=0
-\catcode92=11
-qdefqSimBackslash{\}
-qcatcode92=0
-\catcode113=11
-
-\def\SimQuotes{"}
-
-\catcode`&=11
-\catcode`~=11
-\catcode`$=11 %$
-\catcode`"=13
-\catcode`'=11
-\catcode`_=11
+\def\addoutput#1{\long\edef\output{\output #1}}
+\def\bindkey#1#2{%
+\addoutput{bindcode #1 }#2\addoutput{\nl}%
+}
+\def\BindKey#1#2{%
+\addoutput{bindcode #1 }#2\addoutput{\nl}%
+}
 
 
-\long\def\nl{^^J}
-\newlinechar`^^J % LaTeX already does this
+
+
+\def\ModeDefaultName{default}
+\def\UpModeName{ERR}
+\def\ModeName{ERR}
+\long\def\Mode#1#2{
+{
+\let\UpModeName=\ModeName
+\edef\ModeName{#1}
+\long\edef\output{}
+\ifx\ModeName\ModeDefaultName\else\addoutput{mode "#1"\nl\{\nl}\fi
+#2
+\ifx\ModeName\ModeDefaultName\else\addoutput{\}}\fi
+\immediate\write\file{\output\nl
+}\relax
+}
+}
+
+
+\input keymap-catcode-to-file.tex
 
 \def\beginCmdEsc{%
 \def"{\SimBackslash\SimBackslash\SimQuotes}%
 \def\\{\SimBackslash\SimBackslash\SimBackslash\SimBackslash}%
 }
-\def\endEsc{
-\def"{\SimQuotes}%
-\def\\{\SimBackslash}%
-\def\{{\SimLeftCurli}%
-\def\}{\SimRightCurli}%
-}
-\endEsc
 
 \def\Ctrl{ctrl+}
 \def\Shift{shift+}
@@ -91,43 +86,13 @@ qcatcode92=0
 \def\IiiiLine#1{\addoutput{#1\nl}}
 \def\IiiiInline#1{\addoutput{#1}}
 
-\input keymap-i3-keyboard.tex
-
-\def\addoutput#1{\long\edef\output{\output #1}}
-\def\bindkey#1#2{%
-\addoutput{bindcode #1 }#2\addoutput{\nl}%
-}
-\def\BindKey#1#2{%
-\addoutput{bindcode #1 }#2\addoutput{\nl}%
-}
-
 
 \newwrite\file
 \immediate\openout\file = ./i3.config
 
-
-\def\ModeDefaultName{default}
-\def\UpModeName{ERR}
-\def\ModeName{ERR}
-\long\def\Mode#1#2{
-{
-\let\UpModeName=\ModeName
-\edef\ModeName{#1}
-\long\edef\output{}
-\ifx\ModeName\ModeDefaultName\else\addoutput{mode "#1"\nl\{\nl}\fi
-#2
-\ifx\ModeName\ModeDefaultName\else\addoutput{\}}\fi
-\immediate\write\file{\output\nl
-}\relax
-}
-}
-
-
-
 \Mode{\ModeDefaultName}{
 \input ./master.tex
 }
-
 
 \closeout\file
 \bye
