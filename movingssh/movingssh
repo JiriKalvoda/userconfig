@@ -103,7 +103,6 @@ killallmy()
 		name=$(ps -p $p -o comm=)
 		if [[ " $* " == *"$name"* ]]
 		then
-			echo KILL $p $name
 			debug KILL $p $name
 			kill $p
 		fi
