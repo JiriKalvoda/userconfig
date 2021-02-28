@@ -3,8 +3,10 @@
 \input keymap-abstract.tex
 \input keymap-keyboard.tex
 
-\def\nullkey{\addoutput{nullkey}}
-\def\UndefKey{\addoutput{undefkey}}
+\def\nullkey{\addoutput{k::null}}
+\def\UndefKey{\addoutput{k::undef}}
+\def\Cmd#1{\beginStrEsc\addoutput{k::cmd(\SimQuotes#1\SimQuotes)}\endEsc}
+\def\GoMode#1{\addoutput{k::goMode(\SimQuotes#1\SimQuotes)}}
 \input keymap-map.tex
 
 \long\def\addoutput#1{\immediate\write\file{#1}}
