@@ -24,7 +24,7 @@ then
 	kam -Y -t="$server_m $1"
 elif [[ "$1" == "rf" ]]
 then
-	kam -Y -t="$server_m $2"
+	kam -Y -t="$server_m rf $2"
 elif [[ "$1" == "lf" ]]
 then
 	file=$2
