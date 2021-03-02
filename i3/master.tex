@@ -42,7 +42,7 @@
 
 \def\AppWorkspace#1#2#3#4{
 	\BindKey{\Key{\Super}{#1}{#2}}{\GoWorkspace{#3}}
-	\BindKey{\Key{\Shift\Super}{#1}{#2}}{\Cmd{i3-msg workspace "#3"; #4}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{\AndII{\GoWorkspace{#3}}{\Cmd{#4}}}
 	\BindKey{\Key{\Ctrl\Super}{#1}{#2}}{\ContGoWorkspace{#3}}
 }
 
@@ -109,6 +109,7 @@ bar \{%
 \BindKey{\Key{\Shift\Super}{3}{1}}{\FocusWind{child}}
 
 \BindKey{\Key{\Shift\Super}{2}{4}}{\RestartProg}
+\BindKey{\Key{\Ctrl\Shift\Super}{2}{4}}{\RestartProgII}
 
 % kill window
 \BindKey{\Key{\Super}{2}{1}}{\Cmd{~/.config/i3/i3-kill}}
@@ -173,7 +174,7 @@ bar \{%
 \AppWorkspace{4}{2}{ZOOM}{zoom}
 \IiiiLine{for_window [class="zoom"] move container to workspace ZOOM}
 
-\IiiiLine{for_window [title="Jitsi Meet"] floating enable}
+\IiiiLine{for_window [title="AlwaysOnTop"] floating enable}
 
 \BindKey{\Key{\Super}{4}{7}}{\Cmd{nemo}}
 
@@ -198,7 +199,7 @@ bar \{%
 
 %%%%%%%%%%%%%% OSD %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\OsdEmpty{\Cmd{osdc --duration=1 --output=loglast ""}}
-\def\OsdSkip{\Cmd{osdc --cmd-now=skip --do-not-que --output=no --duration=1 ""}}
+\def\OsdSkip{\Cmd{osdc --cmd-now=skip --do-not-que= --output=no --duration=1 ""}}
 \def\OsdClock{\Cmd{osd-clock --output=display}}
 \def\OsdLog{\Cmd{terminal -e bash -i -c "tail -n500 ~/.osdd_log;read"}}
 \def\OsdRestart{\Cmd{osdd-run & sleep 1;osdc --color=red RESTART}}
@@ -223,7 +224,7 @@ bar \{%
 \BindKey{\Key{\Shift\Super}{2}{3}}{\ExitProg}
 \BindKey{\Key{\Shift\Super}{3}{2}}{\ExitShutdown}
 \BindKey{\Key{\Ctrl\Super}{3}{2}}{\ExitSuspend}
-\BindKey{\Key{\Ctrl\Shift\Super}{2}{4}}{\ExitRestart}
+\BindKey{\Key{\Ctrl\Super}{2}{4}}{\ExitRestart}
 \BindKey{\Key{\Super}{4}{3}}{\GoMode{System-modifikator}}
 
 \Mode{System-modifikator}{
@@ -240,9 +241,9 @@ bar \{%
 	\BindKey{\Key{}{3}{4}}{\Volume{+}{2}}
 	\BindKey{\Key{}{3}{5}}{\Volume{+}{10}}
 
-	\BindKey{\Key{2}{9}{}}{\Cmd{xrandr --auto }}
-	\BindKey{\Key{2}{7}{}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0}}
-	\BindKey{\Key{2}{8}{}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500}}
+	\BindKey{\Key{}{4}{9}}{\Cmd{xrandr --auto }}
+	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0}}
+	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500}}
 
 	\BindKey{\Key{}{4}{6}}{\Cmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}}
 
@@ -268,16 +269,35 @@ bar \{%
 	\BindKey{\Key{\Shift}{2}{12}}{\AndII{\GoMode{default}}{\Cmd{gksudo -g gparted}}}
 	\BindKey{\Key{\Ctrl}{2}{12}}{\AndII{\GoMode{default}}{\Cmd{gksudo -g gnome-disks}}}
 
-	\BindKey{\Key{      }{4}{1}}{\OsdRestart}
+	\BindKey{\Key{}{4}{1}}{\OsdRestart}
 	\BindKey{\Key{\Shift}{4}{1}}{\OsdTest}
-	\BindKey{\Key{      }{4}{2}}{\OsdEnable{led}}
+	\BindKey{\Key{\Super}{3}{12}}{\OsdRestart}
+	\BindKey{\Key{\Super\Shift}{3}{12}}{\OsdTest}
+	\BindKey{\Key{}{4}{2}}{\OsdEnable{led}}
 	\BindKey{\Key{\Shift}{4}{2}}{\OsdDisable{led}}
-	\BindKey{\Key{      }{4}{3}}{\OsdEnable{loglast}}
+	\BindKey{\Key{}{4}{3}}{\OsdEnable{loglast}}
 	\BindKey{\Key{\Shift}{4}{3}}{\OsdDisable{loglast}}
-	\BindKey{\Key{      }{4}{4}}{\OsdEnable{display0}}
+	\BindKey{\Key{}{4}{4}}{\OsdEnable{display0}}
 	\BindKey{\Key{\Shift}{4}{4}}{\OsdDisable{display0}}
-	\BindKey{\Key{      }{4}{5}}{\OsdEnable{display1}}
+	\BindKey{\Key{}{4}{5}}{\OsdEnable{display1}}
 	\BindKey{\Key{\Shift}{4}{5}}{\OsdDisable{display1}}
 }
+%\BindKey{\KeyI{\Super}}{\Cmd{terminal}}
+%\BindKey{\Key{}{2}{6}}{\Cmd{terminal}}
 
 \input led.tex
+
+\def\OutputModeIiii{i3}
+\ifx\OutputMode\OutputModeIiii
+\IiiiInline{bindcode 171 }\LedOpSwap{pokojik}{_}{second}\IiiiLine{}
+\IiiiInline{bindcode 173 }\Volume{}{0}\IiiiLine{}
+\IiiiLine{bindcode 172 exec playerctl play-pause}
+\IiiiLine{bindcode 208 exec playerctl play-pause}
+\IiiiLine{bindcode 209 exec playerctl play-pause}
+\fi
+
+\def\OutputModeDoc{doc}
+\ifx\OutputMode\OutputModeDoc
+\PrintKeyboard{{\relax\Super}{\Super\Shift}{\Super\Ctrl}{\Super\Ctrl\Shift}}
+\PrintKeyboard{{\relax}{\Shift}{\Ctrl}{\Ctrl\Shift}}
+\fi
