@@ -28,8 +28,13 @@ HISTSIZE=1000
 HISTFILESIZE=2000
 
 promt_parse_git_branch() {
-    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+	if [ $promt_NoGit -eq 0 ]; then 
+		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+	else
+		echo "?"
+	fi
 }
+promt_NoGit=0
 promt_rvalue() {
 	lastcmd=$?;
 	if [ $lastcmd -ne 0 ]; then 
@@ -75,6 +80,14 @@ pNN()
 		promt_NoUser=1;
 	else
 		promt_NoUser=0;
+	fi
+}
+pG()
+{
+	if [ $promt_NoGit -eq 0 ]; then
+		promt_NoGit=1;
+	else
+		promt_NoGit=0;
 	fi
 }
 
@@ -242,6 +255,7 @@ alias gil="git log --max-count=1"
 alias gia="git add"
 alias giaa="git add ."
 alias ms="movingssh"
+complete -F _movingssh ms
 alias sys="sudo systemctl "
 alias syss="sudo systemctl start"
 alias syse="sudo systemctl stop"

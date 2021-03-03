@@ -1,0 +1,6 @@
+#!/bin/bash
+for i in kamenik kamenac kamenozrout lomikamen kamenolom kaminka
+do
+	terminal -e movingssh $i -t htop &
+done
+movingssh kamna -t htop

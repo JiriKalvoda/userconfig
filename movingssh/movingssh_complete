@@ -1,0 +1,12 @@
+_movingssh() 
+{
+	prefix=""
+	tmp="$2"
+	while [[ "${tmp:0:1}" == "_" ]]
+	do
+		prefix=${prefix}_
+		tmp=${tmp:1:}
+	done
+	COMPREPLY=( $( (ls ~/.movingssh/address; cat ~/.movingssh/groups-complete/* 2>/dev/null) | grep "^$2" | grep -v "^${prefix}_") )
+}
+complete -F _movingssh movingssh

@@ -1,9 +1,11 @@
 #!/bin/bash
 
-username="$USER"
+usernameDefault="$USER"
+usernameSpec=""
 mkdir -p ~/m
 mkdir -p ~/.movingssh
 
+####################### PARSE ARG #######################################
 for var in "$@"
 do
 	if [[ "$name" == "" ]]
@@ -18,10 +20,18 @@ do
 		parametrs="$parametrs $var"
 	fi
 done
+
+name="$name"
+while [[ "${name:0:1}" == '_' ]]
+do
+	name="${name:1}"
+done
+
 if [[ -f ~/.movingssh/config ]]
 then
 	. ~/.movingssh/config
 fi
+####################### HELP #######################################
 if [[ "$minus" == *"h"* ]]
 then
 	cat <<EOF
@@ -31,8 +41,8 @@ Usage:
 
 Parametrs:
 	-h	print this help
-	-d	print debuging messages
-	-p	print addres and port to connect
+	-b	print debuging messages
+	-p	print address and port to connect
 	-d	download new pozition just after run
 	-D	do not download new pozition
 	-x	do not run parralel
@@ -43,10 +53,22 @@ Parametrs:
 	-U	force umount
 	-t	Make tunel
 	-T	Delete tunel route
-
+	-v  Connect x11vnc session view only
+	-V  Connect x11vnc session with control
+	-c  Connect vnc session
+	-n  Do not tunel X server by -Y
+	-N  Do not tunel X server by -Y, tunel it only by -X
 EOF
 	exit 0
 fi
+
+####################### PARSE ARG #######################################
+xtunelCMD="-Y"
+[[ "$minus" == *"N"* ]] && xtunelCMD="-X"
+[[ "$minus" == *"n"* ]] && xtunelCMD=""
+[[ "$minus" == *"v"* ]] && xtunelCMD=""
+[[ "$minus" == *"V"* ]] && xtunelCMD=""
+[[ "$minus" == *"c"* ]] && xtunelCMD=""
 
 if [[ "$name" == "" ]]
 then
@@ -55,13 +77,19 @@ then
 fi
 if [[ "$name" == *"@"* ]]
 then
-	username="$(echo "$name" | cut -d'@' -f1)"
+	usernameSpec="$(echo "$name" | cut -d'@' -f1)"
 	name="$(echo "$name" | cut -d'@' -f2)"
 fi
 timeout=2
 sleepTime=10
 
-configFile=~/.movingssh/$name
+####################### PARSE ARG #######################################
+addressFile=~/.movingssh/address/$name
+tunelFile=~/.movingssh/tunel/$name
+configFile=~/.movingssh/configDevice/$name
+mkdir -p ~/.movingssh/address/
+mkdir -p ~/.movingssh/tunel/
+mkdir -p ~/.movingssh/configDevice/
 mountpoint=~/m/$name
 servermountpoint=/
 [[ "$MS_MOUNTPOINT" != "" ]] && mountpoint="$MS_MOUNTPOINT"
@@ -115,7 +143,7 @@ parseConfig()
 	debug PARSE CONFIG
 	#shopt -s extglob
 	declare -g -A config
-	if [ -f "$configFile" ]
+	if [ -f "$addressFile" ]
 	then
 		while IFS='= ' read -r lhs rhs
 		do
@@ -126,22 +154,35 @@ parseConfig()
 			rhs="${rhs#\"*}"     # Del closing string quotes 
 			config[$lhs]="$rhs"
 		    fi
-		done < $configFile
-		if [[ "$1" != "notunel" ]] && [ -f $configFile-tunel ] 
-		then
-			while IFS='= ' read -r lhs rhs
-			do
-			    if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
-				rhs="${rhs%%\#*}"    # Del in line right comments
-				rhs="${rhs%%*( )}"   # Del trailing spaces
-				rhs="${rhs%\"*}"     # Del opening string quotes 
-				rhs="${rhs#\"*}"     # Del closing string quotes 
-				config[$lhs]="$rhs"
-			    fi
-			done < $configFile-tunel
-		fi
+		done < $addressFile
 	else
-		debug NOCONFIG
+		if [ -d ~/.movingssh/groups ]
+		then
+			for i in  ~/.movingssh/groups/*
+			do
+				. $i
+			done
+		fi
+	fi
+	if [[ "$1" != "notunel" ]] && [ -f $tunelFile ] 
+	then
+		while IFS='= ' read -r lhs rhs
+		do
+			if [[ ! $lhs =~ ^\ *# && -n $lhs ]]; then
+			rhs="${rhs%%\#*}"    # Del in line right comments
+			rhs="${rhs%%*( )}"   # Del trailing spaces
+			rhs="${rhs%\"*}"     # Del opening string quotes 
+			rhs="${rhs#\"*}"     # Del closing string quotes 
+			config[$lhs]="$rhs"
+			fi
+		done < $tunelFile
+	fi
+	[ -f "$configFile" ] && . $configFile
+	if [[ $usernameSpec == "" ]]
+	then
+		username="$usernameDefault"
+	else
+		username="$usernameSpec"
 	fi
 }
 printAddres()
@@ -156,21 +197,22 @@ printAddres()
 }
 download()
 {
+	[[ "$noDownload" != "" ]] && return
 	if [[ "$minus" == *"D"* ]]
 	then
 		return 0
 	fi
 	debug DOWNLOAD
 	newConfigFile=$(mktemp)
-	ssh $downloadServer  $timeoutCMD "cat /home/jirikalvoda/.movingssh/$name" > $newConfigFile 2>/dev/null
+	ssh $downloadServer  $timeoutCMD "cat /home/jirikalvoda/.movingssh/address/$name" > $newConfigFile 2>/dev/null
 	if [[ $? = 0 ]]
 	then
 		debug DOWNLOAD OK
-		diff $configFile $newConfigFile -q >/dev/null
+		diff $addressFile $newConfigFile -q >/dev/null
 		if [[ $? != 0 ]]
 		then
 			debug DIFF CONFIG
-			cat $newConfigFile > $configFile
+			cat $newConfigFile > $addressFile
 			parseConfig
 			printAddres
 			rm $newConfigFile
@@ -281,7 +323,8 @@ conect()
 		vncserver $@
 		return $?
 	else
-		ssh $envCMD $username@$1 -p$2 $keyCMD $parametrs
+		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyCMD $parametrs
+		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyCMD $parametrs
 		return $?
 	fi
 }
@@ -319,7 +362,7 @@ local()
 
 if [[ "$minus" == *"T"* ]]
 then
-	rm $configFile-tunel
+	rm $tunelFile
 fi
 
 parseConfig
@@ -355,11 +398,11 @@ if [[ "$minus" == *"t"* ]]
 then
 	parseConfig notunel
 	tunelPort=$(( 40000 + $RANDOM % 10000 ))
-	echo -e "ipB=localhost\nportB=$tunelPort" > $configFile-tunel
+	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile
 	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m"
 	ssh -p 443 jirikalvoda@sneaky.kam.mff.cuni.cz -L $tunelPort:${config[ipB]}:${config[portB]} "read"
 	echo END
-	rm $configFile-tunel
+	rm $tunelFile
 	exit 0
 fi
 if [[ "$minus" == *"l"* ]]

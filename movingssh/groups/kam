@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if [[ "$name" == *"kam"* ]] || [[ "$name" == *"cam" ]] || [[ "$minus" == *"k"* ]]
+then
+	config[ipB]=$name.kam.mff.cuni.cz
+	config[portB]=22
+	usernameDefault=jirikalvoda
+	noDownload=1
+fi
