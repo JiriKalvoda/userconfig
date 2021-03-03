@@ -5,6 +5,12 @@
 \newcount\countJ
 \def\Iter{}
 
+\openin15=local.tex  
+\ifeof15
+\else\closein15
+\input local.tex
+\fi
+
 %%%%%%%%%%%%%% Config functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\WorkspaceAll#1#2#3{
 	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoWorkspace{#3}}
