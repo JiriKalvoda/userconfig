@@ -335,3 +335,10 @@ alias please='sudo $(fc -ln -1)'
 if [[ -z "${DISPLAY}" ]] && [[ "${XDG_VTNR}" = "1" ]]; then
   startx 
 fi
+
+
+#gpg
+bye()
+{
+	gpg-connect-agent reloadagent /bye
+}
