@@ -265,6 +265,13 @@ giaac() { git add . $@;git commit; }
 giaca() { git add $@;git commit --amend; }
 giaaca() { git add . $@;git commit --amend; }
 gip() { git pull $@;git push $@; }
+gipa() {
+	b=$1
+	[[ "$b" == "" ]] && b="$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+	git remote | while read r ; do echo -e "\e[91;1m PULL $r $b\e[0m"; git pull $r $b ; done
+	git remote | while read r ; do echo -e "\e[91;1m PUSH $r $b\e[0m"; git push $r $b ; done
+}
+
 youtube() {
 	youtube-dl $@ -o - | vlc -
 }
