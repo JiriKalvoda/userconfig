@@ -6,7 +6,7 @@ sudo chmod +x /usr/bin/publicmyip
 sudo ln -sr myip.sh /usr/bin/myip
 sudo chmod +x /usr/bin/myip
 
-sudo ln -sr publicmyip.service /lib/systemd/system
+sudo cp publicmyip.service /lib/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl enable publicmyip
 
