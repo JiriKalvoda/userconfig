@@ -1,0 +1,4 @@
+in /etc/pam.d/system-auth
+disable -account [success=1 default=ignore] pam_systemd_home.so
+
+from https://github.com/systemd/systemd/issues/17266
