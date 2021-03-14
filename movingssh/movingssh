@@ -442,10 +442,10 @@ then
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
 		echo LOCAL
-		LD_SSHTYPE=local sshfs $username@${config[ipA]}:$servermountpoint -p ${config[portA]} $keyCMD $mountpoint
+		LD_SSHTYPE=local sshfs -o follow_symlinks -C $username@${config[ipA]}:$servermountpoint -p ${config[portA]} $keyCMD $mountpoint
 	else
 		echo '********REMOTE**********'
-		LD_SSHTYPE=remote sshfs $username@${config[ipB]}:$servermountpoint -p ${config[portB]} $keyCMD $mountpoint
+		LD_SSHTYPE=remote sshfs  -o follow_symlinks -C $username@${config[ipB]}:$servermountpoint -p ${config[portB]} $keyCMD $mountpoint
 	fi
 else
 	tryLocalDownload &
