@@ -228,6 +228,7 @@ bar \{%
 
 %%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \BindKey{\Key{\Shift\Super}{2}{3}}{\ExitProg}
+\BindKey{\Key{\Ctrl\Super}{2}{3}}{\Cmd{xtrlock}}
 \BindKey{\Key{\Shift\Super}{3}{2}}{\ExitShutdown}
 \BindKey{\Key{\Ctrl\Super}{3}{2}}{\ExitSuspend}
 \BindKey{\Key{\Ctrl\Super}{2}{4}}{\ExitRestart}
@@ -302,8 +303,11 @@ bar \{%
 \IiiiLine{bindcode 209 exec playerctl play-pause}
 \fi
 
+\BindKey{\KeyO{\Super}}{\Cmd{~/dev/pasman/client chrome}}
+
 \def\OutputModeDoc{doc}
 \ifx\OutputMode\OutputModeDoc
 \PrintKeyboard{{\relax\Super}{\Super\Shift}{\Super\Ctrl}{\Super\Ctrl\Shift}}
 \PrintKeyboard{{\relax}{\Shift}{\Ctrl}{\Ctrl\Shift}}
 \fi
+
