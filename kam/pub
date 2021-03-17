@@ -1,5 +1,7 @@
 #!/bin/bash
 
+user=jirikalvoda
+
 for var in "$@"
 do
 	if [[ "$var" == -* ]]
@@ -28,9 +30,9 @@ done
 
 [[ $port == "" ]] && [[ $host == "" ]] && port=443
 [[ $port == "" ]] && port=80
-[[ $host == "" ]] && host=jirikalvoda@sneaky.kam.mff.cuni.cz
+[[ $host == "" ]] && host=$user@sneaky.kam.mff.cuni.cz
 [[ $dir == "" ]] && dir=WWW/priv
-[[ $printprefix == "" ]] && printprefix="https://kam.mff.cuni.cz/~jirikalvoda/priv"
+[[ $printprefix == "" ]] && printprefix="https://kam.mff.cuni.cz/~$user/priv"
 
 rcode=$(head /dev/random -c100 |  sha224sum | head -c30)
 
