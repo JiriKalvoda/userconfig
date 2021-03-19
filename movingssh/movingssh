@@ -61,6 +61,7 @@ Parametrs:
 	-n  Do not tunel X server by -Y
 	-N  Do not tunel X server by -Y, tunel it only by -X
 	-g 	Only print addres for use
+	-s  use moSh
 EOF
 	exit 0
 fi
@@ -328,6 +329,10 @@ printGetAddres()
 			echo $username@$1:
 			echo -e=\'ssh $envCMD -p$2  $keyCMD\'
 			;;
+		"rsyncnoesc")
+			echo $username@$1:
+			echo -e=ssh $envCMD -p$2  $keyCMD
+			;;
 		*)
 			echo $username $1 $2
 			;;
@@ -349,6 +354,10 @@ conect()
 	elif [[ "$minus" == *"c"* ]]
 	then
 		vncserver $@
+		return $?
+	elif [[ "$minus" == *"s"* ]]
+	then
+		mosh  $username@$1 --ssh="ssh $envCMD -p$2 $xtunelCMD  $keyCMD $parametrs"
 		return $?
 	else
 		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyCMD $parametrs
