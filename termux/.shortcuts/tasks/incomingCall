@@ -1,0 +1,2 @@
+sshd
+ssh localhost -p8022 bash -i ~/.shortcutsmac/$(basename $0)

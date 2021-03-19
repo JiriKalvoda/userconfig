@@ -1,0 +1,14 @@
+#!/bin/bash
+if \
+[[ "$1" != "on" ]] && \
+[[ "$1" != "off" ]] && \
+[[ "$1" != "cpu" ]] && \
+[[ "$1" != "dim" ]]
+then
+	echo "Usage:"
+	echo "\t\t$0 [on, off. cpu, dim]"
+exit 0
+fi
+
+macrodroid "awake $1"
+

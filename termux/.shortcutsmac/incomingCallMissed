@@ -1,0 +1,2 @@
+cat name number | neomutt -e "set from = \"$(cat name)  <jirikalvoda+call@kam.mff.cuni.cz>\"" -s "MISSED CALL"  jirikalvoda+call@kam.mff.cuni.cz &
+movingssh -x arch DISPLAY=:0 osdc "'CALL MISSED'"  --duration=10000 --min-duration=10000  "'$(cat number)'" "'$(cat name)'"

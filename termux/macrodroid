@@ -1,0 +1,2 @@
+#!/bin/bash
+am broadcast -a "termux $1" com.arlosoft.macrodroid

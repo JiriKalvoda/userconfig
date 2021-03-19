@@ -1,0 +1,1 @@
+movingssh -x arch DISPLAY=:0 osdc CALL  --duration=10000 --min-duration=10000  "'$(cat number)'" "'$(cat name)'"

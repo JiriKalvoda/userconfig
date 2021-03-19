@@ -1,0 +1,17 @@
+wd=$(pwd)
+dir=/storage/emulated/0/termux/launcher/$RANDOM
+mkdir $dir
+cd $dir
+
+e=0
+for i in $@
+do
+	[[ "$e" == "1" ]] && echo -n "\"$i\" " >> run
+	[[ "$i" == "-e" ]] && e=1 && echo -n "cd $wd ;  "> run
+done
+[[ "$e" == "0" ]] && echo -n "cd ~ ;bash "> run
+
+cd  ..
+
+
+launcher

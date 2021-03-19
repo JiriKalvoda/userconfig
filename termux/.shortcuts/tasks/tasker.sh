@@ -1,0 +1,1 @@
+bash  ~/.shortcutsmac/tasker.sh
