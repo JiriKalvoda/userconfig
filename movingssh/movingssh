@@ -1,6 +1,6 @@
 #!/bin/bash
 
-msgOut="&2"
+toMsgOutput=">&2"
 
 usernameDefault="$USER"
 usernameSpec=""
@@ -76,7 +76,7 @@ xtunelCMD="-Y"
 
 if [[ "$name" == "" ]]
 then
-	echo NO ARGUMENTS >$msgOut
+	echo NO ARGUMENTS >&2
 	exit 0
 fi
 if [[ "$name" == *"@"* ]]
@@ -115,7 +115,7 @@ debug()
 {
 	if [[ "$minus" == *"b"* ]]
 	then
-		echo DEBUG: $@  >$msgOut
+		echo DEBUG: $@  >&2
 	fi
 }
 
@@ -194,8 +194,8 @@ printAddres()
 	if [[ "$minus" == *"p"* ]]
 	then
 		(
-		echo A: ${config[ipA]} ${config[portA]}  >$msgOut
-		echo B: ${config[ipB]} ${config[portB]}  >$msgOut
+		echo A: ${config[ipA]} ${config[portA]}  >&2
+		echo B: ${config[ipB]} ${config[portB]}  >&2
 		) | column -t -N \ ,ip,port
 	fi
 }
@@ -279,9 +279,9 @@ tryLocalDownload()
 x11vnc()
 {
 	vncTunelPort=$(( 40000 + $RANDOM % 10000 ))
-	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >$msgOut
-	echo "XXX              PORT $vncTunelPort             XXX" >$msgOut
-	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >$msgOut
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >&2
+	echo "XXX              PORT $vncTunelPort             XXX" >&2
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >&2
 	sudoCmd=""
 	passwdFile=$(mktemp)
 	head -c100 /dev/random | shasum | head -c30 > $passwdFile
@@ -292,7 +292,7 @@ x11vnc()
 	(sleep 1; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer $vncviewerOpt localhost::$vncTunelPort ; done ) &
 	cat $passwdFile | ssh -t $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c "\"cat | x11vnc -localhost -display $VNCDISPLAY -autoport  $vncTunelPort -forever -passwdfile /dev/stdin\""
 	r=$(ssh -t $envCMD $username@$1 -p$2 $keyCMD $sudoCmd bash -c" \"pkill -f autoport\\\" $vncTunelPort\\\" ; echo -n OK\$?\"")
-	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m" >$msgOut
+	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m" >&2
 	rm $passwdFile
 	killallmy movingssh
 }
@@ -301,9 +301,9 @@ vncserver()
 {
 	vncDisplay=$(( $RANDOM % 900 + 100 ))
 	vncTunelPort=$(( 5900 + $vncDisplay ))
-	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >$msgOut
-	echo "XXX              PORT $vncTunelPort             XXX" >$msgOut
-	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >$msgOut
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >&2
+	echo "XXX              PORT $vncTunelPort             XXX" >&2
+	echo "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" >&2
 	sudoCmd=""
 	passwdFile=$(mktemp)
 	head -c100 /dev/random | shasum | head -c30 > $passwdFile
@@ -311,7 +311,7 @@ vncserver()
 	(sleep 0.5; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer  localhost::$vncTunelPort ; done ) &
 	( cat $passwdFile; echo; cat $passwdFile; echo ;echo n; cat ) | ssh -t $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c " \"vncpasswd ; vncserver :$vncDisplay\""
 	r=$(ssh -t $envCMD $username@$1 -p$2 $keyCMD $sudoCmd bash -c" \"pkill -f Xvnc\\\" :$vncDisplay -auth\\\" ; echo -n OK\$?\"")
-	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m" >$msgOut
+	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m" >&2
 	rm $passwdFile
 	killallmy movingssh
 }
@@ -416,13 +416,13 @@ then
 		fi
 		if [ $? != 0 ]
 		then
-			echo UMOUNT FAILD >$msgOut
+			echo UMOUNT FAILD >&2
 			rmdir $mountpoint
 			exit 100
 		fi
 		rmdir $mountpoint
 	else
-		echo DIRECTORY $mountpoint NOT EXISTS >$msgOut
+		echo DIRECTORY $mountpoint NOT EXISTS >&2
 		exit 100
 	fi
 	exit 0
@@ -435,10 +435,10 @@ if [[ "$minus" == *"t"* ]]
 then
 	parseConfig notunel
 	tunelPort=$(( 40000 + $RANDOM % 10000 ))
-	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile >$msgOut
-	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m" >$msgOut
+	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile >&2
+	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m" >&2
 	ssh -p 443 jirikalvoda@sneaky.kam.mff.cuni.cz -L $tunelPort:${config[ipB]}:${config[portB]} "read"
-	echo END >$msgOut
+	echo END >&2
 	rm $tunelFile
 	exit 0
 fi
@@ -455,10 +455,10 @@ then
 	echo NO >&3
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
-		echo LOCAL >$msgOut
+		echo LOCAL >&2
 		local
 	else
-		echo '********REMOTE**********' >$msgOut
+		echo '********REMOTE**********' >&2
 		remote
 	fi
 elif [[ "$minus" == *"m"* ]]
@@ -469,8 +469,8 @@ then
 	fi
 	if [[ -d "$mountpoint" || -f "$mountpoint" ]]
 	then
-		echo DIRECTORY $mountpoint EXISTS >$msgOut
-		echo Unmout it first please >$msgOut
+		echo DIRECTORY $mountpoint EXISTS >&2
+		echo Unmout it first please >&2
 		exit 100
 	fi
 	tryLocalDownload
@@ -478,10 +478,10 @@ then
 	mkdir $mountpoint
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
-		echo LOCAL >$msgOut
+		echo LOCAL >&2
 		LD_SSHTYPE=local sshfs -o follow_symlinks -C $username@${config[ipA]}:$servermountpoint -p ${config[portA]} $keyCMD $mountpoint
 	else
-		echo '********REMOTE**********' >$msgOut
+		echo '********REMOTE**********' >&2
 		LD_SSHTYPE=remote sshfs  -o follow_symlinks -C $username@${config[ipB]}:$servermountpoint -p ${config[portB]} $keyCMD $mountpoint
 	fi
 else
