@@ -1,0 +1,128 @@
+\def\pair#1#2{$\left<#1,#2\right>$}
+\def\E{{\bf E}}
+\def\O{{\cal O}}
+\def\frac#1#2{{{#1}\over{#2}}}
+\mathchardef\comma="013B
+% FIXME: This is ugly, no need to switch modes.
+\def\eq{\ifmmode$\nobreak\ \discretionary{=}{=}{=}\nobreak\ $\else$\eq$\errmessage{You shall use \eq in the math mode.}\fi}
+\def\cdotop{\mathop\cdot}
+\def\degree{^{\circ}}
+\def\nsd{\mathop{\rm nsd}\nolimits}
+\def\nsn{\mathop{\rm nsn}\nolimits}
+
+% Function typeset in italic, e.g., $\f{size}(v)$
+\def\f#1{\mathop{\<#1>}\mkern 1mu\relax}
+
+% Sets
+\font\mft=msbm10
+\def\N{\hbox{\mft N}}
+\def\Z{\hbox{\mft Z}}
+\def\Q{\hbox{\mft Q}}
+\def\R{\hbox{\mft R}}
+\def\C{\hbox{\mft C}}
+
+% \vect is longer than \vec, but with smaller arrow than \overrightarrow (same arrow as in \vec)
+\def\vect#1{%
+  \vbox{\m@th \ialign {##\crcr
+  \vectfill\crcr\noalign{\kern-\p@\vskip-2pt \nointerlineskip}
+  $\hfil\displaystyle{#1}\hfil$\crcr}}}
+\def\vectfill{%
+  $\m@th\smash-\mkern-7mu%
+  \cleaders\hbox{$\mkern-2mu\smash-\mkern-2mu$}\hfill\hskip-2.8pt
+  \mkern-7mu\raise-3.7pt\hbox{$\mathord\mathchar"017E$}$}
+
+% \<...> is already defined in ucwmac, but it does not scale the fonts in (super|sub)scripts
+\def\<#1>{\ifmmode
+\mathchoice{\hbox{\I #1}}{\hbox{\I #1}}{\hbox{\it\setfonts[/7]#1\/}}{\hbox{\it\setfonts[/5]#1\/}}
+\else\leavevmode\hbox{\I #1}\fi}
+
+\let\f\frac
+
+
+\pdfpageheight=0cm
+\pdfpagewidth=0cm
+
+\output{\a}
+
+\pdfhorigin 1pt
+\pdfvorigin 1pt
+
+%%% Colors %%% (from ucwmac (c) MJ)
+\chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
+\def\colorset#1{\pdfcolorstack\colorstk set #1}
+\def\colorpush#1{\pdfcolorstack\colorstk push #1}
+\def\colorpop{\pdfcolorstack\colorstk pop}
+\def\colorlocal{\aftergroup\colorpop\colorpush}
+\def\rgb#1{{#1 rg #1 RG}}
+\def\gray#1{{#1 g #1 G}}
+\def\cmyk#1{{#1 k #1 K}}
+\def\cwhite{\rgb{1 1 1}}
+
+\let\ex\expandafter
+\ex\def\csname hex0\endcsname{\advance\count5 0\relax}
+\ex\def\csname hex1\endcsname{\advance\count5 1\relax}
+\ex\def\csname hex2\endcsname{\advance\count5 2\relax}
+\ex\def\csname hex3\endcsname{\advance\count5 3\relax}
+\ex\def\csname hex4\endcsname{\advance\count5 4\relax}
+\ex\def\csname hex5\endcsname{\advance\count5 5\relax}
+\ex\def\csname hex6\endcsname{\advance\count5 6\relax}
+\ex\def\csname hex7\endcsname{\advance\count5 7\relax}
+\ex\def\csname hex8\endcsname{\advance\count5 8\relax}
+\ex\def\csname hex9\endcsname{\advance\count5 9\relax}
+\ex\def\csname hexa\endcsname{\advance\count5 10\relax}
+\ex\def\csname hexb\endcsname{\advance\count5 11\relax}
+\ex\def\csname hexc\endcsname{\advance\count5 12\relax}
+\ex\def\csname hexd\endcsname{\advance\count5 13\relax}
+\ex\def\csname hexe\endcsname{\advance\count5 14\relax}
+\ex\def\csname hexf\endcsname{\advance\count5 15\relax}
+\def\printnum{
+	\count6\count5
+	\divide\count6 255
+	\edef\tmp{\tmp\the\count6}
+	\multiply\count6 -255
+	\advance\count5 \count6
+	\multiply\count5 10
+}
+\def\cset#1#2#3
+{
+	\count5=0
+	\csname hex#2\endcsname
+	\multiply\count5 16\relax
+	\csname hex#3\endcsname
+	\def\tmp{}\printnum\edef\tmp{\tmp.}
+	\printnum\printnum
+	\printnum\printnum
+	\expandafter\edef\csname #1\endcsname,{\tmp}
+}
+\def\cdef#1#2#3#4#5#6
+{
+	\cset{cr}#1#2
+	\cset{cg}#3#4
+	\cset{cb}#5#6
+}
+\def\c{\colorlocal{\rgb{\cr, \cg, \cb,}}}
+\cdef %%XPP_TEXT_COLOR%% 
+00ff00
+
+\def\endinput{}
+\def\T{\def\endinput{ \egroup } \hbox\bgroup }
+
+\newbox\b
+\setbox\b=\hbox{
+	\vrule height 0pt width 0pt
+	\c
+	$
+	\displaystyle
+    %%XPP_TOOL_INPUT%%
+	\endinput
+    % %%XPP_TEXT_COLOR%%
+% \cr,\ \cg,\ \cb,\
+	$
+}
+
+\def\a{\shipout\vbox{\box\b}\setbox5\box255}
+
+a
+
+\bye
+

@@ -1,0 +1,89 @@
+\def\OutputMode{xopp}
+\input keymap-utils.tex
+\input keymap-abstract.tex
+\input keymap-keyboard.tex
+
+\def\setKeyName#1#2#3{\ex\edef\csname keyCodeK#1K#2\endcsname{#3}}
+\input keymap-keyboard.tex
+\setKeyName{1}{11}{minus}
+\setKeyName{4}{9}{comma}
+\setKeyName{3}{10}{semicolon}
+\setKeyName{3}{11}{apostrophe}
+
+\def\addoutput#1{\long\edef\output{\output #1}}
+
+\def\BindKey#1#2{%
+#2{#1}\addoutput{\nl}%
+}
+
+\newcount\fncount
+\def\nextFn{\edef\fn{fn\the\fncount}\advance\fncount 1\relax}
+
+\def\Xpp#1#2#3{\nextFn\addoutput{%
+_G["\fn"] = function ()\nl
+}
+#3
+\addoutput{\nl
+end\nl
+app.registerUi({
+["menu"] = "#1",
+["callback"] = "\fn",
+["accelerator"] = "#2",
+})
+}}
+
+\def\XppColor#1#2#3{\Xpp{color #2}{#3}{\addoutput{ app.changeToolColor({["color"] = #1, ["selection"] = true})}}}
+
+\def\XppUiAction#1#2#3{\Xpp{#2}{#3}{\addoutput{ app.uiAction({["action"] = "ACTION_#1", ["enabled"] = true})}}}
+\def\XppUiActionDisable#1#2#3{\Xpp{#2}{#3}{\addoutput{ app.uiAction({["action"] = "ACTION_#1", ["enabled"] = false})}}}
+\def\XppPageBackground#1#2#3{\Xpp{#2}{#3}{\addoutput{ app.changeCurrentPageBackground("#1")}}}
+
+
+
+
+
+\def\ModeDefaultName{default}
+\def\UpModeName{ERR}
+\def\ModeName{ERR}
+\long\def\Mode#1#2{
+{
+\let\UpModeName=\ModeName
+\edef\ModeName{#1}
+\long\edef\output{}
+\ifx\ModeName\ModeDefaultName
+\addoutput{function initUi()\nl}
+#2
+\addoutput{\nl end\nl}
+\immediate\write\file{\output\nl
+\fi
+}\relax
+}
+}
+
+
+\input keymap-catcode-to-file.tex
+
+\def\beginCmdEsc{%
+\def"{\SimBackslash\SimBackslash\SimQuotes}%
+\def\\{\SimBackslash\SimBackslash\SimBackslash\SimBackslash}%
+}
+
+\def\Ctrl{ctrl+}
+\def\Shift{shift+}
+\def\Super{Mod4+}
+\def\Key#1#2#3{%
+#1\csname keyCodeK#2K#3\endcsname%
+}
+
+
+
+\newwrite\file
+\immediate\openout\file = ./main.lua
+
+\Mode{\ModeDefaultName}{
+\input ./master.tex
+}
+
+\closeout\file
+\bye
+
