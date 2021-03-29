@@ -1,0 +1,79 @@
+#!/bin/bash
+
+mkdir -p ~/.wacom
+
+name="Wacom One by Wacom M Pen stylus"
+
+map()
+{
+	xsetwacom --set "$name" MapToOutput  "$1"
+	echo $1 > ~/.wacom/map
+	osdc "Wacon map to:" "$1" --to=display
+}
+
+echo_maped()
+{
+	read x0 y0 < ~/.wacom/point_0
+	read x1 y1 < ~/.wacom/point_1
+	X0=$(( $x0 < $x1 ? $x0 : $x1 ))
+	X1=$(( $x0 > $x1 ? $x0 : $x1 ))
+	Y0=$(( $y0 < $y1 ? $y0 : $y1 ))
+	Y1=$(( $y0 > $y1 ? $y0 : $y1 ))
+	(( $X1 - $X0 > 100 )) && (( $Y1 - $Y0 > 100 )) && echo $(( $X1 - $X0 ))x$(( $Y1 - $Y0 ))+$X0+$Y0
+}
+
+if [[ "$1" == "init" ]]
+then
+	xsetwacom --set "$name" Button 1 "button +1"
+	xsetwacom --set "$name" Button 2 "button +3"
+	#xsetwacom --set "$name" Button 3 "button +9"
+	xsetwacom --set "$name" Button 3 "pan"
+	xsetwacom --set "$name" "PanScrollThreshold" 20
+fi
+
+if [[ "$1" == "list" ]]
+then
+	xrandr | grep \ connected\ primary | awk '{print $4}'
+	xrandr | grep \ connected | grep -v \ connected\ primary | awk '{print $3}'
+	echo_maped
+fi
+
+if [[ "$1" == "next" ]]
+then
+	a=$($0 list | grep "$(cat ~/.wacom/map)" -A1)
+	num=$(echo "$a" | wc -l )
+	echo "$a"
+	echo $num
+	(( "$num" < 2 )) && map $($0 list | head -n 1)
+	(( "$num" == 2 )) && map $( echo "$a" | tail -n 1)
+	(( "$num" > 2 )) && osdc --color=red "Wacom next error" --to=display
+fi
+
+if [[ "$1" == "map" ]] && ( [[ "$2" == "0" ]] || [[ "$2" == "1" ]] )
+then
+	eval $(xdotool getmouselocation --shell)
+	echo $X $Y > ~/.wacom/point_$2
+	osdc --to=display "Wacom point $2 to $X $Y"
+	[[ $2 == 1 ]] && $0 outputmapped
+fi
+
+
+if [[ "$1" == "output" ]]
+then
+	a=$($0 list)
+	num=$(echo "$a" | wc -l )
+	echo "$a"
+	echo $num
+	(( "$num" >= "$2" )) && map $( echo "$a" | head -n $(( 1 + $2)) | tail -n 1)
+	(( "$num" < "$2" )) && osdc --color=red "Wacom output error" --to=display
+fi
+
+if [[ "$1" == "outputmapped" ]]
+then
+	a=$( echo_maped )
+	num=$(echo "$a" | wc -l )
+	echo "$a"
+	echo $num
+	[[ "$a" == *"x"* ]] && map $( echo "$a" )
+	[[ "$a" != *"x"* ]] && osdc --color=red "Wacom mapped off" --to=display
+fi
