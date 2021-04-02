@@ -180,6 +180,7 @@ alias l='ls -CF'
 alias vi='vim'
 alias e='vim'
 alias view='vim -R'
+alias pink="ping kam.mff.cuni.cz"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -348,4 +349,13 @@ fi
 bye()
 {
 	gpg-connect-agent reloadagent /bye
+}
+
+
+zath()
+{
+	for i in $@
+	do
+		zathura $i & sleep 0.2
+	done
 }
