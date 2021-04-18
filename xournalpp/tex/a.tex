@@ -1,7 +1,11 @@
+\input ucwmac2
+\ucwmodule{verb}
+
 \def\pair#1#2{$\left<#1,#2\right>$}
 \def\E{{\bf E}}
 \def\O{{\cal O}}
 \def\frac#1#2{{{#1}\over{#2}}}
+\let\f\frac
 \mathchardef\comma="013B
 % FIXME: This is ugly, no need to switch modes.
 \def\eq{\ifmmode$\nobreak\ \discretionary{=}{=}{=}\nobreak\ $\else$\eq$\errmessage{You shall use \eq in the math mode.}\fi}
@@ -36,7 +40,6 @@
 \mathchoice{\hbox{\I #1}}{\hbox{\I #1}}{\hbox{\it\setfonts[/7]#1\/}}{\hbox{\it\setfonts[/5]#1\/}}
 \else\leavevmode\hbox{\I #1}\fi}
 
-\let\f\frac
 
 
 \pdfpageheight=0cm
@@ -46,17 +49,6 @@
 
 \pdfhorigin 1pt
 \pdfvorigin 1pt
-
-%%% Colors %%% (from ucwmac (c) MJ)
-\chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
-\def\colorset#1{\pdfcolorstack\colorstk set #1}
-\def\colorpush#1{\pdfcolorstack\colorstk push #1}
-\def\colorpop{\pdfcolorstack\colorstk pop}
-\def\colorlocal{\aftergroup\colorpop\colorpush}
-\def\rgb#1{{#1 rg #1 RG}}
-\def\gray#1{{#1 g #1 G}}
-\def\cmyk#1{{#1 k #1 K}}
-\def\cwhite{\rgb{1 1 1}}
 
 \let\ex\expandafter
 \ex\def\csname hex0\endcsname{\advance\count5 0\relax}
@@ -104,18 +96,15 @@
 \cdef %%XPP_TEXT_COLOR%% 
 00ff00
 
-\def\endinput{}
-\def\T{\def\endinput{ \egroup } \hbox\bgroup }
-
 \newbox\b
 \setbox\b=\hbox{
 	\vrule height 0pt width 0pt
 	\c
+	%\verb|%%XPP_TOOL_INPUT%% |
 	$
+	%\vrule height 10pt width 10ptx
 	\displaystyle
     %%XPP_TOOL_INPUT%%
-	\endinput
-    % %%XPP_TEXT_COLOR%%
 % \cr,\ \cg,\ \cb,\
 	$
 }
