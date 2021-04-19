@@ -40,33 +40,11 @@
 \mathchoice{\hbox{\I #1}}{\hbox{\I #1}}{\hbox{\it\setfonts[/7]#1\/}}{\hbox{\it\setfonts[/5]#1\/}}
 \else\leavevmode\hbox{\I #1}\fi}
 
-
-
 \pdfpageheight=0cm
 \pdfpagewidth=0cm
+\pdfhorigin=1pt
+\pdfvorigin=1pt
 
-\output{\a}
-
-\pdfhorigin 1pt
-\pdfvorigin 1pt
-
-\let\ex\expandafter
-\ex\def\csname hex0\endcsname{\advance\count5 0\relax}
-\ex\def\csname hex1\endcsname{\advance\count5 1\relax}
-\ex\def\csname hex2\endcsname{\advance\count5 2\relax}
-\ex\def\csname hex3\endcsname{\advance\count5 3\relax}
-\ex\def\csname hex4\endcsname{\advance\count5 4\relax}
-\ex\def\csname hex5\endcsname{\advance\count5 5\relax}
-\ex\def\csname hex6\endcsname{\advance\count5 6\relax}
-\ex\def\csname hex7\endcsname{\advance\count5 7\relax}
-\ex\def\csname hex8\endcsname{\advance\count5 8\relax}
-\ex\def\csname hex9\endcsname{\advance\count5 9\relax}
-\ex\def\csname hexa\endcsname{\advance\count5 10\relax}
-\ex\def\csname hexb\endcsname{\advance\count5 11\relax}
-\ex\def\csname hexc\endcsname{\advance\count5 12\relax}
-\ex\def\csname hexd\endcsname{\advance\count5 13\relax}
-\ex\def\csname hexe\endcsname{\advance\count5 14\relax}
-\ex\def\csname hexf\endcsname{\advance\count5 15\relax}
 \def\printnum{
 	\count6\count5
 	\divide\count6 255
@@ -77,10 +55,7 @@
 }
 \def\cset#1#2#3
 {
-	\count5=0
-	\csname hex#2\endcsname
-	\multiply\count5 16\relax
-	\csname hex#3\endcsname
+	\uppercase{\count5="#2#3}\relax
 	\def\tmp{}\printnum\edef\tmp{\tmp.}
 	\printnum\printnum
 	\printnum\printnum
@@ -92,9 +67,9 @@
 	\cset{cg}#3#4
 	\cset{cb}#5#6
 }
+
 \def\c{\colorlocal{\rgb{\cr, \cg, \cb,}}}
 \cdef %%XPP_TEXT_COLOR%% 
-00ff00
 
 \newbox\b
 \setbox\b=\hbox{
@@ -102,16 +77,12 @@
 	\c
 	%\verb|%%XPP_TOOL_INPUT%% |
 	$
-	%\vrule height 10pt width 10ptx
 	\displaystyle
     %%XPP_TOOL_INPUT%%
-% \cr,\ \cg,\ \cb,\
 	$
 }
 
+\output{\a}
 \def\a{\shipout\vbox{\box\b}\setbox5\box255}
-
 a
-
 \bye
-
