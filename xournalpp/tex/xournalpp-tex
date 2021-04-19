@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+
+#tmp=$(mktemp  tmpXXXXXX)
+#echo tmp $tmp $1 > /tmp/aaa
+#pwd >> /tmp/aaa
+
+pdfcsplain -halt-on-error -interaction=nonstopmode "$1" >tex.err
+if [[ $? != 0 ]] || [[ $(stat --printf="%s" tex.pdf) -lt 1000 ]]
+then
+	#vim $tmp -c "hardcopy > $tmp.ps | q"; ps2pdf $tmp.ps
+	#mv $tmp.pdf ${1%.tex}.pdf
+	cat > "$1" <<EOF
+	\input ucwmac2
+\ucwmodule{verb}
+\ucwmodule{ofs}
+\newbox\b
+\setbox\b=\vbox{
+\def\verblocaldefs{\settextsize{5}}
+\verbinput{tex.err.tail}
+}
+\pdfpageheight=0cm
+\pdfpagewidth=0cm
+\output{\a}
+\pdfhorigin 1pt
+\pdfvorigin 1pt
+\def\a{\shipout\vbox{\box\b}\setbox5\box255}
+a
+\bye
+EOF
+	tail -n 50 tex.err > tex.err.tail
+	pdfcsplain -halt-on-error -interaction=nonstopmode "$1"
+fi
