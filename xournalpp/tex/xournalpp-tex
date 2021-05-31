@@ -3,7 +3,25 @@
 twd="$(pwd)"
 wd="$(readlink /proc/$PPID/cwd)"
 
+if [[ "$1" != "/tmp/xournalpp"*"/tex.tex" ]] || [[ "$twd" == "" ]] || [[ "$wd" == "" ]] || [[ "${twd}/tex.tex" != "$1" ]]
+then
+	echo >&2 "This is program for internal usage in xournal++"
+	exit 1
+fi
+
+
 cd "$wd"
+
+cleanup()
+{
+	cd $twd || exit 1
+	for i in * .*
+	do
+		[[ "$i" != "." ]] && [[ "$i" != ".." ]] && [[ "$i" != "tex.pdf" ]] && rm "$i"
+	done
+	exit 0
+}
+
 
 print_help()
 {
@@ -210,12 +228,12 @@ then
 	echo >> "$twd/tex.err"
 	if [[ -f "$f" ]]
 	then
-		cp "$f" "$twd/tex.pdf" 2>> "$twd/tex.err" && exit 0
+		cp "$f" "$twd/tex.pdf" 2>> "$twd/tex.err" && cleanup
 		print_err
 	else
 		error_path "$f"
 	fi
-	exit 0
+	cleanup
 elif [[ "$input" == "#convert "* ]]
 then
 	f="$(preproc_fname "${input:9}" )"
@@ -223,12 +241,12 @@ then
 	echo >> "$twd/tex.err"
 	if [[ -f "$f" ]]
 	then
-		convert "$f" "$twd/tex.pdf" 2>> "$twd/tex.err" && exit 0
+		convert "$f" "$twd/tex.pdf" 2>> "$twd/tex.err" && cleanup
 		print_err
 	else
 		error_path "$f"
 	fi
-	exit 0
+	cleanup
 elif [[ "$input" == "#txt "* ]]
 then
 	f="$(preproc_fname "${input:5}" )"
@@ -239,26 +257,35 @@ then
 		if cp "$f" "$twd/in" 2>> "$twd/tex.err"
 		then
 			verb_file "$twd/in" "$color"
-			exit 0
+			cleanup
 		fi
 		print_err
 	else
 		error_path "$f"
 	fi
-	exit 0
+	cleanup
 elif [[ "$input" == "#bash "* ]]
 then
-	rm "$twd/tex.pdf" 
-	bash -c "${input:6}" "bash" "$twd/tex.pdf"> $twd/in 2>&1
-	[[ -f "$twd/tex.pdf" ]] && exit 0
-	verb_file "$twd/in" "$color"
-	exit 0
+	if [[ "$input" == *"#" ]]
+	then
+		rm "$twd/tex.pdf" 
+		bash -c "${input:6}" "bash" "$twd/tex.pdf"> $twd/in 2>&1
+		[[ -f "$twd/tex.pdf" ]] && cleanup
+		verb_file "$twd/in" "$color"
+		cleanup
+	else
+		cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+		\setbox\b=\hbox{\verb|bash: [Write # on the end to execute]|}
+		\bye
+EOF
+		run_tex
+	fi
 elif [[ "$input" == "#v "* ]]
 then
 	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
 	\cdef $color
 	\setbox\b=\vbox{
-		${input:30}
+		${input:3}
 	}
 	\bye
 EOF
@@ -274,7 +301,7 @@ EOF
 elif [[ "$input" == "#"* ]]
 then
 	print_help
-	exit 0
+	cleanup
 else
 	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
 	\cdef $color
@@ -298,4 +325,4 @@ then
 fi
 if_empty_alert
 
-exit 0
+cleanup
