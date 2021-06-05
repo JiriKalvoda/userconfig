@@ -1,0 +1,76 @@
+#!/bin/bash
+
+Red="\e[31m"
+Green="\e[32m"
+Yellow="\e[33m"
+Blue="\e[34m"
+Magenta="\e[35m"
+None="\e[0m"
+
+
+from="$1"
+to="$2"
+
+if [[ "$to" == *"/" ]]
+then
+	to="$to$(basename "$from")"
+fi
+
+
+
+err()
+{
+	echo -e "$Red Error: $@ $None" 2>&1
+	exit 100
+}
+
+if [[ "$from" == "" ]] || [[ "$to" == "" ]]
+then
+	echo $0 - Config linker 1>&2
+	echo Usage: 1>&2
+	echo "	$0 [from] [to]" 1>&2
+	exit 1
+fi
+
+if [[ ! -e "$from" ]]
+then
+	echo "File $from not exist." 1>&2
+	exit 2
+fi
+
+echo -n "confln: $from -> $to:"
+
+if [[ -e "$to" ]]
+then
+	if [[ "$(readlink -f $from)" == "$(readlink -f $to)" ]] 
+	then
+		echo -e "$Blue Yet done$None"
+		exit 0
+	fi
+	in=""
+	while [[ "$in" != y ]] && [[ "$in" != n ]]
+	do
+		echo -n -e "$Yellow File exist! Overwrite?(y/n)$None"
+		read in
+		[[ "$in" == "n" ]] && exit 0
+	done
+	old="$to.old.$(date +%Y-%m-%d--%H-%M-%S)"
+	echo -n " Old file is: $old"
+	mv "$to" "$old" || err mv 
+fi
+
+if [[ ! -d "$(dirname "$to" )" ]]
+then
+	in=""
+	while [[ "$in" != y ]] && [[ "$in" != n ]]
+	do
+		echo -n -e "$Magenta Directory not exist! Create?(y/n)$None"
+		read in
+		[[ "$in" == "n" ]] && exit 0
+	done
+	mkdir -p "$(dirname "$to")" || err mkdir
+fi
+
+ln -sr "$from" "$to" || err ln
+
+echo -e "$Green OK$None"
