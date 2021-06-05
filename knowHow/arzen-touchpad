@@ -1,0 +1,10 @@
+From: https://archived.forum.manjaro.org/t/elan-touchpad-not-working/143624/3
+
+Final permanent solution:
+
+Create a file /etc/modprobe.d/unneeded-modules.conf
+Add a line blacklist elants_i2c
+Reboot
+
+This solution is found at
+https://forums.lenovo.com/t5/Ubuntu/Ideapad-5-15ARE05-Touchscreen-not-working/m-p/5017099
