@@ -28,3 +28,8 @@ for i in groups-complete/*
 do
 	confln $i ~/.movingssh/groups-complete/ cr
 done
+
+for i in configDevice/*
+do
+	confln $i ~/.movingssh/configDevice/ cr
+done

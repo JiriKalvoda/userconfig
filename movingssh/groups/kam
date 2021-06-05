@@ -2,8 +2,11 @@
 
 if [[ "$name" == *"kam"* ]] || [[ "$name" == *"cam" ]] || [[ "$minus" == *"k"* ]]
 then
-	config[ipB]=$name.kam.mff.cuni.cz
-	config[portB]=22
-	usernameDefault=jirikalvoda
-	noDownload=1
+	if [[ "$minus" != *"K"* ]]
+	then
+		config[ipB]=$name.kam.mff.cuni.cz
+		config[portB]=22
+		usernameDefault=jirikalvoda
+		noDownload=1
+	fi
 fi
