@@ -1,5 +1,7 @@
 \IiiiLine{set $mod Mod4}%$
 
+\def\LedOpSwap#1#2#3{\Cmd{}}
+
 %%%%%%%%%%%%%% Local vars %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcount\countI
 \newcount\countJ
@@ -54,7 +56,8 @@
 
 %%%%%%%%%%%%%% On start run %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \RunCmd{xrdb ~/.Xresources}
-\RunCmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}
+\def\CmdSetxkbmap{setxkbmap us,cz -variant ,ucw -option "" -option grp:caps_switch}
+\RunCmd{\CmdSetxkbmap}
 \RunCmd{sleep 2; osdd-run & sleep 1;osdc --color=red START}
 \RunCmd{/usr/bin/gnome-keyring-deamon --start --components=secrets}
 \RunCmd{numlockx on}
@@ -168,6 +171,8 @@ bar \{%
 
 % web brouwsers
 \BindKey{\Key{\Super}{4}{4}}{\Cmd{chromium}}
+\BindKey{\Key{\Shift\Super}{4}{4}}{\Cmd{firefox}}
+\BindKey{\Key{\Ctrl\Super}{4}{4}}{\Cmd{qutebrowser}}
 
 \BindKey{\Key{\Ctrl\Shift\Super}{4}{2}}{\Cmd{zathura}}
 
@@ -252,7 +257,7 @@ bar \{%
 	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0}}
 	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500}}
 
-	\BindKey{\Key{}{4}{6}}{\Cmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}}
+	\BindKey{\Key{}{4}{6}}{\Cmd{\CmdSetxkbmap}}
 
 	\BindKey{\Key{}{2}{6}}{\CpuFSet{400}}
 	\BindKey{\Key{}{2}{7}}{\CpuFSet{800}}
