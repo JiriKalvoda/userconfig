@@ -1,30 +1,16 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo ln -sr publicmyip.sh /usr/bin/publicmyip
-sudo chmod +x /usr/bin/publicmyip
-sudo ln -sr myip.sh /usr/bin/myip
-sudo chmod +x /usr/bin/myip
-
-sudo cp publicmyip.service /lib/systemd/system
-sudo systemctl daemon-reload
-sudo systemctl enable publicmyip
+confln publicmyip.sh ~/bin/publicmyip
+chmod +x ~/bin/publicmyip
+confln myip.sh /usr/bin/myip
+chmod +x ~/bin/myip
 
 mkdir ~/.publicmyip -p
-if [[ ! -f ~/.publicmyip/config ]]
-then
-	cp config ~/.publicmyip
-fi
+confln config ~/.publicmyip/ c
+confln configIp ~/.publicmyip/ c
+confln myposition.sh ~/.publicmyip/ c
 
-if [[ ! -f ~/.publicmyip/configIp ]]
-then
-	cp configIp ~/.publicmyip
-fi
-
-if [[ ! -f ~/.publicmyip/myposition.sh ]]
-then
-	cp myposition.sh ~/.publicmyip
-fi
 chmod +x ~/.publicmyip/myposition.sh
 
-sudo ln -s ~/.publicmyip/myposition.sh /usr/bin/myposition
+confln ~/.publicmyip/myposition.sh ~/bin/myposition

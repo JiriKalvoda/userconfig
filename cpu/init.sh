@@ -1,12 +1,15 @@
 #!/bin/bash
 cd "$(dirname "$0")"
-sudo g++ ./cpuF.c -o /usr/bin/cpuF
-sudo chmod u+s /usr/bin/cpuF
-sudo cp ./cpuFGUI.sh  /usr/bin/cpuFGUI
-sudo chmod o+x /usr/bin/cpuFGUI
+
+echo -e "\e[31mROOT REQUIRE\e[0m"
+
+g++ ./cpuF.c -o /usr/bin/cpuF
+chmod u+s /usr/bin/cpuF
+cp ./cpuFGUI.sh  /usr/bin/cpuFGUI
+chmod o+x /usr/bin/cpuFGUI
 if [ "$1" == "arch" ];
 then
-	sudo pacman -S cpupower
+	pacman -S cpupower
 fi
 
 

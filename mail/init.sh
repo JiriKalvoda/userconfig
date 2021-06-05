@@ -1,25 +1,21 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo ln -sr offlineimap-run /usr/bin
-sudo g++ offlineimap-deamon.cpp -o /usr/bin/offlineimap-deamon -pthread
+confln mailcap ~/.mailcap
 
-sudo cp offlineimap-jiri.service /lib/systemd/system
-sudo ln -sr mailcap /etc/
-sudo systemctl daemon-reload
-sudo systemctl enable offlineimap-jiri
+confln offlineimap-run ~/bin/
+g++ offlineimap-deamon.cpp -o ~/bin/offlineimap-deamon -pthread
 
-mkdir -p ~/.config/neomutt
-ln -sr neomuttrc ~/.config/neomutt/
-ln -sr m ~/bin
-ln -sr m-daemon ~/bin
-ln -sr m-daemon ~/bin
-ln -sr m-repeat-notification ~/bin
+confln neomuttrc ~/.config/neomutt/
+confln m ~/bin/
+confln m-daemon ~/bin/
+confln m-daemon ~/bin/
+confln m-repeat-notification ~/bin/
 
 
 if [[ ! -L ~/Maildir ]]
 then
-	ln -sr ~/Maildir-no-dot/INBOX ~/Maildir
+	confln ~/Maildir-no-dot/INBOX ~/Maildir
 fi
 
 (
@@ -28,12 +24,12 @@ fi
 	do
 		if [[ "$i" != "INBOX" ]]
 		then 
-			unlink $i/$i 
-			unlink INBOX/$i 
+			# unlink $i/$i 
+			# unlink INBOX/$i 
 
 			if [[ ! -L INBOX/.$i ]]
 			then
-				ln -sr $i INBOX/.$i
+				confln $i INBOX/.$i
 			fi
 		fi
 	done 

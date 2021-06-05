@@ -1,0 +1,17 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+
+git remote -v
+echo 
+
+git remote | while read r
+do
+	git remote remove $r
+done
+
+git remote add rpi0  ssh://gitea@localhost:3002/jiri/userconfig.git
+git remote add gitlab git@gitlab.com:JiriKalvoda/userconfig.git
+git remote add github git@github.com:JiriKalvoda/userconfig.git
+
+echo 
+git remote -v

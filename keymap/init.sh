@@ -1,2 +1,2 @@
-ln -sr . ~/texmf/tex/keymap
+confln . ~/texmf/tex/keymap
 texhash 

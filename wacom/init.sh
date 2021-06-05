@@ -1,2 +1,5 @@
-ln -sr wacom-config ~/bin
-gcc wacom-daemon.c -o ~/bin/wacom-daemon -pthread
+#!/bin/bash
+cd "$(dirname "$0")"
+
+confln wacom-config ~/bin
+gcc wacom-daemon2.c -o ~/bin/wacom-daemon -lxdo

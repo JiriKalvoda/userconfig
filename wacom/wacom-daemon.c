@@ -35,7 +35,7 @@ void * thread()
 			int X = x;
 			int Y = y;
 			x=y=0;
-			printf("%d %d\n",X,Y);
+			//printf("%d %d\n",X,Y);
 			if(X*X + Y*Y > 10*10)
 			{
 				if(X<0 && -(-X)/2 <= Y && Y <= (-X)/2)
@@ -84,6 +84,7 @@ int main(int argc, char ** argv)
 	{
 		char in;
 		assert(1==read(rfd,&in,1));
+		printf("%c\n", in);
 		if(in=='4') y--;
 		if(in=='5') y++;
 		if(in=='6') x++;

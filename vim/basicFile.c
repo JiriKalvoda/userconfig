@@ -1,5 +1,7 @@
-#include<bits/stdc++.h>
-using namespace std;
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+
 #ifdef DEB
 #define D if(1)
 #else
@@ -7,10 +9,10 @@ using namespace std;
 #endif
 
 #define fo(a,b) for(int a=0;a<(b);++a)
-using ll = long long;
+typedef long long ll;
+
 
 int main(int argc, char ** argv)
 {
 	return 0;
 }
-

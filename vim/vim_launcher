@@ -1,0 +1,17 @@
+#!/bin/bash
+type=pdf
+f=${2%.pdf}
+type="$1"
+if [[ "$f.pdf" != "$2" ]]
+then
+	echo "$2 is not a pdf"
+	exit 1
+fi
+
+if [[ "$type" == "xournalppp" ]] 
+then
+	echo ZDE "$f.xopp"
+	[[ -e "$f.xopp" ]] || cp ~/.basicFile/basicFile.xopp "$f.xopp"
+	( ( xournalppp "$f.xopp" && xournalppp "$f.xopp" --create-pdf "$f.pdf" && osdc "Xournall pdf OK" ) || osdc --color=red "Xurnalpp error $?" ) >/dev/null 2>/dev/null &
+fi
+

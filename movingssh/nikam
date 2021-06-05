@@ -1,2 +1,2 @@
 #!/bin/bash
-ssh -D 3128 kam.mff.cuni.cz 
+ssh -D 3128 jirikalvoda@kam.mff.cuni.cz 

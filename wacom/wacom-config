@@ -24,6 +24,7 @@ echo_maped()
 
 if [[ "$1" == "init" ]]
 then
+	xinput  set-button-map "$name" 1 2 3 104 105 106 107
 	xsetwacom --set "$name" Button 1 "button +1"
 	xsetwacom --set "$name" Button 2 "button +3"
 	#xsetwacom --set "$name" Button 3 "button +9"
@@ -51,7 +52,13 @@ fi
 
 if [[ "$1" == "map" ]] && ( [[ "$2" == "0" ]] || [[ "$2" == "1" ]] )
 then
-	eval $(xdotool getmouselocation --shell)
+	if [[ "$3" == "" ]]
+	then
+		eval $(xdotool getmouselocation --shell)
+	else
+		X="$3"
+		Y="$4"
+	fi
 	echo $X $Y > ~/.wacom/point_$2
 	osdc --to=display "Wacom point $2 to $X $Y"
 	[[ $2 == 1 ]] && $0 outputmapped

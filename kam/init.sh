@@ -1,8 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-g++ kam.cpp -o kam.out -O2
-ln -sr kam.out ~/bin/kam
+g++ kam.cpp -o ~/bin/kam -O2
 mkdir ~/kam
-ln -sr  kam_complete.sh ~/bin/bashrc
-ln -sr  pub ~/bin/
+confln  kam_complete.sh ~/bin/bashrc/
+confln pub ~/bin/

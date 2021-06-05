@@ -181,6 +181,9 @@ alias vi='vim'
 alias e='vim'
 alias view='vim -R'
 alias pink="ping kam.mff.cuni.cz"
+alias traceroutek="traceroute kam.mff.cuni.cz"
+alias pin8="ping 8.8.8.8"
+alias traceroute8="traceroute 8.8.8.8"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert

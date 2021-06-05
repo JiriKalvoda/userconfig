@@ -1,5 +1,7 @@
 #!/bin/bash
 
+./confln confln ~/bin/
+
 confirm="$1"
 fromC=0
 os="arch"

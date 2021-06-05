@@ -9,7 +9,7 @@ active_window()
 
 if [[ "$1" == "l" ]]
 then
-	cm -c1  ~/Maildir/.* -od -ob -oo -op -ol1  -os -k -K -Ll2\
+	cm -c1  ~/Maildir/.* -od -ob -oo -op -ol1 -of  -os -k -K -Ll2\
 		-sduration=6000 -smin-duration=3000 -scolor=orange\
 		-m" osdc --to=exec m t lf %s "\
 		-a]"osdc --to=exec m t rf %s"\
