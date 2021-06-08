@@ -19,7 +19,7 @@ then
 fi
 
 (
-	cd ~/Maildir-no-dot
+	cd ~/Maildir-no-dot || exit 1
 	for i in *;
 	do
 		if [[ "$i" != "INBOX" ]]
