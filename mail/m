@@ -1,6 +1,7 @@
 #!/bin/bash
 
 server_m=/home/jirikalvoda/bin/m
+ssh='movingssh kam -Y -t'
 
 active_window()
 {
@@ -18,13 +19,13 @@ then
 		-r"to:exec\n:m-repeat-notification\n:%t %n %m%B\n\n" -R"\\\\n<%a> %n %m"
 elif [[ "$1" == "" ]]
 then
-	kam -Y -t="$server_m $1"
+	$ssh $server_m $1
 elif [[ "$1" == "h" ]]
 then
-	kam -Y -t="$server_m $1"
+	$ssh $server_m $1
 elif [[ "$1" == "rf" ]]
 then
-	kam -Y -t="$server_m rf $2"
+	$ssh $server_m rf $2
 elif [[ "$1" == "lf" ]]
 then
 	file=$2
