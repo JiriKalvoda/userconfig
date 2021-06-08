@@ -7,6 +7,7 @@ confln offlineimap-run ~/bin/
 g++ offlineimap-deamon.cpp -o ~/bin/offlineimap-deamon -pthread
 
 confln neomuttrc ~/.config/neomutt/
+confln color ~/.config/neomutt/ c
 confln m ~/bin/
 confln m-daemon ~/bin/
 confln m-daemon ~/bin/
