@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 
 confln tunel.sh ~/bin/tunel
-sudo chmod +x ~/bin/tunel
+chmod +x ~/bin/tunel
 
 mkdir ~/.tunel -p
 confln "`which ssh`" ~/.tunel/ssh-tunel
