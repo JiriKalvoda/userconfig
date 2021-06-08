@@ -2,8 +2,9 @@
 cd "$(dirname "$0")"
 
 echo -e "\e[31mROOT REQUIRE\e[0m"
-confln  offlineimap-jiri.service /lib/systemd/system/ cr
-systemctl daemon-reload
-systemctl enable offlineimap-jiri
-systemctl start offlineimap-jiri
+#confln  offlineimap-jiri.service /lib/systemd/system/ cr
+#systemctl daemon-reload
+#systemctl enable offlineimap-jiri
+#systemctl start offlineimap-jiri
 
+../init-service.sh offlineimap-"$1" "$1" offlineimap-deamon
