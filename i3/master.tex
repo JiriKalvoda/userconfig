@@ -7,11 +7,7 @@
 \newcount\countJ
 \def\Iter{}
 
-\openin15=local.tex  
-\ifeof15
-\else\closein15
-\input local.tex
-\fi
+\IfInclude{local.tex}
 
 %%%%%%%%%%%%%% Config functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\WorkspaceAll#1#2#3{
@@ -318,7 +314,7 @@ bar \{%
 \IiiiLine{bindsym --whole-window $Mod+Shift+button1 exec wacom-config map 0} %$
 \IiiiLine{bindsym --whole-window $Mod+Ctrl+button1 exec wacom-config map 1} %$
 
-\input led.tex
+\IfInclude{led.tex}
 
 \def\OutputModeIiii{i3}
 \ifx\OutputMode\OutputModeIiii

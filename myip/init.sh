@@ -3,7 +3,7 @@ cd "$(dirname "$0")"
 
 confln publicmyip.sh ~/bin/publicmyip
 chmod +x ~/bin/publicmyip
-confln myip.sh /usr/bin/myip
+confln myip.sh ~/bin/myip
 chmod +x ~/bin/myip
 
 mkdir ~/.publicmyip -p
