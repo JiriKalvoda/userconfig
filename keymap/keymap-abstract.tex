@@ -1,3 +1,11 @@
+\def\IfInclude#1{%
+\openin15=#1\relax%
+\ifeof15%
+\else\closein15%
+\input local.tex%
+\fi%
+}
+
 %%%%%%%%%%%%%% Mod keys %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\Ctrl{c}
 \def\Shift{s}
