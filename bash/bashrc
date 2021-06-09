@@ -310,7 +310,10 @@ fi
 
 if [ "$SSH_CONNECTION" != "" ];
 then 
-	if [ "$LD_SSHTYPE" = "local" ];
+	if [ "$LD_SSHTYPE" = "localhost" ];
+	then
+		true
+	elif [ "$LD_SSHTYPE" = "local" ];
 	then 
 		promt_color_user=96
 	else
