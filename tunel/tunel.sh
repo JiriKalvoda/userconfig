@@ -3,6 +3,7 @@
 cd ~/.tunel
 cmdprefix=tunel
 
+. config-default
 . config
 
 if [[ "$1" == "-p" ]]

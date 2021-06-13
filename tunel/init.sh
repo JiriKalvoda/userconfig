@@ -15,6 +15,7 @@ confln "`which ssh`" ~/.tunel/second-tunel-ssh
 confln "`which ssh`" ~/.tunel/tunel-ssh-check
 
 confln config ~/.tunel/ c
+confln config-default ~/.tunel/
 
 ssh -o HostKeyAlias=localhost localhost echo OK ssh localhost
 . ~/.tunel/config

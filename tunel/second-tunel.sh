@@ -3,6 +3,7 @@
 cd ~/.tunel
 cmdprefix=second-tunel
 
+. config-default
 . config
 
 port=$(( port  + 1 ))
