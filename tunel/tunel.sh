@@ -35,7 +35,7 @@ do
 	killall ssh-tunel -q
 	killall ssh-sleep -q
 	echo START
-	./ssh-sleep 10000000 | ./ssh-tunel $tunel $user@$server -oServerAliveInterval=300 "cat - tunel $name port $port from $(myip)"  &
+	./tunel-echo | ./ssh-tunel $tunel $user@$server -oServerAliveInterval=300 "./bin/tunel-server $name port $port from \$SSH_CLIENT local $(myip) start at \$(date \"+%y-%m-%d %H:%M:%S\")"  &
 	whileok
 done
 
