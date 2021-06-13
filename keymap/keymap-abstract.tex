@@ -1,3 +1,11 @@
+\def\IfInclude#1{%
+\openin15=#1\relax%
+\ifeof15%
+\else\closein15%
+\input local.tex%
+\fi%
+}
+
 %%%%%%%%%%%%%% Mod keys %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\Ctrl{c}
 \def\Shift{s}
@@ -50,3 +58,5 @@
 \def\RunCmd#1{}
 \def\IiiiLine#1{}
 \def\IiiiInline#1{}
+\def\SpectrLine#1{}
+\def\SpectrInline#1{}

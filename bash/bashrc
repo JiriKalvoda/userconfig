@@ -269,6 +269,12 @@ giaac() { git add . $@;git commit; }
 giaca() { git add $@;git commit --amend; }
 giaaca() { git add . $@;git commit --amend; }
 gip() { git pull $@;git push $@; }
+gipma() {
+	b=$1
+	[[ "$b" == "" ]] && b="$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+	git remote | while read r ; do echo -e "\e[91;1m PULL MEERGE $r $b\e[0m"; git pull $r $b --no-rebase ; done
+	git remote | while read r ; do echo -e "\e[91;1m PUSH $r $b\e[0m"; git push $r $b ; done
+}
 gipa() {
 	b=$1
 	[[ "$b" == "" ]] && b="$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
@@ -304,7 +310,10 @@ fi
 
 if [ "$SSH_CONNECTION" != "" ];
 then 
-	if [ "$LD_SSHTYPE" = "local" ];
+	if [ "$LD_SSHTYPE" = "localhost" ];
+	then
+		true
+	elif [ "$LD_SSHTYPE" = "local" ];
 	then 
 		promt_color_user=96
 	else

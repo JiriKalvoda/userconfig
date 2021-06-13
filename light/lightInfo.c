@@ -3,10 +3,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <math.h>
-#include "adr.h"
+#include "config.h"
 
-const int lightMin = 2;
-const int lightMax = 937;
 char out[1234];
 int main(int argc,char ** argv)
 {
