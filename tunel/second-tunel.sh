@@ -6,6 +6,7 @@ cmdprefix=second-tunel
 . config
 
 port=$(( port  + 1 ))
+tunel="-R *:$port:localhost:22"
 
 killall $cmdprefix-echo -q
 killall $cmdprefix-ssh -q
