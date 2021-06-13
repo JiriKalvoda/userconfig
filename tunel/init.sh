@@ -18,5 +18,6 @@ confln config ~/.tunel/ c
 confln config-default ~/.tunel/
 
 ssh -o HostKeyAlias=localhost localhost echo OK ssh localhost
+. ~/.tunel/config-default
 . ~/.tunel/config
 ssh $user@$server echo OK ssh server
