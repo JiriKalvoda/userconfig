@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cd ~/.tunel
+cmdprefix=tunel
 
 . config
 
@@ -17,9 +18,9 @@ whileok()
 	while true
 	do
 		sleep $checktime
-		./ssh-check $server -p $port "echo OK > $okfile" -oServerAliveInterval=300&
+		./$cmdprefix-ssh-check $server -p $port "echo OK > $okfile" -oServerAliveInterval=300 -o HostKeyAlias=localhost &
 		sleep $timeout
-		killall ssh-check -q
+		killall $cmdprefix-ssh-check -q
 		if [[ -f $okfile ]]
 		then
 			rm $okfile 
@@ -32,10 +33,11 @@ whileok()
 
 while true
 do
-	killall ssh-tunel -q
-	killall ssh-sleep -q
+	killall $cmdprefix-echo -q
+	killall $cmdprefix-ssh -q
+	killall $cmdprefix-check -q
 	echo START
-	./tunel-echo | ./ssh-tunel $tunel $user@$server -oServerAliveInterval=300 "./bin/tunel-server $name port $port from \$SSH_CLIENT local $(myip) start at \$(date \"+%y-%m-%d %H:%M:%S\")"  &
+	./$cmdprefix-echo |  ./$cmdprefix-ssh $tunel $user@$server -oServerAliveInterval=300 "./bin/tunel-server -- $name port $port from \$SSH_CLIENT local $(myip) start at \$(date \"+%y-%m-%d %H:%M:%S\")"  &
 	whileok
 done
 

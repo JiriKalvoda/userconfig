@@ -8,3 +8,4 @@ echo -e "\e[31mROOT REQUIRE\e[0m"
 #systemctl start tunel
 
 ../init-service.sh tunel "$1" tunel
+../init-service.sh second-tunel "$1" second-tunel "" d

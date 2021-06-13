@@ -53,7 +53,11 @@ EOF
 
 confln $tmp /lib/systemd/system/$name.service cr
 systemctl daemon-reload
-systemctl enable $name
-systemctl restart $name
+
+if [[ "$opt" != *d* ]]
+then
+	systemctl enable $name
+	systemctl restart $name
+fi
 
 rm $tmp
