@@ -49,6 +49,7 @@ WantedBy=multi-user.target
 EOF
 
 
+systemctl disable $name
 
 
 confln $tmp /lib/systemd/system/$name.service cr
