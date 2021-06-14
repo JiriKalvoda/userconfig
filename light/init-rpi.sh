@@ -1,14 +1,17 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo g++ ./light-rpi.c -o /usr/bin/light
-sudo chmod u+s /usr/bin/light
-sudo g++ ./lightInfo.c -o /usr/bin/lightInfo
-sudo chmod u+s /usr/bin/lightInfo
-sudo cp ./lightGUI.sh  /usr/bin/lightGUI
-sudo chmod o+x /usr/bin/lightGUI
+echo -e "\e[31mROOT REQUIRE\e[0m"
+
+
+g++ ./light-rpi.c -o /usr/bin/light
+chmod u+s /usr/bin/light
+g++ ./lightInfo.c -o /usr/bin/lightInfo
+chmod u+s /usr/bin/lightInfo
+cp ./lightGUI.sh  /usr/bin/lightGUI
+chmod o+x /usr/bin/lightGUI
 
 if [ "$1" == "mint" ]
 then 
-	sudo apt install notify-osd
+	apt install notify-osd
 fi

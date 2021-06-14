@@ -1,6 +1,7 @@
 #!/bin/bash
 
 server_m=/home/jirikalvoda/bin/m
+ssh='ssh jirikalvoda@kam.mff.cuni.cz -Y -t'
 
 active_window()
 {
@@ -9,7 +10,7 @@ active_window()
 
 if [[ "$1" == "l" ]]
 then
-	cm -c1  ~/Maildir/.* -od -ob -oo -op -ol1  -os -k -K -Ll2\
+	cm -c1  ~/Maildir/.* -od -ob -oo -op -ol1 -of  -os -k -K -Ll2\
 		-sduration=6000 -smin-duration=3000 -scolor=orange\
 		-m" osdc --to=exec m t lf %s "\
 		-a]"osdc --to=exec m t rf %s"\
@@ -18,13 +19,13 @@ then
 		-r"to:exec\n:m-repeat-notification\n:%t %n %m%B\n\n" -R"\\\\n<%a> %n %m"
 elif [[ "$1" == "" ]]
 then
-	kam -Y -t="$server_m $1"
+	$ssh $server_m $1
 elif [[ "$1" == "h" ]]
 then
-	kam -Y -t="$server_m $1"
+	$ssh $server_m $1
 elif [[ "$1" == "rf" ]]
 then
-	kam -Y -t="$server_m rf $2"
+	$ssh $server_m rf $2
 elif [[ "$1" == "lf" ]]
 then
 	file=$2
@@ -42,7 +43,7 @@ then
 	terminal -e $0 $@ &
 	for i in {0..10}
 	do
-		sleep 0.1
+		sleep 0.2
 		i3-msg "[con_id=\"$window\"] resize set 450 px" 2>/dev/null >/dev/null
 	done
 fi

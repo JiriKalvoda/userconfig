@@ -1,0 +1,9 @@
+#!/bin/bash
+cd /usr/bin
+rm tunel
+rm movingssh kam 
+rm publicmyip myip myposition
+rm offlineimap-run
+
+
+ls -alF | grep home

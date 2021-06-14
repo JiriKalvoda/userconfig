@@ -148,16 +148,6 @@ promt()
 	echo -n ${PS1@P} | tr -d `char 1``char 2`
 }
 
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -180,6 +170,10 @@ alias l='ls -CF'
 alias vi='vim'
 alias e='vim'
 alias view='vim -R'
+alias pink="ping kam.mff.cuni.cz"
+alias traceroutek="traceroute kam.mff.cuni.cz"
+alias pin8="ping 8.8.8.8"
+alias traceroute8="traceroute 8.8.8.8"
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -204,10 +198,11 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-# light()
-# {
- #  sudo sh -c 'echo '$1'  > /sys/devices/pci0000:00/0000:00:02.0/drm/card0/card0-eDP-1/intel_backlight/brightness'
-# }
+
+mcd()
+{
+	mkdir -p $1; cd $1
+}
 mkdircd()
 {
 	mkdir $1; cd $1
@@ -217,6 +212,10 @@ BG()
 	( $@ 1>/dev/null 2>/dev/null & ) 
 }
 gopen()
+{
+	( xdg-open "$@" 2>/dev/null 1>/dev/null & ) 
+}
+g()
 {
 	( xdg-open "$@" 2>/dev/null 1>/dev/null & ) 
 }
@@ -265,6 +264,12 @@ giaac() { git add . $@;git commit; }
 giaca() { git add $@;git commit --amend; }
 giaaca() { git add . $@;git commit --amend; }
 gip() { git pull $@;git push $@; }
+gipma() {
+	b=$1
+	[[ "$b" == "" ]] && b="$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
+	git remote | while read r ; do echo -e "\e[91;1m PULL MEERGE $r $b\e[0m"; git pull $r $b --no-rebase ; done
+	git remote | while read r ; do echo -e "\e[91;1m PUSH $r $b\e[0m"; git push $r $b ; done
+}
 gipa() {
 	b=$1
 	[[ "$b" == "" ]] && b="$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
@@ -283,24 +288,43 @@ export PATH=$PATH:~/bin
 
 promt_color_rvalue=91
 promt_color_user=32
-promt_color_dir=34
+promt_color_dir=96
 promt_color_git=93
 promt_color_dolar=39
 
 
-if [ "$device_name" = "externalArch" ] ;
+if [ "$device_name" == "externalArch" ] ;
 then
 	promt_color_user=33
 fi
 
-if [ "$ISBREAKEBLE" = "1" ] ;
+if [[ "$device_name" == acid ]] || [[ "$device_name" == poppi ]]
 then
-	promt_color_user=95
+	promt_color_dir=91
+fi
+if [[ "$device_name" == *kam* ]] || [[ "$device_name" == *cam* ]]
+then
+	promt_color_dir=92
+fi
+# 93 -> git
+if [ "$device_name" == "arzen" ] ;
+then
+	promt_color_dir=94
+fi
+if [[ "$device_name" == rpi* ]]
+then
+	promt_color_dir=95
 fi
 
 if [ "$SSH_CONNECTION" != "" ];
 then 
-	if [ "$LD_SSHTYPE" = "local" ];
+	if [ "$LD_SSHTYPE" = "localhost" ];
+	then
+		true
+	elif [ "$LD_SSHTYPE" = "second" ];
+	then 
+		promt_color_user=33
+	elif [ "$LD_SSHTYPE" = "local" ];
 	then 
 		promt_color_user=96
 	else
@@ -313,6 +337,12 @@ else
 		pNN
 	fi
 fi
+
+if [ "$ISBREAKEBLE" = "1" ] ;
+then
+	promt_color_user=95
+fi
+
 if [ "$USER" == "root" ];
 then 
 	promt_color_dolar="91;1"
@@ -328,7 +358,8 @@ done 2>/dev/null
 PS1='${debian_chroot:+($debian_chroot)}\
 \[\033[01;${promt_color_rvalue}m\]$(promt_rvalue)\
 \[\033[01;${promt_color_user}m\]$(promt_usrCut)\
-\[\033[00m\]:\[\033[01;${promt_color_dir}m\]\w\
+\[\033[${promt_color_dolar}m\]:\
+\[\033[01;${promt_color_dir}m\]\w\
 \[\033[00m\]\[\033[01;${promt_color_git}m\]$(promt_parse_git_branch)\
 \[\033[0m\]\
 \[\033[${promt_color_dolar}m\]\
@@ -348,4 +379,13 @@ fi
 bye()
 {
 	gpg-connect-agent reloadagent /bye
+}
+
+
+zath()
+{
+	for i in $@
+	do
+		zathura $i & sleep 0.2
+	done
 }

@@ -1,15 +1,13 @@
 \IiiiLine{set $mod Mod4}%$
 
+\def\LedOpSwap#1#2#3{\Cmd{}}
+
 %%%%%%%%%%%%%% Local vars %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcount\countI
 \newcount\countJ
 \def\Iter{}
 
-\openin15=local.tex  
-\ifeof15
-\else\closein15
-\input local.tex
-\fi
+\IfInclude{local.tex}
 
 %%%%%%%%%%%%%% Config functions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \def\WorkspaceAll#1#2#3{
@@ -54,7 +52,8 @@
 
 %%%%%%%%%%%%%% On start run %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \RunCmd{xrdb ~/.Xresources}
-\RunCmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}
+\def\CmdSetxkbmap{setxkbmap us,cz -variant ,ucw -option "" -option grp:caps_switch}
+\RunCmd{\CmdSetxkbmap}
 \RunCmd{sleep 2; osdd-run & sleep 1;osdc --color=red START}
 \RunCmd{/usr/bin/gnome-keyring-deamon --start --components=secrets}
 \RunCmd{numlockx on}
@@ -168,11 +167,14 @@ bar \{%
 
 % web brouwsers
 \BindKey{\Key{\Super}{4}{4}}{\Cmd{chromium}}
+\BindKey{\Key{\Shift\Super}{4}{4}}{\Cmd{firefox}}
+\BindKey{\Key{\Ctrl\Super}{4}{4}}{\Cmd{qutebrowser}}
 
 \BindKey{\Key{\Ctrl\Shift\Super}{4}{2}}{\Cmd{zathura}}
 
 \AppWorkspace{4}{9}{WUI}{~/dev/runWUI/run.sh}
 \IiiiLine{for_window [title="WebUpdatingIndicator compare"] floating enable}
+\IiiiLine{for_window [title="Tea Timer"] floating enable}
 
 \AppWorkspace{4}{8}{MAIL}{start-mail}
 \IiiiLine{for_window [title="MAIL"] move container to workspace MAIL}
@@ -248,11 +250,11 @@ bar \{%
 	\BindKey{\Key{}{3}{4}}{\Volume{+}{2}}
 	\BindKey{\Key{}{3}{5}}{\Volume{+}{10}}
 
-	\BindKey{\Key{}{4}{9}}{\Cmd{xrandr --auto }}
-	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0}}
-	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500}}
+	\BindKey{\Key{}{4}{9}}{\Cmd{xrandr --auto ; wacom-config output 0}}
+	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0; wacom-config output 0}}
+	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500; xsetwacom --set 10 MapToOutput  2560x1440+0+0; wacom-config output 0}}
 
-	\BindKey{\Key{}{4}{6}}{\Cmd{setxkbmap us,cz -variant ,ucw -option grp:caps_switch}}
+	\BindKey{\Key{}{4}{6}}{\Cmd{\CmdSetxkbmap}}
 
 	\BindKey{\Key{}{2}{6}}{\CpuFSet{400}}
 	\BindKey{\Key{}{2}{7}}{\CpuFSet{800}}
@@ -292,7 +294,27 @@ bar \{%
 %\BindKey{\KeyI{\Super}}{\Cmd{terminal}}
 %\BindKey{\Key{}{2}{6}}{\Cmd{terminal}}
 
-\input led.tex
+%\IiiiLine{bindsym --whole-window button9 exec wacom-config next}
+%\IiiiLine{bindsym --whole-window button4 exec osdc 4  ~/.wacom/button}
+%\IiiiLine{bindsym --whole-window button5 exec osdc 5  ~/.wacom/button}
+%\IiiiLine{bindsym --whole-window button6 exec osdc 6  ~/.wacom/button}
+%\IiiiLine{bindsym --whole-window button7 exec osdc 7  ~/.wacom/button}
+%\IiiiLine{bindsym --whole-window button8 exec osdc 8  ~/.wacom/button}
+
+%\def\nope,{}
+%\for{I}4 {30} {
+%\IiiiLine{bindsym --whole-window button\the\countI\nope, exec "echo -n \the\countI\nope, > ~/.wacom/button"}
+%\IiiiLine{bindsym --release --whole-window --border button\the\countI\nope, exec "echo -n \the\countI\nope, > ~/.wacom/button"}
+%}
+%\IiiiLine{bindsym --whole-window button5 exec "echo -n 5 > ~/.wacom/button"}
+%\IiiiLine{bindsym --whole-window button6 exec "echo -n 6 > ~/.wacom/button"}
+%\IiiiLine{bindsym --whole-window button7 exec "echo -n 7 > ~/.wacom/button"}
+%\IiiiLine{bindsym --whole-window button8 exec "echo -n 8 > ~/.wacom/button"}
+\IiiiLine{exec wacom-daemon}
+\IiiiLine{bindsym --whole-window $Mod+Shift+button1 exec wacom-config map 0} %$
+\IiiiLine{bindsym --whole-window $Mod+Ctrl+button1 exec wacom-config map 1} %$
+
+\IfInclude{led.tex}
 
 \def\OutputModeIiii{i3}
 \ifx\OutputMode\OutputModeIiii
@@ -303,7 +325,21 @@ bar \{%
 \IiiiLine{bindcode 209 exec playerctl play-pause}
 \fi
 
-\BindKey{\KeyO{\Super}}{\Cmd{~/dev/pasman/client chrome}}
+\def\BindPasman#1#2{
+\BindKey{#1{      \Super}}{\IiiiInline{ --release }\Cmd{pasman-osd #2 xall}}
+\BindKey{#1{\Shift\Super}}{\IiiiInline{ --release }\Cmd{pasman-osd #2 xuser}}
+\BindKey{#1{\Ctrl \Super}}{\IiiiInline{ --release }\Cmd{pasman-osd #2 xpasswd}}
+}
+\BindPasman{\KeyU}{rofi}
+\BindPasman{\KeyI}{clip}
+\BindPasman{\KeyO}{chrome}
+\BindPasman{\csname Key[\endcsname}{roficlip}
+\BindPasman{\csname Key]\endcsname}{rofichrome}
+
+\BindKey{\Key{\Super}{3}{10}}{\Cmd{tt}}
+\BindKey{\Key{\Super\Shift}{3}{10}}{\Cmd{tt 2:00}}
+\BindKey{\Key{\Super\Ctrl}{3}{10}}{\Cmd{tt 3:00}}
+\BindKey{\Key{\Super\Ctrl\Shift}{3}{10}}{\Cmd{tt 5:00}}
 
 \def\OutputModeDoc{doc}
 \ifx\OutputMode\OutputModeDoc

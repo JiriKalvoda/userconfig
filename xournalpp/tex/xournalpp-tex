@@ -1,0 +1,328 @@
+#!/bin/bash
+
+twd="$(pwd)"
+wd="$(readlink /proc/$PPID/cwd)"
+
+if [[ "$1" != "/tmp/xournalpp"*"/tex.tex" ]] || [[ "$twd" == "" ]] || [[ "$wd" == "" ]] || [[ "${twd}/tex.tex" != "$1" ]]
+then
+	echo >&2 "This is program for internal usage in xournal++"
+	exit 1
+fi
+
+
+cd "$wd"
+
+cleanup()
+{
+	cd $twd || exit 1
+	for i in * .*
+	do
+		[[ "$i" != "." ]] && [[ "$i" != ".." ]] && [[ "$i" != "tex.pdf" ]] && rm "$i"
+	done
+	exit 0
+}
+
+
+print_help()
+{
+cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+\cdef $color
+\hsize 5cm
+
+\def\sc{\expandafter\ifx\the\scriptfont\fam\nullfont\font\temp = cmr7 \temp\else\the\scriptfont\fam\fi\def\uppercasesc{\char\uccode\`}}
+\def\LaTeX{L\kern-.36em\raise.3ex\hbox{\sc \uppercasesc a}\kern-.15em\TeX}
+
+\font\hhdfont csbx14 at 10pt
+\setbox\b=\vbox{
+\hfil{\bf \verb|#| escape input help}
+
+\settextsize{4}
+\font\fa cmr10 at 4pt \relax \fa
+This is xournall-tex program  extending standard
+\TeX{} xournall++ api by commands starting with \verb|#|
+and replacing \LaTeX{} by UCW-\TeX{}.
+
+Usage:
+\halign{#\hfil&#\hfil\cr
+\verb|#h [tex]| & typeset \verb|[tex]| in \verb|\hbox| (not in math mode)\cr
+\verb|#v [tex]| & typeset \verb|[tex]| in \verb|\vbox|\cr
+\verb|#pdf [path]| & copy as output file \verb|[path]| in file system\cr
+\verb|#convert [path]| & convert file \verb|[path]| to pdf by \verb|convert|\cr
+\verb|#txt [path]| & typeset text file \verb|[path]| to \verb|\vbox|\cr
+\verb|#bash [cmd]| & run \verb|[cmd]| in \verb|bash| and typeset output\cr
+& or if \verb|\$1| is created, use it as pdf. \cr%$
+}
+
+\verb|[path]| will be expanded by \verb|sh|, you can use \verb|~|, \verb|*| and \verb|\$(cmd)|. %$
+Working directory will be taken from xournall.
+
+}
+\bye
+EOF
+run_tex
+}
+
+cat > "$twd/template.tex" <<EOF
+\input ucwmac2
+\ucwmodule{verb}
+\ucwmodule{ofs}
+
+\chyph
+\parskip 3pt
+\parindent 0pt
+
+\font\hhdfont csbx17
+\font\hdfont csbx12
+\font\smallboldfont csbx10 at 7.5pt
+\def\hhd#1{\bigskip\leftline{\hfill\hhdfont #1\hfill}\interlinepenalty 10000}
+
+\newcount\countH
+\def\hd#1{\penalty-2000\bigskip\advance\countH1\relax\leftline{\hdfont\the\countH. #1}\nobreak}
+
+
+\def\pair#1#2{$\left<#1,#2\right>$}
+\def\E{{\bf E}}
+\def\O{{\cal O}}
+\def\frac#1#2{{{#1}\over{#2}}}
+\let\f\frac
+\mathchardef\comma="013B
+% FIXME: This is ugly, no need to switch modes.
+\def\eq{\ifmmode$\nobreak\ \discretionary{=}{=}{=}\nobreak\ $\else$\eq$\errmessage{You shall use \eq in the math mode.}\fi}
+\def\cdotop{\mathop\cdot}
+\def\degree{^{\circ}}
+\def\nsd{\mathop{\rm nsd}\nolimits}
+\def\nsn{\mathop{\rm nsn}\nolimits}
+
+% Function typeset in italic, e.g., $\f{size}(v)$
+\def\f#1{\mathop{\<#1>}\mkern 1mu\relax}
+
+% Sets
+\font\mft=msbm10
+\def\N{\hbox{\mft N}}
+\def\Z{\hbox{\mft Z}}
+\def\Q{\hbox{\mft Q}}
+\def\R{\hbox{\mft R}}
+\def\C{\hbox{\mft C}}
+
+% \vect is longer than \vec, but with smaller arrow than \overrightarrow (same arrow as in \vec)
+\def\vect#1{%
+  \vbox{\m@th \ialign {##\crcr
+  \vectfill\crcr\noalign{\kern-\p@\vskip-2pt \nointerlineskip}
+  $\hfil\displaystyle{#1}\hfil$\crcr}}}
+\def\vectfill{%
+  $\m@th\smash-\mkern-7mu%
+  \cleaders\hbox{$\mkern-2mu\smash-\mkern-2mu$}\hfill\hskip-2.8pt
+  \mkern-7mu\raise-3.7pt\hbox{$\mathord\mathchar"017E$}$}
+
+% \<...> is already defined in ucwmac, but it does not scale the fonts in (super|sub)scripts
+\def\<#1>{\ifmmode
+\mathchoice{\hbox{\I #1}}{\hbox{\I #1}}{\hbox{\it\setfonts[/7]#1\/}}{\hbox{\it\setfonts[/5]#1\/}}
+\else\leavevmode\hbox{\I #1}\fi}
+
+\pdfpageheight=0cm
+\pdfpagewidth=0cm
+\pdfhorigin=1pt
+\pdfvorigin=1pt
+
+\def\printnum{
+	\count6\count5
+	\divide\count6 255
+	\edef\tmp{\tmp\the\count6}
+	\multiply\count6 -255
+	\advance\count5 \count6
+	\multiply\count5 10
+}
+\def\cset#1#2#3
+{
+	\uppercase{\count5="#2#3}\relax
+	\def\tmp{}\printnum\edef\tmp{\tmp.}
+	\printnum\printnum
+	\printnum\printnum
+	\expandafter\edef\csname #1\endcsname,{\tmp}
+}
+\def\cdef#1#2#3#4#5#6
+{
+	\cset{cR}#1#2
+	\cset{cG}#3#4
+	\cset{cB}#5#6
+}
+
+\def\c{\colorlocal{\rgb{\cR, \cG, \cB,}}}
+
+\output{\a}
+\def\a{\shipout\vbox{\box\b}\setbox5\box255}
+a
+\newbox\b
+EOF
+
+run_tex()
+{
+	(cd "$twd" ; pdfcsplain -halt-on-error -interaction=nonstopmode tex.tex)
+}
+
+if_empty_alert()
+{
+if [[ $(stat --printf="%s" "$twd/tex.pdf") -lt 1000 ]]
+then
+cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+\setbox\b=\hbox{\verb|[EMPTY OUTPUT]|}
+\bye
+EOF
+run_tex
+fi
+}
+
+verb_file()
+{
+cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+\cdef ${2:-000000}
+\setbox\b=\vbox{
+\def\verblocaldefs{\settextsize{4.5}}
+\c \verbinput{$1}
+}
+\bye
+EOF
+run_tex
+if_empty_alert
+}
+
+print_err()
+{
+	tail -n 50 "$twd/tex.err" > "$twd/tex.err.tail"
+	verb_file "$twd/tex.err.tail"
+}
+
+error_path()
+{
+	f="$1"
+	ls -lh "$f"  > "$twd/lsout" 2>&1 || ls -lhd "$f"* > "$twd/lsout" 2>&1
+	r=$?
+	cat "$twd/lsout" >> "$twd/tex.err"
+	if [[ $r != 0 ]]
+	then
+		while :
+		do
+			f="$(dirname "$f")"
+
+			ls -lh "$f"  > "$twd/lsout" 2>&1 && break
+		done
+		echo >> "$twd/tex.err"
+		echo "Directory $f:" >> "$twd/tex.err"
+		cat "$twd/lsout" >> "$twd/tex.err"
+	fi
+	print_err
+}
+
+preproc_fname()
+{
+	sh -c "echo $1"
+}
+
+color="$(head -n1 $twd/tex.tex)"
+input="$(tail  -n+2 $twd/tex.tex)"
+
+if [[ "$input" == "#pdf "* ]]
+then
+	f="$(preproc_fname "${input:5}" )"
+	echo "PDF INPUT: '$f'" > "$twd/tex.err"
+	echo >> "$twd/tex.err"
+	if [[ -f "$f" ]]
+	then
+		cp "$f" "$twd/tex.pdf" 2>> "$twd/tex.err" && cleanup
+		print_err
+	else
+		error_path "$f"
+	fi
+	cleanup
+elif [[ "$input" == "#convert "* ]]
+then
+	f="$(preproc_fname "${input:9}" )"
+	echo "CONVERT: '$f'" > "$twd/tex.err"
+	echo >> "$twd/tex.err"
+	if [[ -f "$f" ]]
+	then
+		convert "$f" "$twd/tex.pdf" 2>> "$twd/tex.err" && cleanup
+		print_err
+	else
+		error_path "$f"
+	fi
+	cleanup
+elif [[ "$input" == "#txt "* ]]
+then
+	f="$(preproc_fname "${input:5}" )"
+	echo "TXT INPUT: '$f'" > "$twd/tex.err"
+	echo >> "$twd/tex.err"
+	if [[ -f "$f" ]]
+	then
+		if cp "$f" "$twd/in" 2>> "$twd/tex.err"
+		then
+			verb_file "$twd/in" "$color"
+			cleanup
+		fi
+		print_err
+	else
+		error_path "$f"
+	fi
+	cleanup
+elif [[ "$input" == "#bash "* ]]
+then
+	if [[ "$input" == *"#" ]]
+	then
+		rm "$twd/tex.pdf" 
+		bash -c "${input:6}" "bash" "$twd/tex.pdf"> $twd/in 2>&1
+		[[ -f "$twd/tex.pdf" ]] && cleanup
+		verb_file "$twd/in" "$color"
+		cleanup
+	else
+		cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+		\setbox\b=\hbox{\verb|bash: [Write # on the end to execute]|}
+		\bye
+EOF
+		run_tex
+	fi
+elif [[ "$input" == "#v "* ]]
+then
+	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+	\cdef $color
+	\setbox\b=\vbox{
+		${input:3}
+	}
+	\bye
+EOF
+elif [[ "$input" == "#h "* ]]
+then
+	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+	\cdef $color
+	\setbox\b=\hbox{
+		${input:3}
+	}
+	\bye
+EOF
+elif [[ "$input" == "#"* ]]
+then
+	print_help
+	cleanup
+else
+	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
+	\cdef $color
+	\setbox\b=\hbox{
+		\vrule height 0pt width 0pt
+		\c
+		\$
+		\displaystyle $input
+		\$
+	}
+	\bye
+EOF
+fi
+
+run_tex > $twd/tex.err
+if [[ $? != 0 ]]
+then
+	#vim $tmp -c "hardcopy > $tmp.ps | q"; ps2pdf $tmp.ps
+	#mv $tmp.pdf ${1%.tex}.pdf
+	print_err
+fi
+if_empty_alert
+
+cleanup

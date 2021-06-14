@@ -14,6 +14,7 @@ do
 	while true;
 	do
 		myposition > new
+		[[ "$noDownload" == "y" ]] && echo noDownload=$noDownload >> new
 		diff new onServer -q >/dev/null
 		if [ $? = 0 ]
 		then

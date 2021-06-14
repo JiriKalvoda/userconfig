@@ -7,7 +7,9 @@ set header_cache= "~/.cache/mutt"
 set sort = threads 
 set sort_aux = reverse-last-date-received
 set copy = yes
-set record = "+.Sent"
+my_hdr Bcc: "jirikalvoda+sent@kam.mff.cuni.cz"
+# unmy_hdr Fcc
+set record =
 set trash = "+.Trash"
 mailboxes "$HOME/Maildir/." "$HOME/Maildir/.Drafts" "$HOME/Maildir/.jaroska"  "$HOME/Maildir/.ksp" "$HOME/Maildir/.ksp-git" "$HOME/Maildir/.piazza" "$HOME/Maildir/.Sent" "$HOME/Maildir/.seznam" "$HOME/Maildir/.Spam"  "$HOME/Maildir/.Trash" "$HOME/Maildir/.maso"
 #set mask=".*"

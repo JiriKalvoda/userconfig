@@ -3,3 +3,4 @@ user=jirikalvoda
 port=22
 name=tmp
 serverDir=/home/jirikalvoda/.movingssh
+#noDownload=y

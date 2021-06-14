@@ -1,0 +1,9 @@
+[user]
+	email = jirikalvoda@kam.mff.cuni.cz
+	name = Jiri Kalvoda
+[alias]
+	dfw = diff --ignore-space-change
+[core]
+	 #autocrlf=auto
+[pull]
+	rebase = true

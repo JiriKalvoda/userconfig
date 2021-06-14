@@ -55,13 +55,14 @@ Parametrs:
 	-U	force umount
 	-t	Make tunel
 	-T	Delete tunel route
-	-v  Connect x11vnc session view only
-	-V  Connect x11vnc session with control
-	-c  Connect vnc session
-	-n  Do not tunel X server by -Y
-	-N  Do not tunel X server by -Y, tunel it only by -X
+	-v	Connect x11vnc session view only
+	-V	Connect x11vnc session with control
+	-c	Connect vnc session
+	-n	Do not tunel X server by -Y
+	-N	Do not tunel X server by -Y, tunel it only by -X
 	-g 	Only print addres for use
-	-s  use moSh
+	-s	use moSh
+	-2	use second tunel (port number plus one)
 EOF
 	exit 0
 fi
@@ -115,7 +116,7 @@ debug()
 {
 	if [[ "$minus" == *"b"* ]]
 	then
-		echo DEBUG: $@  >&2
+		echo -e DEBUG: "$@"  >&2
 	fi
 }
 
@@ -202,13 +203,19 @@ printAddres()
 download()
 {
 	[[ "$noDownload" != "" ]] && return
+	if [[ "$minus" != *"d"* ]] && [[ "${config[noDownload]}" != "" ]]
+	then
+		return 0
+	fi
 	if [[ "$minus" == *"D"* ]]
 	then
 		return 0
 	fi
 	debug DOWNLOAD
+	#echo -en "\e[91mDOWNLOAD\e[0m\015"
 	newConfigFile=$(mktemp)
 	ssh $downloadServer  $timeoutCMD "cat /home/jirikalvoda/.movingssh/address/$name" > $newConfigFile 2>/dev/null
+	#echo -en "\e[92mDOW DONE\e[0m\015"
 	if [[ $? = 0 ]]
 	then
 		debug DOWNLOAD OK
@@ -233,6 +240,7 @@ download()
 tryLocal()
 {
 	debug TRY LOCAL
+	#echo -en "\e[91mTRY LOC \e[0m\015"
 	#declare -p config
 	if [[ "${config[portA]}" == "" ]]
 	then
@@ -245,6 +253,7 @@ tryLocal()
 	else
 		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyCMD $timeoutCMD echo OK 2>/dev/null)
 	fi
+	#echo -en "\e[92mTRY DONE\e[0m\015"
 	if [ "$ret" = "OK" ]
 	then
 		debug LOCAL OK
@@ -359,6 +368,20 @@ conect()
 	then
 		mosh  $username@$1 --ssh="ssh $envCMD -p$2 $xtunelCMD  $keyCMD $parametrs"
 		return $?
+	elif [[ "$minus" == *"m"* ]]
+	then
+		if [[ -d "$mountpoint" || -f "$mountpoint" ]]
+		then
+			rmdir $mountpoint
+		fi
+		if [[ -d "$mountpoint" || -f "$mountpoint" ]]
+		then
+			echo DIRECTORY $mountpoint EXISTS >&2
+			echo Unmout it first please >&2
+			exit 100
+		fi
+		mkdir $mountpoint
+		sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyCMD $mountpoint
 	else
 		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyCMD $parametrs
 		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyCMD $parametrs
@@ -369,6 +392,7 @@ conect()
 remote()
 {
 	debug REMOTE
+	echo -en "\e[91mREMOTE  \e[0m\015"
 	if [[ "${config[portB]}" == "" ]]
 	then
 		config[portB]=22
@@ -377,13 +401,19 @@ remote()
 	then
 		return 255
 	else
-		LD_SSHTYPE=remote conect ${config[ipB]} ${config[portB]}
+		if [[ "$minus" == *"2"* ]]
+		then
+			LD_SSHTYPE=second conect ${config[ipB]} $(( ${config[portB]} + 1))
+		else
+			LD_SSHTYPE=remote conect ${config[ipB]} ${config[portB]}
+		fi
 		return $?
 	fi
 }
 local()
 {
 	debug LOCAL
+	echo -en "\e[96mLOCAL   \e[0m\015"
 	if [[ "${config[portA]}" == "" ]]
 	then
 		config[portA]=22
@@ -448,8 +478,7 @@ then
 elif [[ "$minus" == *"r"* ]]
 then
 	remote
-elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]]
-
+elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]] || [[ "$minus" == *"m"* ]]
 then
 	tryLocalDownload
 	echo NO >&3
@@ -460,29 +489,6 @@ then
 	else
 		echo '********REMOTE**********' >&2
 		remote
-	fi
-elif [[ "$minus" == *"m"* ]]
-then
-	if [[ -d "$mountpoint" || -f "$mountpoint" ]]
-	then
-		rmdir $mountpoint
-	fi
-	if [[ -d "$mountpoint" || -f "$mountpoint" ]]
-	then
-		echo DIRECTORY $mountpoint EXISTS >&2
-		echo Unmout it first please >&2
-		exit 100
-	fi
-	tryLocalDownload
-	echo NO >&3
-	mkdir $mountpoint
-	if [ "$(head -n1 <&3)" == "YES" ]
-	then
-		echo LOCAL >&2
-		LD_SSHTYPE=local sshfs -o follow_symlinks -C $username@${config[ipA]}:$servermountpoint -p ${config[portA]} $keyCMD $mountpoint
-	else
-		echo '********REMOTE**********' >&2
-		LD_SSHTYPE=remote sshfs  -o follow_symlinks -C $username@${config[ipB]}:$servermountpoint -p ${config[portB]} $keyCMD $mountpoint
 	fi
 else
 	tryLocalDownload &

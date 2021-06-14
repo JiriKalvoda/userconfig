@@ -1,0 +1,155 @@
+\def\XppUiActionDefaultName#1{\XppUiAction{#1}{#1}}
+\def\XppUiActionDefaultNameDisable#1{\XppUiActionDisable{#1}{#1}}
+\def\XppPageBackgroundDefaultName#1{\XppPageBackground{#1}{#1}}
+
+\def\XppUiActionTool#1{\XppUiActionDefaultName{TOOL_#1}}
+\def\XppUiActionLineStyle#1{\XppUiActionTool{LINE_STYLE_#1}}
+\def\XppUiActionSelect#1{\XppUiActionTool{SELECT_#1}}
+\def\XppUiActionSize#1{\XppUiActionDefaultName{SIZE_#1}}
+\def\XppUiActionEraser#1{\XppUiActionTool{ERASER_#1}}
+
+\def\OutputModeDoc{doc}
+\ifx\OutputMode\OutputModeDoc
+%%% Colors %%% (from ucwmac (c) MJ)
+\chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
+\def\colorset#1{\pdfcolorstack\colorstk set #1}
+\def\colorpush#1{\pdfcolorstack\colorstk push #1}
+\def\colorpop{\pdfcolorstack\colorstk pop}
+\def\colorlocal{\aftergroup\colorpop\colorpush}
+\def\rgb#1{{#1 rg #1 RG}}
+\def\gray#1{{#1 g #1 G}}
+\def\cmyk#1{{#1 k #1 K}}
+\def\cwhite{\rgb{1 1 1}}
+
+\let\ex\expandafter
+\ex\def\csname hex0\endcsname{\advance\count5 0\relax}
+\ex\def\csname hex1\endcsname{\advance\count5 1\relax}
+\ex\def\csname hex2\endcsname{\advance\count5 2\relax}
+\ex\def\csname hex3\endcsname{\advance\count5 3\relax}
+\ex\def\csname hex4\endcsname{\advance\count5 4\relax}
+\ex\def\csname hex5\endcsname{\advance\count5 5\relax}
+\ex\def\csname hex6\endcsname{\advance\count5 6\relax}
+\ex\def\csname hex7\endcsname{\advance\count5 7\relax}
+\ex\def\csname hex8\endcsname{\advance\count5 8\relax}
+\ex\def\csname hex9\endcsname{\advance\count5 9\relax}
+\ex\def\csname hexa\endcsname{\advance\count5 10\relax}
+\ex\def\csname hexb\endcsname{\advance\count5 11\relax}
+\ex\def\csname hexc\endcsname{\advance\count5 12\relax}
+\ex\def\csname hexd\endcsname{\advance\count5 13\relax}
+\ex\def\csname hexe\endcsname{\advance\count5 14\relax}
+\ex\def\csname hexf\endcsname{\advance\count5 15\relax}
+\def\printnum{
+	\count6\count5
+	\divide\count6 255
+	\edef\tmp{\tmp\the\count6}
+	\multiply\count6 -255
+	\advance\count5 \count6
+	\multiply\count5 10
+}
+\def\cset#1#2#3
+{
+	\count5=0
+	\csname hex#2\endcsname
+	\multiply\count5 16\relax
+	\csname hex#3\endcsname
+	\def\tmp{}\printnum\edef\tmp{\tmp.}
+	\printnum\printnum
+	\printnum\printnum
+	\expandafter\edef\csname #1\endcsname,{\tmp}
+}
+\def\cdef#1#2#3#4#5#6#7#8
+{
+	\cset{cr}#3#4
+	\cset{cg}#5#6
+	\cset{cb}#7#8
+}
+\def\c{\rgb{\cr, \cg, \cb,}}
+
+\cdef 0xff00ff
+\def\XppUiActionDisable#1#2{\printkey{\rgb{1 1 0}}{Action\nl#2 Disable}}
+\def\XppUiAction#1#2{\printkey{\rgb{1 1 0}}{\autofont{Action\nl#2}}}
+\def\XppColor#1#2{\cdef #1 \printkey{\c}{Color\nl#2}}
+\def\XppUiActionTool#1{\printkey{\rgb{0.5 0.5 1}}{Tool\nl#1}}
+\def\XppUiActionSelect#1{\printkey{\rgb{1 0 1}}{Select\nl#1}}
+\def\XppUiActionLineStyle#1{\printkey{\rgb{0 1 1}}{Line style\nl#1}}
+\def\XppUiActionSize#1{\printkey{\rgb{0 1 0}}{Size\nl#1}}
+\def\XppPageBackground#1#2{\printkey{\rgb{1 0 0}}{Background\nl#2}}
+\def\XppUiActionEraser#1{\printkey{\rgb{1 0.5 0.5}}{Eraser\nl#1}}
+
+\BindKey{\Key{}{0}{10}}{\printkey{\rgb{1 1 1}}{{Hide menubar}}}
+\BindKey{\Key{}{0}{11}}{\printkey{\rgb{1 1 1}}{{Fullscreen}}}
+\BindKey{\Key{}{0}{12}}{\printkey{\rgb{1 1 1}}{{Show sidebar}}}
+\fi
+
+\newcount\CIt
+\def\C{\the\CIt}
+\def\SetK#1#2{\def\R{#1}\CIt #2\relax}
+\def\NextK{\advance\CIt 1\relax}
+\def\K{\Key{}{\R}{\C}}
+
+\SetK{0}{1}
+\BindKey{\K}{\XppUiActionDefaultName{UNDO}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{REDO}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{NEW_PAGE_AFTER}}\NextK
+
+\SetK{0}{5}
+\BindKey{\K}{\XppPageBackgroundDefaultName{plain}}\NextK
+\BindKey{\K}{\XppPageBackgroundDefaultName{ruled}}\NextK
+\BindKey{\K}{\XppPageBackgroundDefaultName{graph}}\NextK
+\BindKey{\K}{\XppPageBackgroundDefaultName{dotted}}\NextK
+\BindKey{\K}{\XppPageBackgroundDefaultName{lined}}\NextK
+
+\SetK{1}{1}
+\BindKey{\K} {\XppColor{0x000000}{black     }}\NextK
+\BindKey{\K} {\XppColor{0x008000}{green     }}\NextK
+\BindKey{\K} {\XppColor{0x00c0ff}{lightblue }}\NextK
+\BindKey{\K} {\XppColor{0x00ff00}{lightgreen}}\NextK
+\BindKey{\K} {\XppColor{0x3333cc}{blue      }}\NextK
+\BindKey{\K} {\XppColor{0x808080}{gray      }}\NextK
+\BindKey{\K} {\XppColor{0xff0000}{red       }}\NextK
+\BindKey{\K} {\XppColor{0xff00ff}{magenta   }}\NextK
+\BindKey{\K} {\XppColor{0xff8000}{orange    }}\NextK
+\BindKey{\K} {\XppColor{0xffff00}{yellow    }}\NextK
+\BindKey{\K} {\XppColor{0xffffff}{white     }}\NextK
+
+\SetK{2}{1}
+\BindKey{\K}{\XppUiActionTool{PEN}}\NextK
+\BindKey{\K}{\XppUiActionTool{ERASER}}\NextK
+\BindKey{\K}{\XppUiActionTool{HIGHLIGHTER}}\NextK
+\BindKey{\K}{\XppUiActionTool{HAND}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{TEX}}\NextK
+\BindKey{\K}{\XppUiActionTool{VERTICAL_SPACE}}\NextK
+
+\BindKey{\K}{\XppUiActionLineStyle{PLAIN}}\NextK
+\BindKey{\K}{\XppUiActionLineStyle{DASH}}\NextK
+\BindKey{\K}{\XppUiActionLineStyle{DOT}}\NextK
+\BindKey{\K}{\XppUiActionLineStyle{DASH_DOT}}\NextK
+
+
+\SetK{3}{1}
+\BindKey{\K}{\XppUiActionDefaultNameDisable{RULER}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{RULER}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{TOOL_DRAW_ARROW}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{TOOL_DRAW_RECT}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{TOOL_DRAW_ELLIPSE}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{TOOL_DRAW_COORDINATE_SYSTEM}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{TOOL_DRAW_SPLINE}}\NextK
+\BindKey{\K}{\XppUiActionDefaultName{SHAPE_RECOGNIZER}}\NextK
+
+\SetK{3}{9}
+\BindKey{\K}{\XppUiActionEraser{STANDARD}}\NextK
+\BindKey{\K}{\XppUiActionEraser{WHITEOUT}}\NextK
+\BindKey{\K}{\XppUiActionEraser{DELETE_STROKE}}\NextK
+
+
+
+\SetK{4}{2}
+\BindKey{\K}{\XppUiActionSelect{OBJECT}}\NextK
+\BindKey{\K}{\XppUiActionSelect{REGION}}\NextK
+\BindKey{\K}{\XppUiActionSelect{RECT}}\NextK
+
+\BindKey{\K}{\XppUiActionSize{VERY_FINE}}\NextK
+\BindKey{\K}{\XppUiActionSize{FINE}}\NextK
+\BindKey{\K}{\XppUiActionSize{MEDIUM}}\NextK
+\BindKey{\K}{\XppUiActionSize{THICK}}\NextK
+\BindKey{\K}{\XppUiActionSize{VERY_THICK}}\NextK

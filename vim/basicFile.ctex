@@ -1,0 +1,24 @@
+\input ucwmac.tex
+\ucwmodule{verb}
+\ucwmodule{ofs}
+\chyph
+\parskip 3pt
+\parindent 0pt
+\raggedbottom
+
+\font\hhdfont csbx17
+\font\hdfont csbx12
+\font\smallboldfont csbx10 at 7.5pt
+\def\hhd#1{\bigskip\leftline{\hfill\hhdfont #1\hfill}\interlinepenalty 10000}
+
+\newcount\countH
+\def\hd#1{\penalty-2000\bigskip\advance\countH1\relax\leftline{\hdfont\the\countH. #1}\nobreak}
+
+\hhd{}
+
+
+
+
+
+\bye
+

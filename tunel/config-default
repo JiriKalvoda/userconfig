@@ -1,0 +1,6 @@
+#/bin/bash
+server=kamna.kam.mff.cuni.cz
+user=jirikalvoda
+okfile=/tmp/sshtuneltest
+checktime=60
+timeout=30

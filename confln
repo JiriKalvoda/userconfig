@@ -1,0 +1,115 @@
+#!/bin/bash
+
+Red="\e[31m"
+Green="\e[32m"
+Yellow="\e[33m"
+Blue="\e[34m"
+Magenta="\e[35m"
+None="\e[0m"
+
+
+from="$1"
+to="$2"
+par="$3"
+
+NoOld()
+{
+	[[ "$par" == *r* ]]
+}
+Copy()
+{
+	[[ "$par" == *c* ]]
+}
+
+if [[ "$to" == *"/" ]]
+then
+	to="$to$(basename "$from")"
+fi
+
+
+
+typeEq()
+{
+	( [[ -d "$1" ]] && [[ -d "$1" ]] ) || ( [[ -f "$1" ]] && [[ -f "$2" ]] )
+}
+err()
+{
+	echo -e "$Red Error: $@ $None" 2>&1
+	exit 100
+}
+
+if [[ "$from" == "" ]] || [[ "$to" == "" ]]
+then
+	echo $0 - Config linker 1>&2
+	echo Usage: 1>&2
+	echo "	$0 from to [parametrs]" 1>&2
+	exit 1
+fi
+
+if [[ ! -e "$from" ]]
+then
+	echo "File $from not exist." 1>&2
+	exit 2
+fi
+
+echo -n "confln"
+Copy && echo -n -e "${Red}[COPY]$None"
+echo -n ": $from -> $to:"
+
+if [[ -e "$to" ]]
+then
+	if ! Copy && [[ "$(readlink -f $from)" == "$(readlink -f $to)" ]]
+	then
+		echo -e "$Blue Yet done$None"
+		exit 0
+	fi
+	if Copy && ! [[ "$(readlink -f $from)" == "$(readlink -f $to)" ]] && diff "$to" "$from"  -r >/dev/null &&  typeEq "$from" "$to"
+	then
+		echo -e "$Blue Yet done$None"
+		exit 0
+	fi
+	in=""
+	while [[ "$in" != y ]] && [[ "$in" != n ]]
+	do
+		echo -n -e "$Yellow File exist! Overwrite?(y/n/d)$None"
+		NoOld && echo -n -e "$Red (Delete old)$None"
+
+		read in
+		[[ "$in" == "n" ]] && exit 0
+		if [[ "$in" == "d" ]]
+		then
+			typeEq || echo -e "$Red Type are not equival.$None"
+			diff "$to" "$from" --color=always -r
+		fi
+	done
+	if NoOld
+	then
+		rm "$to" || err rm
+		echo -n "Old file deleted"
+	else
+		old="$to.old.$(date +%Y-%m-%d--%H-%M-%S)"
+		echo -n " Old file is: $old"
+		mv "$to" "$old" || err mv 
+	fi
+fi
+
+if [[ ! -d "$(dirname "$to" )" ]]
+then
+	in=""
+	while [[ "$in" != y ]] && [[ "$in" != n ]]
+	do
+		echo -n -e "$Magenta Directory not exist! Create?(y/n)$None"
+		read in
+		[[ "$in" == "n" ]] && exit 0
+	done
+	mkdir -p "$(dirname "$to")" || err mkdir
+fi
+
+if Copy
+then
+	cp "$from" "$to" -r || err cp
+else
+	ln -sr "$from" "$to" || err ln
+fi
+
+echo -e "$Green OK$None"

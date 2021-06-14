@@ -1,0 +1,4 @@
+#!/bin/bash
+echo localhost:57283 > ~/.secret/mqtt/rpi2-all.tunel
+movingssh -dx rpi2  -L57283:localhost:1883
+rm ~/.secret/mqtt/rpi2-all.tunel

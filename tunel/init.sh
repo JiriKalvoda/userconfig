@@ -1,20 +1,23 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
-sudo ln -sr tunel.sh /usr/bin/tunel
-sudo chmod +x /usr/bin/tunel
+confln second-tunel.sh ~/bin/second-tunel
+confln second-tunel-kill.sh ~/bin/second-tunel-kill
 
-sudo cp tunel.service /lib/systemd/system
-sudo systemctl daemon-reload
-sudo systemctl enable tunel
+confln tunel.sh ~/bin/tunel
+
+gcc tunel-echo.c -o ~/.tunel/tunel-echo
+gcc tunel-echo.c -o ~/.tunel/second-tunel-echo
 
 mkdir ~/.tunel -p
-ln -s `which ssh` ~/.tunel/ssh-tunel
-ln -s `which sleep` ~/.tunel/ssh-sleep
-ln -s `which ssh` ~/.tunel/ssh-check
-if [[ ! -f ~/.tunel/config ]]
-then
-	cp config ~/.tunel
-fi
+confln "`which ssh`" ~/.tunel/tunel-ssh
+confln "`which ssh`" ~/.tunel/second-tunel-ssh
+confln "`which ssh`" ~/.tunel/tunel-ssh-check
 
+confln config ~/.tunel/ c
+confln config-default ~/.tunel/
 
+ssh -o HostKeyAlias=localhost localhost echo OK ssh localhost
+. ~/.tunel/config-default
+. ~/.tunel/config
+ssh $user@$server echo OK ssh server

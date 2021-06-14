@@ -246,6 +246,12 @@ function! Run(isVimRun,input)
 	elseif s == "sh"
 		w
 		execute "AddExec bash ".NameAll()." ".RunArg()." ".a:input
+	elseif s == "prolog"
+		w
+		execute "AddExec swipl ".NameAll()." ".RunArg()." ".a:input
+	elseif s == "haskell"
+		w
+		execute "AddExec ghci ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "python"
 		w
 		execute "AddExec bpython ".NameAll()." ".RunArg()." ".a:input
@@ -279,6 +285,21 @@ function! Run(isVimRun,input)
 		endif
 	endif
 endfunction
+
+"#function! NameAll()
+	"#return expand('%:p')
+"#%endfunction
+"#%function! NameNoE()
+	"#%return expand('%:p:r')
+"#%endfunction
+"#%function! NameDir()
+	"#%return expand('%:p:h')
+"##%endfunction
+function! XournalLaunch()
+		"execute "AddExec ( xournalpp ".expand('<cfile>:p:r').".xopp; xournalpp ".expand('<cfile>:p:r').".xopp --create-pdf ".expand('<cfile>:p:r').".pdf ) 2>/dev/null >/dev/null & echo" 
+		execute "AddExec ~/bin/vim_launcher xournalppp ".expand('<cfile>')
+endfunction
+
 function! RunTests(isVimRun)
 	let ls = split(system("ls ".NameNoE()."*.txt ".NameNoE()."*.in 2>/dev/null"),"\n")
 	for i in ls
@@ -393,9 +414,13 @@ map \h :call Help()<CR>
 map \f :call BasicFile()<CR><Up>dd
 
 map \s :se spell<CR>:se spelllang=cs<CR>
+map \S :se spell<CR>:se spelllang=en<CR>
+map \D :se nospell<CR>
 
 map \b <HOME>v<END>y:!<c-R>"<BS><CR>
 map \B <HOME>v<END>y:!sudo <c-R>"<BS><CR>
+
+map \n :B BG nemo <C-R>% <CR>
 
 imap <silent> <C-Up> <C-o>gk
 imap <silent> <C-Down> <C-o>gj
@@ -422,6 +447,7 @@ map <silent> ,m oeqnarray* <Esc>,,
 map <silent> ,M Oeqnarray* <Esc>,,
 map <silent> ,n o$$<ESC>o$$<ESC>O
 map <silent> ,N O$$<ESC>o$$<ESC>O
+map <silent> ,x "xyaB:call XournalLaunch()<CR>:call Exec()<CR>
 "map ,, yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
 
 
