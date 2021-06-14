@@ -306,7 +306,7 @@ if [ "$device_name" == "arzen" ] ;
 then
 	promt_color_dir=94
 fi
-if [ "$device_name" = "rpi"* ] ;
+if [[ "$device_name" == rpi* ]]
 then
 	promt_color_dir=95
 fi
