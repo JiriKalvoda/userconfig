@@ -78,7 +78,7 @@ then
 		[[ "$in" == "n" ]] && exit 0
 		if [[ "$in" == "d" ]]
 		then
-			typeEq || echo -e "$Red Type ar not equival.$None"
+			typeEq || echo -e "$Red Type are not equival.$None"
 			diff "$to" "$from" --color=always -r
 		fi
 	done
