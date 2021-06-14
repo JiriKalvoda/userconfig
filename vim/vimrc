@@ -328,6 +328,7 @@ function! BasicFile()
 	execute "r ~/.basicFile/basicFile." . extension
 endfunction
 
+map ; :
 map \c :call Compile(g:useVimRun)<CR>:call Exec()<CR>
 map \v :call Compile(g:useVimRun)<CR>:AddLess<CR>:call Exec()<CR>
 map \r :call Run(g:useVimRun,"")<CR>:call Exec()<CR>
