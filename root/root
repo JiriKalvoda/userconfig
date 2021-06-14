@@ -1,0 +1,7 @@
+#!/bin/bash
+if [[ "$@" == "" ]]
+then
+	LD_SSHTYPE=localhost LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD 
+else
+	LD_SSHTYPE=localhost LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD -t cd "$PWD" \; "$@" 
+fi
