@@ -148,16 +148,6 @@ promt()
 	echo -n ${PS1@P} | tr -d `char 1``char 2`
 }
 
-
-# If this is an xterm set the title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
-
 # enable color support of ls and also add handy aliases
 if [ -x /usr/bin/dircolors ]; then
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
@@ -293,19 +283,32 @@ export PATH=$PATH:~/bin
 
 promt_color_rvalue=91
 promt_color_user=32
-promt_color_dir=34
+promt_color_dir=96
 promt_color_git=93
 promt_color_dolar=39
 
 
-if [ "$device_name" = "externalArch" ] ;
+if [ "$device_name" == "externalArch" ] ;
 then
 	promt_color_user=33
 fi
 
-if [ "$ISBREAKEBLE" = "1" ] ;
+if [[ "$device_name" == acid ]] || [[ "$device_name" == poppi ]]
 then
-	promt_color_user=95
+	promt_color_dir=91
+fi
+if [[ "$device_name" == *kam* ]] || [[ "$device_name" == *cam* ]]
+then
+	promt_color_dir=92
+fi
+# 93 -> git
+if [ "$device_name" == "arzen" ] ;
+then
+	promt_color_dir=94
+fi
+if [ "$device_name" = "rpi"* ] ;
+then
+	promt_color_dir=95
 fi
 
 if [ "$SSH_CONNECTION" != "" ];
@@ -313,6 +316,9 @@ then
 	if [ "$LD_SSHTYPE" = "localhost" ];
 	then
 		true
+	elif [ "$LD_SSHTYPE" = "second" ];
+	then 
+		promt_color_user=33
 	elif [ "$LD_SSHTYPE" = "local" ];
 	then 
 		promt_color_user=96
@@ -326,6 +332,12 @@ else
 		pNN
 	fi
 fi
+
+if [ "$ISBREAKEBLE" = "1" ] ;
+then
+	promt_color_user=95
+fi
+
 if [ "$USER" == "root" ];
 then 
 	promt_color_dolar="91;1"
@@ -341,7 +353,8 @@ done 2>/dev/null
 PS1='${debian_chroot:+($debian_chroot)}\
 \[\033[01;${promt_color_rvalue}m\]$(promt_rvalue)\
 \[\033[01;${promt_color_user}m\]$(promt_usrCut)\
-\[\033[00m\]:\[\033[01;${promt_color_dir}m\]\w\
+\[\033[${promt_color_dolar}m\]:\
+\[\033[01;${promt_color_dir}m\]\w\
 \[\033[00m\]\[\033[01;${promt_color_git}m\]$(promt_parse_git_branch)\
 \[\033[0m\]\
 \[\033[${promt_color_dolar}m\]\
