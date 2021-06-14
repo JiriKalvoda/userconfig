@@ -1,7 +1,7 @@
 #!/bin/bash
 
 server_m=/home/jirikalvoda/bin/m
-ssh='movingssh kam -Y -t'
+ssh='ssh jirikalvoda@kam.mff.cuni.cz -Y -t'
 
 active_window()
 {
@@ -43,7 +43,7 @@ then
 	terminal -e $0 $@ &
 	for i in {0..10}
 	do
-		sleep 0.1
+		sleep 0.2
 		i3-msg "[con_id=\"$window\"] resize set 450 px" 2>/dev/null >/dev/null
 	done
 fi
