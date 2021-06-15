@@ -1,9 +1,10 @@
 #!/bin/bash
 app="snapshoter"
-version=1.2
+version=1.4
 author="Jiri Kalvoda"
 
 if [[ "$UID" != "0" ]]
+then
 	sudo $0 $@
 	exit $?
 fi
@@ -28,6 +29,10 @@ usingSSH=false
 exclude_mnt=true
 exclude_aux=true
 exclude_key=true
+exclude_fs=true
+exclude_downloads=true
+exclude_mountdir=true
+excludedir_homes="'/root' '/home/*'"
 
 ms()
 {
@@ -39,7 +44,7 @@ ms()
 
 if [[ "$device" == "clean" ]]
 then
-  data="$(ls /mnt/snapshot/*/working/* -d 2>/dev/null)$(ls /mnt/snapshot-manual/*/working/* -d 2>/dev/null)"
+	data="$(ls /mnt/snapshot/*/working/* -d 2>/dev/null)$(echo)$(ls /mnt/snapshot-manual/*/working/* -d 2>/dev/null)"
   echo "$data"
   [[ "$data" == "" ]] && exit 0
 	echo -e "\e[1mIF NO SNAPSHOTER RUNNING PRESS <Enter> for clean (some string to exit)\e[0m"
@@ -69,8 +74,9 @@ okto="$okdir/$date"
 linkdir="$(ls $okdir/ | tail -n1)"
 [[ "$linkdir" != "" ]] && linkdir="$okdir/$linkdir"
 
-if [[ ! $usingSSH ]]
+if ! $usingSSH 
 then
+	echo NOT SSH
 	if [[ ! -e "$from" ]]
 	then
 		err "FROM $from NOT EXIST!"
@@ -96,23 +102,25 @@ mkdir -p "$wto"
 echo -n "" > "$excludefile"
 
 
-parcmd="-atu --recursive --info=progress2 --info=name0 --delete --force --sparse --delete-excluded"
+parcmd="-atu --recursive --info=progress2 --info=name0 --delete --force --sparse --delete-excluded --stats"
 unset linkcmd
 [[ "$linkdir" != "" ]] && linkcmd="--link-dest=$linkdir/data/"
 excludecmd="--exclude-from=$excludefile"
 
-echo >> "$excludefile" "/dev"
-echo >> "$excludefile" "/proc"
-echo >> "$excludefile" "/run"
-echo >> "$excludefile" "/sys"
-echo >> "$excludefile" "/tmp"
+$exclude_fs && echo >> "$excludefile" "/dev"
+$exclude_fs && echo >> "$excludefile" "/proc"
+$exclude_fs && echo >> "$excludefile" "/run"
+$exclude_fs && echo >> "$excludefile" "/sys"
+$exclude_fs && echo >> "$excludefile" "/tmp"
 $exclude_mnt && echo >> "$excludefile" "/mnt"
 $exclude_aux &&  echo >> "$excludefile" "/aux"
-for h in '/root' '/home/*'
+for h_it in $excludedir_homes
 do
+	h="${h_it:1:-1}"
 	$exclude_key && echo >> "$excludefile" "$h/.ssh"
-	echo >> "$excludefile" "$h/m"
-	echo >> "$excludefile" "$h/kam"
+	$exclude_mountdir && echo >> "$excludefile" "$h/m"
+	$exclude_mountdir && echo >> "$excludefile" "$h/kam"
+	$exclude_downloads && echo >> "$excludefile" "$h/Downloads"
 done
 
 logcmd="--log-file=$wto/log"
@@ -162,7 +170,7 @@ if [[ "$r" != "0" ]]
 then
 	echo
 	err RSYNC ERROR $r
-	exit 1
+	[[ "$r" != 24 ]] && exit 1
 fi
 if [[ "$(ls $to)" == "" ]]
 then
