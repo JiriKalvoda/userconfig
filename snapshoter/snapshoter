@@ -1,10 +1,11 @@
 #!/bin/bash
 app="snapshoter"
-version=1.2
+version=1.5
 author="Jiri Kalvoda"
 
 if [[ "$UID" != "0" ]]
-	sudo $0 $@
+then
+	root "$0" "$@"
 	exit $?
 fi
 
@@ -53,10 +54,12 @@ then
 	exit 0
 fi
 
+snapdir="/mnt/snapshot-manual"
+autosnapdir="/mnt/snapshot"
+
 . ~/snapshoter.devices
 
-snapdir="/mnt/snapshot-manual"
-[[ "$minus" == *"a"* ]] && snapdir="/mnt/snapshot"
+[[ "$minus" == *"a"* ]] && snapdir="$autosnapdir"
 devicedir="$snapdir/$device"
 okdir="$devicedir/ok"
 workingdir="$devicedir/working"
