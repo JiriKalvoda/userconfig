@@ -1,0 +1,36 @@
+#!/bin/bash
+
+snapdir="/mnt/snapshot"
+autosnapdir="/mnt/snapshot"
+
+case "$device" in
+  test)
+		from=/tmp/testsnap
+    ;;
+  arzen)
+		from=/
+		exclude_key=false
+	;;
+  rpi[0-7])
+	    exclude_aux=false
+		fromdir=/
+  		ms root@$device
+	  ;;
+  arch | external)
+		fromdir=/
+  		ms root@$device
+    ;;
+  phone)
+		fromdir="'/data/data/com.termux/'"
+		exclude_mnt=false
+		exclude_aux=false
+		exclude_fs=false
+		exclude_mountdir=false
+		excludedir_homes="'/files/home'"
+  		ms root@$device
+    ;;
+  *)
+	err DEVICE $device NOT EXIST
+    exit 200
+    ;;
+esac

@@ -1,0 +1,197 @@
+#!/bin/bash
+app="snapshoter"
+version=1.5
+author="Jiri Kalvoda"
+
+if [[ "$UID" != "0" ]]
+then
+	root "$0" "$@"
+	exit $?
+fi
+
+err()
+{
+	echo -e "\e[31m\e[1m$@\e[0m"
+}
+
+minus=""
+while [[ "$1" == "-"* ]]
+do
+	minus="$minus$1"
+	shift
+done
+
+device="$1"
+
+sshcmd=""
+usingSSH=false
+
+exclude_mnt=true
+exclude_aux=true
+exclude_key=true
+exclude_fs=true
+exclude_downloads=true
+exclude_mountdir=true
+excludedir_homes="'/root' '/home/*'"
+
+ms()
+{
+	ms_ret="$(movingssh -gdx $@ rsync)"
+	from="$(echo "$ms_ret" | head -n1)$fromdir"
+	sshcmd="$(echo "$ms_ret" | head -n2 | tail -n1)"
+	usingSSH=true
+}
+
+if [[ "$device" == "clean" ]]
+then
+	data="$(ls /mnt/snapshot/*/working/* -d 2>/dev/null)$(echo)$(ls /mnt/snapshot-manual/*/working/* -d 2>/dev/null)"
+  echo "$data"
+  [[ "$data" == "" ]] && exit 0
+	echo -e "\e[1mIF NO SNAPSHOTER RUNNING PRESS <Enter> for clean (some string to exit)\e[0m"
+	read r
+	if [[ "$r" != "" ]]
+	then
+		err EXIT
+		exit 0
+	fi
+	rm  $data -r
+	exit 0
+fi
+
+snapdir="/mnt/snapshot-manual"
+autosnapdir="/mnt/snapshot"
+
+. ~/snapshoter.devices
+
+[[ "$minus" == *"a"* ]] && snapdir="$autosnapdir"
+devicedir="$snapdir/$device"
+okdir="$devicedir/ok"
+workingdir="$devicedir/working"
+date="$(date +%Y-%m-%d--%H-%M)"
+mkdir -p "$okdir"
+mkdir -p "$workingdir"
+wto="$workingdir/$date"
+okto="$okdir/$date"
+
+linkdir="$(ls $okdir/ | tail -n1)"
+[[ "$linkdir" != "" ]] && linkdir="$okdir/$linkdir"
+
+if ! $usingSSH 
+then
+	echo NOT SSH
+	if [[ ! -e "$from" ]]
+	then
+		err "FROM $from NOT EXIST!"
+		exit 101
+	fi
+	if [[ "$(ls $from)" == "" ]]
+	then
+		err "FROM $from IS EMPTY!"
+		exit 102
+	fi
+fi
+if [[ -e "$wto" ]] || [[ -e "$okto" ]]
+then
+	err "FILE $wto OR $okto EXIST!"
+	exit 100
+fi
+
+to="$wto/data"
+#mkdir -p "$to"
+
+excludefile="$wto/exclude"
+mkdir -p "$wto"
+echo -n "" > "$excludefile"
+
+
+parcmd="-atu --recursive --info=progress2 --info=name0 --delete --force --sparse --delete-excluded --stats"
+unset linkcmd
+[[ "$linkdir" != "" ]] && linkcmd="--link-dest=$linkdir/data/"
+excludecmd="--exclude-from=$excludefile"
+
+$exclude_fs && echo >> "$excludefile" "/dev"
+$exclude_fs && echo >> "$excludefile" "/proc"
+$exclude_fs && echo >> "$excludefile" "/run"
+$exclude_fs && echo >> "$excludefile" "/sys"
+$exclude_fs && echo >> "$excludefile" "/tmp"
+$exclude_mnt && echo >> "$excludefile" "/mnt"
+$exclude_aux &&  echo >> "$excludefile" "/aux"
+for h_it in $excludedir_homes
+do
+	h="${h_it:1:-1}"
+	$exclude_key && echo >> "$excludefile" "$h/.ssh"
+	$exclude_mountdir && echo >> "$excludefile" "$h/m"
+	$exclude_mountdir && echo >> "$excludefile" "$h/kam"
+	$exclude_downloads && echo >> "$excludefile" "$h/Downloads"
+done
+
+logcmd="--log-file=$wto/log"
+
+
+echo "RUNNING SNAPSHOTER ON DEVICE $device"
+echo -e  "from:    \e[1m\e[92m$from\e[0m"
+[[ $sshcmd != "" ]] && echo -e  "\e[1m\e[33m$sshcmd\e[0m"
+echo "to:      $okto"
+echo "working: $wto"
+echo "link:    $linkdir"
+echo
+echo "******** RSYNC ******"
+echo "par:    " $parcmd
+echo "link:   " $linkcmd
+echo "exclude: $excludecmd"
+echo -e -n "\e[33m"
+cat "$excludefile"
+echo -e "\e[0m"
+
+echo rsync ${parcmd} "${linkcmd@Q}" "${excludecmd@Q}" $sshcmd "${from@Q}/" "${to@Q}/" "${logcmd@Q} " > $wto/cmd
+echo -e -n "\e[96m"
+cat $wto/cmd
+echo -e "\e[0m"
+
+echo "snapshot made by $app $version (c) $author on $date for device $device" > $wto/README
+
+if [[ "$minus" != *"y"* ]]
+then
+	echo -e "\e[1mPRESS <Enter> for start (some string to exit)\e[0m"
+	read r
+	if [[ "$r" != "" ]]
+	then
+		err EXIT
+		rm -r $wto
+		exit 0
+	fi
+fi
+
+#rsync $parcmd $linkcmd "$excludecmd" "$from/" "$to/"
+echo -e -n "\e[92m"
+time nice -10 bash  $wto/cmd
+r=$?
+echo -e -n "\e[0m"
+
+if [[ "$r" != "0" ]]
+then
+	echo
+	err RSYNC ERROR $r
+	[[ "$r" != 24 ]] && exit 1
+fi
+if [[ "$(ls $to)" == "" ]]
+then
+	err "TO DIRECTORY $to IS EMPTY!"
+	exit 104
+fi
+echo
+echo RSYNC OK
+mv $wto $okto
+if [[ "$?" != "0" ]]
+then
+	echo FINEL MV $?
+	err 2
+fi
+echo ALL OK
+
+
+#rsync  \
+#--link-dest=/run/timeshift/backup/timeshift/snapshots/2021-03-01_19-00-08/localhost/ \
+##--log-file=/run/timeshift/backup/timeshift/snapshots/2021-03-01_23-54-36/rsync-log \
+#--exclude-from=/run/timeshift/backup/timeshift/snapshots/2021-03-01_23-54-36/exclude.list \
+#/ /run/timeshift/backup/timeshift/snapshots/2021-03-01_23-54-36/localhost/
