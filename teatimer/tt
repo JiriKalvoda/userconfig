@@ -1,0 +1,1 @@
+teatimer --run="osdc --duration=10000 --min-duration=5000 'už je' ČAJ\!\!\!" $@
