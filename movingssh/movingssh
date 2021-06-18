@@ -212,10 +212,10 @@ download()
 		return 0
 	fi
 	debug DOWNLOAD
-	#echo -en "\e[91mDOWNLOAD\e[0m\015"
+	#echo -en "\e[91mDOWNLOAD\e[0m\015" 1>&2
 	newConfigFile=$(mktemp)
 	ssh $downloadServer  $timeoutCMD "cat /home/jirikalvoda/.movingssh/address/$name" > $newConfigFile 2>/dev/null
-	#echo -en "\e[92mDOW DONE\e[0m\015"
+	#echo -en "\e[92mDOW DONE\e[0m\015" 1>&2
 	if [[ $? = 0 ]]
 	then
 		debug DOWNLOAD OK
@@ -240,7 +240,7 @@ download()
 tryLocal()
 {
 	debug TRY LOCAL
-	#echo -en "\e[91mTRY LOC \e[0m\015"
+	#echo -en "\e[91mTRY LOC \e[0m\015" 1>&2
 	#declare -p config
 	if [[ "${config[portA]}" == "" ]]
 	then
@@ -253,7 +253,7 @@ tryLocal()
 	else
 		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyCMD $timeoutCMD echo OK 2>/dev/null)
 	fi
-	#echo -en "\e[92mTRY DONE\e[0m\015"
+	#echo -en "\e[92mTRY DONE\e[0m\015" 1>&2
 	if [ "$ret" = "OK" ]
 	then
 		debug LOCAL OK
@@ -392,7 +392,7 @@ conect()
 remote()
 {
 	debug REMOTE
-	echo -en "\e[91mREMOTE  \e[0m\015"
+	echo -en "\e[91mREMOTE  \e[0m\015" 2>/dev/null 1>&2
 	if [[ "${config[portB]}" == "" ]]
 	then
 		config[portB]=22
@@ -413,7 +413,7 @@ remote()
 local()
 {
 	debug LOCAL
-	echo -en "\e[96mLOCAL   \e[0m\015"
+	echo -en "\e[96mLOCAL   \e[0m\015" 1>&2
 	if [[ "${config[portA]}" == "" ]]
 	then
 		config[portA]=22
