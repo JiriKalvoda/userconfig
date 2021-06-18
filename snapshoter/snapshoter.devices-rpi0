@@ -1,0 +1,32 @@
+#!/bin/bash
+case "$device" in
+  test)
+		from=/tmp/testsnap
+    ;;
+  rpi0 )
+		from=/
+		exclude_aux=false
+	;;
+  rpi[1-7])
+	    exclude_aux=false
+		fromdir=/
+  		ms root@$device
+	  ;;
+  arch | external | arzen)
+		fromdir=/
+  		ms root@$device
+    ;;
+  phone)
+		fromdir="'/data/data/com.termux/'"
+		exclude_mnt=false
+		exclude_aux=false
+		exclude_fs=false
+		exclude_mountdir=false
+		excludedir_homes="'/files/home'"
+  		ms root@$device
+    ;;
+  *)
+	err DEVICE $device NOT EXIST
+    exit 200
+    ;;
+esac

@@ -19,7 +19,7 @@ whileok()
 	while true
 	do
 		sleep $checktime
-		./$cmdprefix-ssh-check $server -p $port "echo OK > $okfile" -oServerAliveInterval=300 -o HostKeyAlias=localhost &
+		./$cmdprefix-ssh-check $server -p $port -oServerAliveInterval=300 -o HostKeyAlias=localhost "echo OK > $okfile" &
 		sleep $timeout
 		killall $cmdprefix-ssh-check -q
 		if [[ -f $okfile ]]
