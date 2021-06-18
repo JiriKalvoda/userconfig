@@ -250,9 +250,9 @@ bar \{%
 	\BindKey{\Key{}{3}{4}}{\Volume{+}{2}}
 	\BindKey{\Key{}{3}{5}}{\Volume{+}{10}}
 
+	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output DP-1 --off --output HDMI-1 --off --output eDP-1 --pos 0x0; wacom-config output 0}}
+	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output DP-1 --pos 0x0 --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500; xsetwacom --set 10 MapToOutput  2560x1440+0+0; wacom-config output 0}}
 	\BindKey{\Key{}{4}{9}}{\Cmd{xrandr --auto ; wacom-config output 0}}
-	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output HDMI-1 --off --output eDP-1 --pos 0x0; wacom-config output 0}}
-	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500; xsetwacom --set 10 MapToOutput  2560x1440+0+0; wacom-config output 0}}
 
 	\BindKey{\Key{}{4}{6}}{\Cmd{\CmdSetxkbmap}}
 
@@ -324,6 +324,7 @@ bar \{%
 \IiiiLine{bindcode 208 exec playerctl play-pause}
 \IiiiLine{bindcode 209 exec playerctl play-pause}
 \fi
+\BindKey{\KeyX{\Super\Shift}}{\Cmd{playerctl play-pause}}
 
 \def\BindPasman#1#2{
 \BindKey{#1{      \Super}}{\IiiiInline{ --release }\Cmd{pasman-osd #2 xall}}
