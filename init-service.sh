@@ -19,7 +19,7 @@ if id "$user" &>/dev/null; then  true ; else
 fi
 
 home="$(getent passwd "$user" | cut -d: -f6)"
-path="/usr/local/sbin:/usr/local/bin:/usr/bin:$home/bin"
+path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/usr/bin:/bin:$home/bin"
 if [[ "$exe" == "/"* ]]
 then
 	exePath="$exe"
