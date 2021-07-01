@@ -9,6 +9,7 @@ case $- in
 	      [[ "$use_bashrc" = "" ]] && return;;
 esac
 
+######################### spawn-alacritty-cwd
 PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME}:${PWD}\007"'
 if [[ "$LC_CD" != "" ]];
 then
@@ -16,6 +17,14 @@ then
 	export -n LC_CD
 fi
 
+########################################################################
+######################### BASIC DEFAULT CONFIG #########################
+########################################################################
+
+######################### Local bin
+export PATH=$PATH:~/bin
+
+######################### history files
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -27,69 +36,6 @@ shopt -s histappend
 HISTSIZE=1000
 HISTFILESIZE=2000
 
-promt_parse_git_branch() {
-	if [ $promt_NoGit -eq 0 ]; then 
-		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
-	else
-		echo "?"
-	fi
-}
-promt_NoGit=0
-promt_rvalue() {
-	lastcmd=$?;
-	if [ $lastcmd -ne 0 ]; then 
-		echo "[$lastcmd]";
-	fi
-	exit $lastcmd
-}
-promt_NoUser=0
-promt_usrCut(){
-	lastcmd=$?;
-	usr="\u@\h"
-	usr=${usr@P}
-	if [ $promt_NoUser -eq 0 ]; then 
-		if [ $lastcmd -ne 0 ]; then 
-			lastcmdStr="[$lastcmd]";
-			printf  ${usr:${#lastcmdStr}} | sed -e 's/* \(.*\)/(\1)/'
-		else
-			printf  $usr | sed -e 's/* \(.*\)/(\1)/'
-		fi
-	fi
-	exit $lastcmd
-}
-promt_NewLine=0;
-promt_MakNewLine(){
-	if [ $promt_NewLine -ne 0 ]; then 
-		printf  '\n$' #| sed -e 's/* \(.*\)/(\1)/'
-	else
-		printf  '$' #| sed -e 's/* \(.*\)/(\1)/'
-	fi
-}
-
-pNL()
-{
-	if [ $promt_NewLine -eq 0 ]; then
-		promt_NewLine=1;
-	else
-		promt_NewLine=0;
-	fi
-}
-pNN()
-{
-	if [ $promt_NoUser -eq 0 ]; then
-		promt_NoUser=1;
-	else
-		promt_NoUser=0;
-	fi
-}
-pG()
-{
-	if [ $promt_NoGit -eq 0 ]; then
-		promt_NoGit=1;
-	else
-		promt_NoGit=0;
-	fi
-}
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
@@ -128,56 +74,6 @@ if [ -n "$force_color_prompt" ]; then
     fi
 fi
 
-#if [ "$color_prompt" = yes ]; then
-
-device_name()
-{
-	tmp="\h";
-	echo ${tmp@P};
-}
-device_name=`device_name`;
-
-
-char() {
-  [ "$1" -lt 256 ] || return 1
-  printf "\\$(printf '%03o' "$1")"
-}
-
-promt()
-{
-	echo -n ${PS1@P} | tr -d `char 1``char 2`
-}
-
-# enable color support of ls and also add handy aliases
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    #alias dir='dir --color=auto'
-    #alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
-fi
-
-# colored GCC warnings and errors
-#export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
-
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias vi='vim'
-alias e='vim'
-alias view='vim -R'
-alias pink="ping kam.mff.cuni.cz"
-alias traceroutek="traceroute kam.mff.cuni.cz"
-alias pin8="ping 8.8.8.8"
-alias traceroute8="traceroute 8.8.8.8"
-
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
-alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
 # Alias definitions.
 # You may want to put all your additions into a separate file like
@@ -199,72 +95,184 @@ if ! shopt -oq posix; then
   fi
 fi
 
-mcd()
+
+##########################################################################
+######################### GLOBAL HELPER FUNCTONS #########################
+##########################################################################
+
+device_name()
 {
-	mkdir -p $1; cd $1
+	tmp="\h";
+	echo ${tmp@P};
 }
-mkdircd()
-{
-	mkdir $1; cd $1
+device_name=`device_name`;
+
+
+char() {
+  [ "$1" -lt 256 ] || return 1
+  printf "\\$(printf '%03o' "$1")"
 }
-BG()
-{
-	( $@ 1>/dev/null 2>/dev/null & ) 
+
+
+###############################################################################
+######################### ALIASES AND PROGRAMS CONFIG #########################
+###############################################################################
+
+#test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+
+real_ls=$(which ls)
+ls(){
+	$real_ls --color=auto "$@"
 }
-gopen()
-{
+
+######################### grep
+real_grep="$(which grep)"
+grep(){
+	$real_grep --color=auto "$@"
+}
+real_fgrep="$(which fgrep)"
+fgrep(){
+	$real_fgrep --color=auto "$@"
+}
+real_egrep="$(which egrep)"
+egrep(){
+	$real_egrep --color=auto "$@"
+}
+
+######################### ls
+ll(){
+	ls -alF "$@"
+}
+la(){
+	ls -A "$@"
+}
+l(){
+	ls -CF "$@"
+}
+
+######################### vim
+e(){
+	vim "$@"
+}
+vi(){
+	vim "$@"
+}
+view(){
+	vim -R "$@"
+}
+
+######################### ping, traceroute
+pink(){ ping kam.mff.cuni.cz "$@"
+}
+traceroutek(){ traceroute kam.mff.cuni.cz "$@"
+}
+pin8(){ ping 8.8.8.8 "$@"
+}
+traceroute8(){ traceroute 8.8.8.8 "$@"
+}
+
+
+######################### mkdir, cd
+mcd(){
+	mkdir -p "$1"; cd "$1"
+}
+mkdircd(){
+	mkdir "$1"; cd "$1"
+}
+
+######################## Open on background
+BG(){
+	( "$@" 1>/dev/null 2>/dev/null & ) 
+}
+
+gopen(){
 	( xdg-open "$@" 2>/dev/null 1>/dev/null & ) 
 }
-g()
-{
+g(){
 	( xdg-open "$@" 2>/dev/null 1>/dev/null & ) 
 }
-run()
-{
+run(){
 	$@;
 }
-h()
-{
-	 echo ---------- $@: | lolcat;
-	$@
+zath(){
+	for i in $@
+	do
+		zathura $i & sleep 0.2
+	done
 }
-bashLine()
-{
-	promt;
-	printf "%s\n" "${@}";
-	$@
+
+######################### Separators
+h(){
+	 echo ---------- "$@": | lolcat
+	"$@"
 }
-sepLine()
-{
+promt(){
+	echo -n ${PS1@P} | tr -d `char 1``char 2`
+}
+bashLine(){
+	promt
+	echo "$@"
+	"$@"
+}
+sepLine(){
 	s=$(printf "%-`stty size | cut -d ' ' -f 2`s" " ");echo -e "\e[30;48;5;82m${s// / }\e[0m"
 }
-rmHARD()
-{
-	rm "$@"
-}
-alias rm='trash '
-alias cp='cp -i '
-alias mv='mv -i '
 
-alias gic="git commit"
-alias gica="git commit --amend"
-alias gis="git status"
-alias gig="git log --oneline --graph"
-alias gil="git log --max-count=1"
-alias gia="git add"
-alias giaa="git add ."
-alias ms="movingssh"
-complete -F _movingssh ms
-alias sys="sudo systemctl "
-alias syss="sudo systemctl start"
-alias syse="sudo systemctl stop"
-alias sysp="sudo systemctl status"
-giac() { git add $@;git commit; }
-giaac() { git add . $@;git commit; }
-giaca() { git add $@;git commit --amend; }
-giaaca() { git add . $@;git commit --amend; }
-gip() { git pull $@;git push $@; }
-gipma() {
+######################### remove, coppy, move
+real_rm="(which rm)"
+rmHARD(){
+	$real_rm "$@"
+}
+rm(){
+	trash  "$@"
+}
+real_cp="$(which cp)"
+cp(){
+	$real_cp -i "$@"
+}
+real_mv="$(which mv)"
+mv(){
+	$real_mv -i "$@"
+}
+
+######################### git
+gic(){
+	git commit "$@"
+}
+gica(){
+	git commit --amend "$@"
+}
+gis(){
+	git status "$@"
+}
+gig(){ 
+	git log --oneline --graph "$@"
+}
+gil(){
+	git log --max-count=1 "$@"
+}
+gi(){
+	git add "$@"
+}
+gia(){
+	git add . "$@"
+}
+giac(){
+	git add $@;git commit;
+}
+giaac(){
+	git add . $@;git commit;
+}
+giaca(){
+	git add $@;git commit --amend;
+}
+giaaca(){
+	git add . $@;git commit --amend;
+}
+gip(){
+	git pull $@;git push $@;
+}
+gipma(){
 	b=$1
 	[[ "$b" == "" ]] && b="$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')"
 	git remote | while read r ; do echo -e "\e[91;1m PULL MEERGE $r $b\e[0m"; git pull $r $b --no-rebase ; done
@@ -276,16 +284,153 @@ gipa() {
 	git remote | while read r ; do echo -e "\e[91;1m PULL $r $b\e[0m"; git pull $r $b ; done
 	git remote | while read r ; do echo -e "\e[91;1m PUSH $r $b\e[0m"; git push $r $b ; done
 }
+ 
+######################### systemctl
+sys(){
+	root systemctl  "$@"
+}
+syss(){
+	root systemctl start "$@"
+}
+syse(){
+	root systemctl stop "$@"
+}
+sysp(){
+	root systemctl status "$@"
+}
 
+######################### youtube-dl
 youtube() {
 	youtube-dl $@ -o - | vlc -
 }
 
+######################### movingssh
+ms(){
+	movingssh "$@"
+}
+complete -F _movingssh m "$@"
+
+######################### gpg
+bye(){
+	gpg-connect-agent reloadagent /bye
+}
+
+######################### neofetch
+neopeč(){
+	neofetch
+}
+
+######################### root
+please(){
+	root $(fc -ln -1)
+}
+
+######################### python
+p(){
+	bpython "$@"
+}
+p3(){
+	python3 "$@"
+}
+pe(){
+	. ./venv/bin/activate
+}
+pde(){
+	deactivate
+}
+
+####################### make
+makej(){
+	make -j8 "$@"
+}
 
 
-export PATH=$PATH:~/bin
 
 
+# Add an "alert" alias for long running commands.  Use like so:
+#   sleep 10; alert
+alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
+
+
+
+
+
+#########################################################
+######################### PROMT #########################
+#########################################################
+
+######################### git
+promt_NoGit=0
+promt_parse_git_branch() {
+	if [ $promt_NoGit -eq 0 ]; then 
+		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+	else
+		echo "?"
+	fi
+}
+
+######################### return value and user
+promt_rvalue() {
+	lastcmd=$?;
+	if [ $lastcmd -ne 0 ]; then 
+		echo "[$lastcmd]";
+	fi
+	exit $lastcmd
+}
+promt_NoUser=0
+promt_usrCut(){
+	lastcmd=$?;
+	usr="\u@\h"
+	usr=${usr@P}
+	if [ $promt_NoUser -eq 0 ]; then 
+		if [ $lastcmd -ne 0 ]; then 
+			lastcmdStr="[$lastcmd]";
+			printf  ${usr:${#lastcmdStr}} | sed -e 's/* \(.*\)/(\1)/'
+		else
+			printf  $usr | sed -e 's/* \(.*\)/(\1)/'
+		fi
+	fi
+	exit $lastcmd
+}
+
+######################### $ and new line
+promt_NewLine=0;
+promt_MakNewLine(){
+	if [ $promt_NewLine -ne 0 ]; then 
+		printf  '\n$' #| sed -e 's/* \(.*\)/(\1)/'
+	else
+		printf  '$' #| sed -e 's/* \(.*\)/(\1)/'
+	fi
+}
+
+######################### config functions
+pNL()
+{
+	if [ $promt_NewLine -eq 0 ]; then
+		promt_NewLine=1;
+	else
+		promt_NewLine=0;
+	fi
+}
+pNN()
+{
+	if [ $promt_NoUser -eq 0 ]; then
+		promt_NoUser=1;
+	else
+		promt_NoUser=0;
+	fi
+}
+pG()
+{
+	if [ $promt_NoGit -eq 0 ]; then
+		promt_NoGit=1;
+	else
+		promt_NoGit=0;
+	fi
+}
+
+
+######################### default colors
 promt_color_rvalue=91
 promt_color_user=32
 promt_color_dir=96
@@ -293,6 +438,7 @@ promt_color_git=93
 promt_color_dolar=39
 
 
+######################### configuration by devices
 if [ "$device_name" == "externalArch" ] ;
 then
 	promt_color_user=33
@@ -316,6 +462,8 @@ then
 	promt_color_dir=95
 fi
 
+
+######################### configuration by connection types
 if [ "$SSH_CONNECTION" != "" ];
 then 
 	if [ "$LD_SSHTYPE" = "localhost" ];
@@ -331,8 +479,12 @@ then
 		promt_color_rvalue=32
 		promt_color_user=91
 	fi
-else
-	if [ "$device_name" = "localhost" ] ;
+fi
+
+######################### phone: no device name
+if [ "$SSH_CONNECTION" == "" ]
+then
+	if [ "$device_name" = "localhost" ]
 	then
 		pNN
 	fi
@@ -343,18 +495,15 @@ then
 	promt_color_user=95
 fi
 
+######################### configuration by user (root)
 if [ "$USER" == "root" ];
 then 
 	promt_color_dolar="91;1"
 fi
 
-for i in ~/bin/bashrc/*
-do
-	  . $i
-done 2>/dev/null
 
 
-
+######################### PS1
 PS1='${debian_chroot:+($debian_chroot)}\
 \[\033[01;${promt_color_rvalue}m\]$(promt_rvalue)\
 \[\033[01;${promt_color_user}m\]$(promt_usrCut)\
@@ -365,27 +514,26 @@ PS1='${debian_chroot:+($debian_chroot)}\
 \[\033[${promt_color_dolar}m\]\
 $(promt_MakNewLine)\[\033[21m\]\[\033[0m\] '
 
-unset color_prompt force_color_prompt
-alias neopeč=neofetch
-alias please='sudo $(fc -ln -1)'
+# unset color_prompt force_color_prompt
 
+###############################################################
+######################### AUTO STARTX #########################
+###############################################################
 
 if [[ -z "${DISPLAY}" ]] && [[ "${XDG_VTNR}" = "1" ]]; then
   startx 
 fi
 
 
-#gpg
-bye()
-{
-	gpg-connect-agent reloadagent /bye
-}
+####################################################################
+######################### BASHRC DIRECTORY #########################
+####################################################################
 
-
-zath()
-{
-	for i in $@
-	do
-		zathura $i & sleep 0.2
-	done
-}
+for i in ~/.config/bash/*
+do
+	  . $i
+done 2>/dev/null
+for i in ~/bin/bashrc/*
+do
+	  . $i
+done 2>/dev/null
