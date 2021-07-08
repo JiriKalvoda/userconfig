@@ -6,7 +6,7 @@
 case $- in
     *i*) ;;
       *) 
-	      [[ "$use_bashrc" = "" ]] && return;;
+	      [[ "$use_bashrc" = "" ]] && exit;;
 esac
 
 ######################### spawn-alacritty-cwd
