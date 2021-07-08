@@ -207,7 +207,7 @@ h(){
 	"$@"
 }
 promt(){
-	echo -n ${PS1@P} | tr -d `char 1``char 2`
+	echo -n "${PS1@P}" | tr -d `char 1``char 2`
 }
 bashLine(){
 	promt
