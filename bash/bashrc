@@ -412,6 +412,14 @@ pNL()
 		promt_NewLine=0;
 	fi
 }
+pNR()
+{
+	if [ $promt_NoRight -eq 0 ]; then
+		promt_NoRight=1;
+	else
+		promt_NoRight=0;
+	fi
+}
 pNN()
 {
 	if [ $promt_NoUser -eq 0 ]; then
@@ -435,7 +443,9 @@ promt_color_rvalue=91
 promt_color_user=32
 promt_color_dir=96
 promt_color_git=93
+promt_color_venv=93
 promt_color_dolar=39
+promt_color_right=32
 
 
 ######################### configuration by devices
@@ -502,17 +512,47 @@ then
 fi
 
 
+promt_pwd(){
+	wd="\w"
+	wd="${wd@P}"
+	if [[ "$VIRTUAL_ENV" == "" ]]
+	then
+		echo -e "\001\e[${promt_color_dir}m\002$wd"
+	else
+		ve="${VIRTUAL_ENV%/venv}"
+		[[ "$ve" =~ ^"$HOME"(/|$) ]] && ve="~${ve#$HOME}"
+		if [[ "$wd" =~ ^"$ve" ]]
+		then
+			echo -ne "\001\e[${promt_color_dir}m\002[\001\e[${promt_color_venv}m\002$ve\001\e[${promt_color_dir}m\002].${wd#$ve}"
+		else
+			echo -ne "\001\e[${promt_color_venv}m[$ve]\e[${promt_color_dir}m$wd"
+		fi
+	fi
+}
+
+promt_NoRight=0
+promt_right()
+{
+	if [ "$promt_NoRight" -eq 0 ]
+	then 
+		printf "%*s" $(( $(tput cols) + 6 ))  "$(echo -e "\e[${promt_color_right}m[$(date +%H:%M:%S)]\015")"
+	fi
+}
 
 ######################### PS1
-PS1='${debian_chroot:+($debian_chroot)}\
+promt_PS1='\
+\[$(promt_right)\]\
+${debian_chroot:+($debian_chroot)}\
 \[\033[01;${promt_color_rvalue}m\]$(promt_rvalue)\
 \[\033[01;${promt_color_user}m\]$(promt_usrCut)\
 \[\033[${promt_color_dolar}m\]:\
-\[\033[01;${promt_color_dir}m\]\w\
+$(promt_pwd)\
 \[\033[00m\]\[\033[01;${promt_color_git}m\]$(promt_parse_git_branch)\
 \[\033[0m\]\
 \[\033[${promt_color_dolar}m\]\
 $(promt_MakNewLine)\[\033[21m\]\[\033[0m\] '
+
+PS1="$promt_PS1"
 
 # unset color_prompt force_color_prompt
 
