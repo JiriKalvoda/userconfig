@@ -333,7 +333,9 @@ p3(){
 	python3 "$@"
 }
 pe(){
+	p="$PS1"
 	. ./venv/bin/activate
+	PS1="$p"
 }
 pde(){
 	deactivate
