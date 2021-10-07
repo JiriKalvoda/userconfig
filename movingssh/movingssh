@@ -1,12 +1,23 @@
 #!/bin/bash
 
-toMsgOutput=">&2"
+debug()
+{
+	if [[ "$minus" == *"b"* ]]
+	then
+		echo -e DEBUG: "$@"  >&2
+	fi
+}
 
 usernameDefault="$USER"
 keyFile=""
 usernameSpec=""
+
+####################### MKDIRs #######################################
 mkdir -p ~/m
 mkdir -p ~/.movingssh
+mkdir -p ~/.movingssh/address/
+mkdir -p ~/.movingssh/tunel/
+mkdir -p ~/.movingssh/configDevice/
 
 ####################### PARSE ARG #######################################
 for var in "$@"
@@ -30,10 +41,6 @@ do
 	name="${name:1}"
 done
 
-if [[ -f ~/.movingssh/config ]]
-then
-	. ~/.movingssh/config
-fi
 ####################### HELP #######################################
 if [[ "$minus" == *"h"* ]]
 then
@@ -89,13 +96,9 @@ fi
 timeout=2
 sleepTime=10
 
-####################### PARSE ARG #######################################
 addressFile=~/.movingssh/address/$name
 tunelFile=~/.movingssh/tunel/$name
 configFile=~/.movingssh/configDevice/$name
-mkdir -p ~/.movingssh/address/
-mkdir -p ~/.movingssh/tunel/
-mkdir -p ~/.movingssh/configDevice/
 mountpoint=~/m/$name
 servermountpoint=/
 [[ "$MS_MOUNTPOINT" != "" ]] && mountpoint="$MS_MOUNTPOINT"
@@ -112,14 +115,23 @@ keyCMD="-o HostKeyAlias=$name"
 
 [[ "$downloadServer" == "" ]] && downloadServer="jirikalvoda@kam.mff.cuni.cz"
 
+####################### IMPUT CONFIGs #######################################
+[[ -f ~/.movingssh/config ]] && 	. ~/.movingssh/config
+[ -f "$configFile" ] && . $configFile
 
-debug()
-{
-	if [[ "$minus" == *"b"* ]]
-	then
-		echo -e DEBUG: "$@"  >&2
-	fi
-}
+####################### PROCES ARGS #######################################
+
+if [[ $usernameSpec == "" ]]
+then
+	username="$usernameDefault"
+else
+	username="$usernameSpec"
+fi
+keyFileCMD=""
+[[ "$keyFile" != "" ]] && keyFileCMD="-o IdentityFile=$keyFile"
+
+
+####################### FUNCTIONS #######################################
 
 kilrek()
 {
@@ -130,6 +142,7 @@ kilrek()
 		kill $p;
 	done
 }
+
 killallmy()
 {
 	pgrep -P $$ |  while read p;
@@ -143,8 +156,7 @@ killallmy()
 	done
 }
 
-
-parseConfig()
+parseAddresFile()
 {
 	debug PARSE CONFIG
 	#shopt -s extglob
@@ -183,16 +195,8 @@ parseConfig()
 			fi
 		done < $tunelFile
 	fi
-	[ -f "$configFile" ] && . $configFile
-	if [[ $usernameSpec == "" ]]
-	then
-		username="$usernameDefault"
-	else
-		username="$usernameSpec"
-	fi
-	keyFileCMD=""
-	[[ "$keyFile" != "" ]] && keyFileCMD="-o IdentityFile=$keyFile"
 }
+
 printAddres()
 {
 	if [[ "$minus" == *"p"* ]]
@@ -203,6 +207,7 @@ printAddres()
 		) | column -t -N \ ,ip,port
 	fi
 }
+
 download()
 {
 	[[ "$noDownload" != "" ]] && return
@@ -227,7 +232,7 @@ download()
 		then
 			debug DIFF CONFIG
 			cat $newConfigFile > $addressFile
-			parseConfig
+			parseAddresFile
 			printAddres
 			rm $newConfigFile
 			return 1
@@ -240,6 +245,7 @@ download()
 		return 0
 	fi
 }
+
 tryLocal()
 {
 	debug TRY LOCAL
@@ -435,7 +441,7 @@ then
 	rm $tunelFile
 fi
 
-parseConfig
+parseAddresFile
 printAddres
 if [[ "$minus" == *"u"* || "$minus" == *"U"* ]]
 then
@@ -466,7 +472,7 @@ then
 fi
 if [[ "$minus" == *"t"* ]]
 then
-	parseConfig notunel
+	parseAddresFile notunel
 	tunelPort=$(( 40000 + $RANDOM % 10000 ))
 	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile >&2
 	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m" >&2
@@ -503,7 +509,7 @@ else
 	echo NO >&3
 	if [ "$(head -n1 <&3)" == "YES" ]
 	then
-		parseConfig
+		parseAddresFile
 		local
 	fi
 fi
