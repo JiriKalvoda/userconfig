@@ -3,6 +3,7 @@
 toMsgOutput=">&2"
 
 usernameDefault="$USER"
+keyFile=""
 usernameSpec=""
 mkdir -p ~/m
 mkdir -p ~/.movingssh
@@ -189,6 +190,8 @@ parseConfig()
 	else
 		username="$usernameSpec"
 	fi
+	keyFileCMD=""
+	[[ "$keyFile" != "" ]] && keyFileCMD="-o IdentityFile=$keyFile"
 }
 printAddres()
 {
@@ -251,7 +254,7 @@ tryLocal()
 		ret=
 		debug LOCAL NO IPA
 	else
-		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyCMD $timeoutCMD echo OK 2>/dev/null)
+		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyFileCMD $keyCMD $timeoutCMD echo OK 2>/dev/null)
 	fi
 	#echo -en "\e[92mTRY DONE\e[0m\015" 1>&2
 	if [ "$ret" = "OK" ]
@@ -299,8 +302,8 @@ x11vnc()
 	vncviewerOpt=""
 	[[ "$minus" == *"V"* ]] || vncviewerOpt="-ViewOnly"
 	(sleep 1; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer $vncviewerOpt localhost::$vncTunelPort ; done ) &
-	cat $passwdFile | ssh -t $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c "\"cat | x11vnc -localhost -display $VNCDISPLAY -autoport  $vncTunelPort -forever -passwdfile /dev/stdin\""
-	r=$(ssh -t $envCMD $username@$1 -p$2 $keyCMD $sudoCmd bash -c" \"pkill -f autoport\\\" $vncTunelPort\\\" ; echo -n OK\$?\"")
+	cat $passwdFile | ssh -t $envCMD $username@$1 -p$2 $keyFileCMD $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c "\"cat | x11vnc -localhost -display $VNCDISPLAY -autoport  $vncTunelPort -forever -passwdfile /dev/stdin\""
+	r=$(ssh -t $envCMD $username@$1 -p$2 $keyFileCMD $keyCMD $sudoCmd bash -c" \"pkill -f autoport\\\" $vncTunelPort\\\" ; echo -n OK\$?\"")
 	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m" >&2
 	rm $passwdFile
 	killallmy movingssh
@@ -318,8 +321,8 @@ vncserver()
 	head -c100 /dev/random | shasum | head -c30 > $passwdFile
 	[[ "$SUDO" != "" ]] && sudoCmd="sudo -u $SUDO" 
 	(sleep 0.5; while true; do VNC_PASSWORD="$(cat $passwdFile)" vncviewer  localhost::$vncTunelPort ; done ) &
-	( cat $passwdFile; echo; cat $passwdFile; echo ;echo n; cat ) | ssh -t $envCMD $username@$1 -p$2 $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c " \"vncpasswd ; vncserver :$vncDisplay\""
-	r=$(ssh -t $envCMD $username@$1 -p$2 $keyCMD $sudoCmd bash -c" \"pkill -f Xvnc\\\" :$vncDisplay -auth\\\" ; echo -n OK\$?\"")
+	( cat $passwdFile; echo; cat $passwdFile; echo ;echo n; cat ) | ssh -t $envCMD $username@$1 -p$2 $keyFileCMD $keyCMD -L$vncTunelPort:localhost:$vncTunelPort $sudoCmd bash -c " \"vncpasswd ; vncserver :$vncDisplay\""
+	r=$(ssh -t $envCMD $username@$1 -p$2 $keyFileCMD $keyCMD $sudoCmd bash -c" \"pkill -f Xvnc\\\" :$vncDisplay -auth\\\" ; echo -n OK\$?\"")
 	[[ "$r" != "OK0" ]] && echo -e "\e[31;1m### CLEAN FAILD $r ####\e[0m" >&2
 	rm $passwdFile
 	killallmy movingssh
@@ -336,11 +339,11 @@ printGetAddres()
 			;;
 		"rsync")
 			echo $username@$1:
-			echo -e=\'ssh $envCMD -p$2  $keyCMD\'
+			echo -e=\'ssh $envCMD -p$2  $keyFileCMD $keyCMD\'
 			;;
 		"rsyncnoesc")
 			echo $username@$1:
-			echo -e=ssh $envCMD -p$2  $keyCMD
+			echo -e=ssh $envCMD -p$2  $keyFileCMD $keyCMD
 			;;
 		*)
 			echo $username $1 $2
@@ -366,7 +369,7 @@ conect()
 		return $?
 	elif [[ "$minus" == *"s"* ]]
 	then
-		mosh  $username@$1 --ssh="ssh $envCMD -p$2 $xtunelCMD  $keyCMD $parametrs"
+		mosh  $username@$1 --ssh="ssh $envCMD -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs"
 		return $?
 	elif [[ "$minus" == *"m"* ]]
 	then
@@ -381,10 +384,10 @@ conect()
 			exit 100
 		fi
 		mkdir $mountpoint
-		sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyCMD $mountpoint
+		sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
 	else
-		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyCMD $parametrs
-		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyCMD $parametrs
+		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyFileCMD $keyCMD $parametrs
+		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs
 		return $?
 	fi
 }
