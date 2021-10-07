@@ -71,6 +71,8 @@ Parametrs:
 	-g 	Only print addres for use
 	-s	use moSh
 	-2	use second tunel (port number plus one)
+	-A	do not use key agent
+	-a	do not use key agent
 EOF
 	exit 0
 fi
@@ -112,6 +114,7 @@ rm $pipeFile
 timeoutCMD="-o ConnectTimeout=$timeout"
 envCMD="-o SendEnv=LD_SSHTYPE"
 keyCMD="-o HostKeyAlias=$name"
+useAgent=false
 
 [[ "$downloadServer" == "" ]] && downloadServer="jirikalvoda@kam.mff.cuni.cz"
 
@@ -130,6 +133,22 @@ fi
 keyFileCMD=""
 [[ "$keyFile" != "" ]] && keyFileCMD="-o IdentityFile=$keyFile"
 
+
+####################### AGENT #######################################
+
+[[ "$minus" == *"a"* ]] && useAgent=true
+[[ "$minus" == *"A"* ]] && useAgent=false
+
+if $useAgent
+then
+	eval $(ssh-agent -s -t 30 | head -n2)
+	if [[ "$keyFile" != "" ]]
+	then
+		echo ADD
+		ssh-add "$keyFile"
+		echo DDA
+	fi
+fi
 
 ####################### FUNCTIONS #######################################
 
