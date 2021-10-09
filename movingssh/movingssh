@@ -144,9 +144,7 @@ then
 	eval $(ssh-agent -s -t 30 | head -n2)
 	if [[ "$keyFile" != "" ]]
 	then
-		echo ADD
 		ssh-add "$keyFile"
-		echo DDA
 	fi
 fi
 
