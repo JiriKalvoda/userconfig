@@ -12,6 +12,8 @@ usernameDefault="$USER"
 keyFile=""
 usernameSpec=""
 
+declare -g -A config
+
 ####################### MKDIRs #######################################
 mkdir -p ~/m
 mkdir -p ~/.movingssh
@@ -122,6 +124,14 @@ useAgent=false
 [[ -f ~/.movingssh/config ]] && 	. ~/.movingssh/config
 [ -f "$configFile" ] && . $configFile
 
+	if [ -d ~/.movingssh/groups ]
+	then
+		for i in  ~/.movingssh/groups/*
+		do
+			. $i
+		done
+	fi
+
 ####################### PROCES ARGS #######################################
 
 if [[ $usernameSpec == "" ]]
@@ -177,7 +187,6 @@ parseAddresFile()
 {
 	debug PARSE CONFIG
 	#shopt -s extglob
-	declare -g -A config
 	if [ -f "$addressFile" ]
 	then
 		while IFS='= ' read -r lhs rhs
@@ -190,14 +199,6 @@ parseAddresFile()
 			config[$lhs]="$rhs"
 		    fi
 		done < $addressFile
-	else
-		if [ -d ~/.movingssh/groups ]
-		then
-			for i in  ~/.movingssh/groups/*
-			do
-				. $i
-			done
-		fi
 	fi
 	if [[ "$1" != "notunel" ]] && [ -f $tunelFile ] 
 	then
