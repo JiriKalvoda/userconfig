@@ -23,6 +23,7 @@ fi
 
 ######################### Local bin
 export PATH=$PATH:~/bin
+unalias -a
 
 ######################### history files
 # don't put duplicate lines or lines starting with space in the history.
