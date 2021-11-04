@@ -6,7 +6,7 @@
 case $- in
     *i*) ;;
       *) 
-	      [[ "$use_bashrc" = "" ]] && exit;;
+	      [[ "$use_bashrc" = "" ]] && return;;
 esac
 
 ######################### spawn-alacritty-cwd
@@ -23,6 +23,7 @@ fi
 
 ######################### Local bin
 export PATH=$PATH:~/bin
+#unalias -a
 
 ######################### history files
 # don't put duplicate lines or lines starting with space in the history.
@@ -140,13 +141,13 @@ egrep(){
 }
 
 ######################### ls
-ll(){
+llL(){
 	ls -alF "$@"
 }
-la(){
+laL(){
 	ls -A "$@"
 }
-l(){
+lL(){
 	ls -CF "$@"
 }
 
