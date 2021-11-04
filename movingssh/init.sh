@@ -3,6 +3,8 @@ cd "$(dirname "$0")"
 
 chmod +x movingssh
 confln movingssh ~/bin/
+confln cssh ~/bin/
+confln movingssh_complete ~/bin/bashrc/
 
 confln rpi0 ~/bin/
 confln rpi2 ~/bin/

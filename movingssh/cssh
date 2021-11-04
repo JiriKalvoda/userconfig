@@ -1,0 +1,55 @@
+#!/bin/env python3
+import subprocess
+import os
+import sys
+
+def connect(local, remote, cmd):
+	wd = os.getcwd()
+	remote_wd = ":".join(remote.split(":")[1:])+wd[len(local)+1:]
+	os.environ['LC_CD'] = remote_wd
+	ssh_cmd = ["ssh", remote.split(":")[0]]+cmd+["-o", "SendEnv=LC_CD"]
+	sys_arg = sys.argv[1:]
+	while len(sys_arg) and sys_arg[0][0]=="-":
+		ssh_cmd.append(sys_arg[0])
+		sys_arg = sys_arg[1:]
+	if len(sys_arg):
+		ssh_cmd += ["cd", remote_wd, ";" ] + sys_arg
+	subprocess.run(ssh_cmd)
+	exit(0)
+
+pgrep = subprocess.run(["pgrep", "sshfs"], capture_output=True)
+for pid in pgrep.stdout.decode('utf-8').split("\n")[:-1]:
+	# Open a file: file
+	file = open(f"/proc/{pid}/cmdline",mode='r')
+	cmd = file.read().split('\0')[:-1]
+	file.close()
+	cmd_p = []
+	cmd_o = []
+	place_cmd=[]
+	i=-1
+	while i+1 < len(cmd):
+		i -=- 1
+		if cmd[i][0]=='-':
+			if cmd[i]=="-F":
+				i -=- 1
+			if cmd[i]=="-o":
+				if cmd[i+1] != 'follow_symlinks':
+					cmd_o += cmd[i:i+2]
+				i -=- 1
+			if cmd[i]=="-p":
+				cmd_p += cmd[i:i+2]
+				i -=- 1
+		else:
+			place_cmd.append(cmd[i])
+	wd = os.getcwd()
+	if wd.startswith(place_cmd[2]):
+		connect(place_cmd[2], place_cmd[1], cmd_p+cmd_o)
+
+df = subprocess.run(["df", ".", "--output=source,fstype,target"], capture_output=True)
+df_out = [x for x in df.stdout.decode('utf-8').split("\n")[1].split(" ")  if x]
+#print(df_out)
+if df_out[1] in ["nfs4"]:
+	connect(df_out[2], df_out[0],[])
+
+print("Unknown remote filesystem")
+exit(1)
