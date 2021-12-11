@@ -492,7 +492,7 @@ if [[ "$minus" == *"t"* ]]
 then
 	parseAddresFile notunel
 	tunelPort=$(( 40000 + $RANDOM % 10000 ))
-	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile >&2
+	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile
 	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m" >&2
 	ssh -p 443 jirikalvoda@sneaky.kam.mff.cuni.cz -L $tunelPort:${config[ipB]}:${config[portB]} "read"
 	echo END >&2
