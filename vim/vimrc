@@ -16,14 +16,14 @@ if v:progname =~? "evim"
 endif
 
 " Get the defaults that most users want.
-source $VIMRUNTIME/defaults.vim
+source /usr/share/vim/vim82/defaults.vim
 
 if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
 else
-"  set backup		" keep a backup file (restore to previous version)
+  "set backup		" keep a backup file (restore to previous version)
   if has('persistent_undo')
-"    set undofile	" keep an undo file (undo changes after closing)
+    set undofile	" keep an undo file (undo changes after closing)
   endif
 endif
 
@@ -68,7 +68,7 @@ let g:useVimRun = 0
 command! -nargs=+ AddExecF  let g:toExec = g:toExec . <q-args>
 command! -nargs=+ AddExec  AddExecF promt; echo <q-args>; <args>;
 command! -nargs=+ AddBashF  let g:toExec = <q-args>
-command! -nargs=* AddBashG  AddBashF bash-rc -i -c <q-args>;
+command! -nargs=* AddBashG  AddBashF bash-rc -i -c <q-args>
 command!  AddBash  execute "AddBashG ".g:toExec
 command! -nargs=+ AddLessF  let g:toExec = <q-args>
 command! -nargs=* AddLessG  AddLessF bash-rc -i -c <q-args>;
@@ -91,7 +91,8 @@ command! -nargs=* BR call BR(<q-args>)
 
 function! ExecHere()
 	AddBash
-	execute "!".g:toExec
+	execute "! ".g:toExec."echo"
+	normal i
 	let g:toExec = ""
 endfunction
 
@@ -225,7 +226,7 @@ function! Compile(isVimRun)
 	elseif s == "asy"
 		execute "AddExec asy ".NameAll()." ".CompileArg()
 	elseif s == "make"
-		execute "AddExec make"
+		execute "AddExec make ".CompileArg()
 	else
 		let script = GetVar("CompileScript")
 		if script == "EMPTY"
@@ -272,6 +273,9 @@ function! Run(isVimRun,input)
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ltex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
+	elseif s == "cs"
+		w
+		execute "AddExec dotnet run ".RunArg()" ".a:input
 	else
 		let script = GetVar("RunScript")
 		if script == "EMPTY"
@@ -433,7 +437,7 @@ map <silent> <C-x> "+d
 vmap <silent> <C-x> "+d
 imap <silent> <C-v> <C-r>+
 
-set timeoutlen=100000000000000000
+set timeoutlen=10000000
 
 map ,, A <ESC>I <Esc>lvEdi<BS><Del>\begin{}<Esc>Po\end{}<Esc>PO
 map <silent> ,o o\item 
@@ -450,7 +454,43 @@ map <silent> ,N O$$<ESC>o$$<ESC>O
 map <silent> ,x "xyaB:call XournalLaunch()<CR>:call Exec()<CR>
 "map ,, yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
 
+function StyleDefault()
+	se shiftwidth=4
+	se tabstop=4
+	se cinoptions=
+endfunc
+
+function StyleGNU()
+	se shiftwidth=8
+	se tabstop=8
+	se cinoptions=>4,n-2,^-2,{2,:2,=2,t0,(2
+endfunc
+
+call StyleDefault()
+map \h :call StyleDefault()<CR>
+map \g :call StyleGNU()<CR>
 
 
-se shiftwidth=4
-se tabstop=4
+function ListCharsAll()
+	se list
+	se listchars=tab:>-,eol:$,space:_,nbsp:~,extends:\|
+	syntax off
+endfunction
+
+function ListCharsDefault()
+	se list
+   set listchars=tab:>-
+	syntax on
+endfunction
+
+function ListCharsNone()
+	se nolist
+	syntax on
+endfunction
+
+call ListCharsDefault()
+map \m :call ListCharsAll()<CR>
+map \M :call ListCharsDefault()<CR>
+map \<C-m> :call ListCharsNone()<CR>
+
+set list
