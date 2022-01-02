@@ -289,6 +289,7 @@ tryLocal()
 		return 1
 	fi
 	debug LOCAL NO
+	echo NO >&3
 	return 0
 }
 tryLocalDownload()
@@ -520,15 +521,16 @@ then
 else
 	tryLocalDownload &
 	remote
-	if [ $? = 255 ]
+	r=$?
+	if [ $r = 255 ]
 	then
-		sleep $sleepTime
-	fi
-	echo NO >&3
-	if [ "$(head -n1 <&3)" == "YES" ]
-	then
-		parseAddresFile
-		local
+		debug START READ PIPE
+		if [ "$(head -n1 <&3)" == "YES" ]
+		then
+			debug END HEAD
+			parseAddresFile
+			local
+		fi
 	fi
 fi
 
