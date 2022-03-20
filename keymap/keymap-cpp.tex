@@ -9,7 +9,10 @@
 \def\GoMode#1{\addoutput{k::goMode(\SimQuotes#1\SimQuotes)}}
 \input keymap-map.tex
 
+\def\writeOnEnd{}
+
 \long\def\addoutput#1{\immediate\write\file{#1}}
+\long\def\addoutputOnEnd#1{\long\xdef\writeOnEnd{\writeOnEnd#1}}
 
 \def\PrintKeyboard#1{
 \getUsedMod
@@ -41,12 +44,16 @@
 
 \newwrite\file
 
-\def\beginIn#1{
+\def\openOutputFile#1{
 \immediate\openout\file = #1
+}
+
+\def\beginIn{
 \addoutput{map<pair<string,int>,KeyMode> keyModes = \{}
 }
 
 \def\endIn{
 \addoutput{\};}
+\addoutput{\writeOnEnd}
 \closeout\file
 }

@@ -141,25 +141,25 @@ egrep(){
 }
 
 ######################### ls
-llL(){
+ll(){
 	ls -alF "$@"
 }
-laL(){
+la(){
 	ls -A "$@"
 }
-lL(){
+l(){
 	ls -CF "$@"
 }
 
 ######################### vim
 e(){
-	vim "$@"
+	nvim "$@"
 }
 vi(){
-	vim "$@"
+	nvim "$@"
 }
 view(){
-	vim -R "$@"
+	nvim -R "$@"
 }
 
 ######################### ping, traceroute
@@ -220,7 +220,7 @@ sepLine(){
 }
 
 ######################### remove, coppy, move
-real_rm="(which rm)"
+real_rm="$(which rm)"
 rmHARD(){
 	$real_rm "$@"
 }
@@ -252,11 +252,8 @@ gig(){
 gil(){
 	git log --max-count=1 "$@"
 }
-gi(){
-	git add "$@"
-}
 gia(){
-	git add . "$@"
+	git add "$@"
 }
 giac(){
 	git add $@;git commit;
@@ -285,6 +282,15 @@ gipa() {
 	git remote | while read r ; do echo -e "\e[91;1m PULL $r $b\e[0m"; git pull $r $b ; done
 	git remote | while read r ; do echo -e "\e[91;1m PUSH $r $b\e[0m"; git push $r $b ; done
 }
+gir(){
+	git rebase $@
+}
+giri(){
+	git rebase -i $@
+}
+girc(){
+	git rebase --continue $@
+}
  
 ######################### systemctl
 sys(){
@@ -309,7 +315,7 @@ youtube() {
 ms(){
 	movingssh "$@"
 }
-complete -F _movingssh m "$@"
+complete -F _movingssh ms
 
 ######################### gpg
 bye(){
@@ -335,7 +341,7 @@ p3(){
 }
 pe(){
 	p="$PS1"
-	. ./venv/bin/activate
+	. "${1:-.}"/venv/bin/activate
 	PS1="$p"
 }
 pde(){
@@ -349,6 +355,17 @@ makej(){
 
 
 
+d(){
+	BG ~/.config/alacritty/spawn-alacritty-cwd
+}
+
+cwd(){
+	cd $(wd $@)
+}
+
+mcwd(){
+	mcd $(wd $@)
+}
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -439,6 +456,24 @@ pG()
 		promt_NoGit=0;
 	fi
 }
+
+nm()
+{
+	neomutt -f"notmuch://?query=$1" ; offlineimap-run all
+}
+nmt()
+{
+	neomutt -f"notmuch://?query=thread:{$1}" ; offlineimap-run all
+}
+nmi()
+{
+	nm "tag:unread or tag:flagged"
+}
+nmat()
+{
+	notmuch search --output=tags '*'
+}
+
 
 
 ######################### default colors
@@ -533,13 +568,15 @@ promt_pwd(){
 	fi
 }
 
-promt_NoRight=0
+promt_NoRight=1
 promt_right()
 {
+	lastcmd=$?;
 	if [ "$promt_NoRight" -eq 0 ]
 	then 
 		printf "%*s" $(( $(tput cols) + 6 ))  "$(echo -e "\e[${promt_color_right}m[$(date +%H:%M:%S)]\015")"
 	fi
+	exit $lastcmd
 }
 
 ######################### PS1

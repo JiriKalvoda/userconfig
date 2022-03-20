@@ -1,0 +1,15 @@
+\def\CppOutputMode{key-event}
+\input keymap-cpp.tex
+
+\openOutputFile{./map.cpp}
+\catcode`#=11
+\addoutput{#include "../actions.cpp"}
+\catcode`#=6
+
+\beginIn
+\Mode{default}{
+\input ./master.tex
+}
+\endIn
+
+\bye
