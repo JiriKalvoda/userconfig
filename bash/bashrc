@@ -617,3 +617,19 @@ for i in ~/bin/bashrc/*
 do
 	  . $i
 done 2>/dev/null
+
+
+mv2md()
+{
+	tr -d "{}"  | pandoc -f mediawiki -t markdown
+}
+
+aux()
+{
+	if [[ "$(pwd)" == /aux/* ]]
+	then
+		cwd 0 home
+	else
+		cwd 0 aux
+	fi
+}
