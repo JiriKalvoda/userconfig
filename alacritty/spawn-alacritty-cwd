@@ -64,12 +64,17 @@ then
 	SHELL_CWD=$(pwd -P)
 	ssh="$(findSSH $CHILD_PID 10 | head -n1)"
 	#osdc SSH SSH SSH "$ssh"
-
 	popd
+
+	#while IFS= read -rd '' var
+	#do
+		#export "$var"
+	#done </proc/$CHILD_PID/environ
+
+
 	# Start alacritty with the working directory
 	if [[ "$ssh" == "" ]];
 	then
-	#//osdc $SHELL_CWD
 		while IFS= read -rd '' var; do export "$var"; done </proc/$CHILD_PID/environ
 		alacritty --working-directory $SHELL_CWD
 	else
@@ -80,8 +85,9 @@ then
 		#echo "$sshCom" > ~/.tmpSSH
 		sshCom="${sshCom::3} -o SendEnv=LC_CD ${sshCom:3}"
 		while IFS= read -rd '' var; do export "$var"; done </proc/$ssh/environ
-		export LC_CD="$ssh_cwd"
-		alacritty --working-directory $SHELL_CWD -e bash -i -c "LC_CD=$ssh_cwd $sshCom"
+		#export LC_CD="$ssh_cwd"
+		#echo alacritty --working-directory $SHELL_CWD -e bash -i -c "LC_CD=$ssh_cwd $sshCom"
+		alacritty --working-directory $SHELL_CWD -e bash -c "LC_CD=$ssh_cwd $sshCom"
 	fi
 else
 	alacritty
