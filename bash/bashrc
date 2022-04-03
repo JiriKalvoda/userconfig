@@ -141,6 +141,9 @@ egrep(){
 }
 
 ######################### ls
+unalias ll 2>/dev/null
+unalias la 2>/dev/null
+unalias l 2>/dev/null
 ll(){
 	ls -alF "$@"
 }
