@@ -13,6 +13,7 @@ confln poppi ~/bin/
 confln gimli ~/bin/
 confln nikam ~/bin/
 confln kamtop ~/bin/
+confln contest ~/bin/
 
 mkdir -p ~/.movingssh/address
 mkdir -p ~/.movingssh/tunel
