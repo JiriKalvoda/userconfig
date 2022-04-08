@@ -285,8 +285,8 @@ tryLocal()
 	if [ "$ret" = "OK" ]
 	then
 		debug LOCAL OK
+		killallmy ssh
 		echo YES >&3
-		killallmy sleep ssh
 		return 1
 	fi
 	debug LOCAL NO
@@ -307,11 +307,9 @@ tryLocalDownload()
 	download
 	if [[ $? == 0 ]]
 	then
-		killallmy sleep
 		return
 	fi
 	tryLocal
-	killallmy sleep
 }
 
 x11vnc()
@@ -524,7 +522,8 @@ else
 	tryLocalDownload &
 	remote
 	r=$?
-	if [ $r = 255 ]
+	debug return $r
+	if [ $r = 255 ] || [ $r = 143 ]
 	then
 		debug START READ PIPE
 		if [ "$(head -n1 <&3)" == "YES" ]
