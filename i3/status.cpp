@@ -17,6 +17,17 @@ ll t;
 #define TIME(a) ((a)<180?a:(a)/60<180?a/60:a/60/60),((a)<180?"s":(a)/60<180?"min":"h")
 
 #define ERR(a,b) {sprintf(out,"{\"name\":\"error\",\"color\":\"#FF0000\",\"full_text\":\"%s\"}" b,a);return;}
+
+void loadWifiChannel(char * out)
+{
+	*out=0;
+	FILE * f = popen("iwlist wlp1s0 channel | tail -n2 | head -n1 | awk '{print $5}' | head -c -2","r");
+	if(!f) ERR("Open f",",");
+	int ch;
+	if(fscanf(f,"%d", &ch)==1)
+		out+=sprintf(out,"{\"name\":\"wifi-ch\",\"color\":\"#FFFFFF\",\"full_text\":\"%d\"},",ch);
+	pclose(f);
+}
 void loadOsdd(char * out)
 {
 	*out=0;
@@ -79,6 +90,7 @@ void loadMail(char * out)
 char i3status_aloc[LEN];
 char mail[LEN];
 char osdd[LEN];
+char wifi_ch[LEN];
 
 int main()
 {
@@ -102,10 +114,11 @@ int main()
 		{
 			if(i3status[0]==',') {putc(*i3status,stderr);putchar(i3status++[0]);}
 			if(i3status[0]=='[') {putc(*i3status,stderr);putchar(i3status++[0]);}
+			loadWifiChannel(wifi_ch);
 			loadMail(mail);
 			loadOsdd(osdd);
-			printf("%s%s%s",osdd,mail,i3status);
-			fprintf(stderr,"%s%s%s",osdd,mail,i3status);
+			printf("%s%s%s%s",osdd,mail,wifi_ch,i3status);
+			//fprintf(stderr,"%s%s%s",osdd,mail,i3status);
 		}
 		fflush(stdout);
 		fflush(stderr);
