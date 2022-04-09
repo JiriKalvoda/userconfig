@@ -176,12 +176,15 @@ bar \{%
 \AppWorkspace{4}{9}{WUI}{~/dev/runWUI/run.sh}
 \IiiiLine{for_window [title="WebUpdatingIndicator compare"] floating enable}
 \IiiiLine{for_window [title="Tea Timer"] floating enable}
+\IiiiLine{for_window [title="Tea Timer"] sticky enable}
 
 \AppWorkspace{4}{8}{MAIL}{start-mail}
 \IiiiLine{for_window [title="MAIL"] move container to workspace MAIL}
 
 \AppWorkspace{4}{2}{ZOOM}{zoom}
 \IiiiLine{for_window [class="zoom"] move container to workspace ZOOM}
+\IiiiLine{for_window [title="^zoom$" class="zoom"] floating enable}
+\IiiiLine{for_window [title="Zoom - Free Account" class="zoom"] floating disable}
 
 \IiiiLine{for_window [title="AlwaysOnTop"] floating enable}
 
