@@ -294,6 +294,8 @@ bar \{%
 	\BindKey{\Key{\Shift}{4}{4}}{\OsdDisable{display0}}
 	\BindKey{\Key{}{4}{5}}{\OsdEnable{display1}}
 	\BindKey{\Key{\Shift}{4}{5}}{\OsdDisable{display1}}
+	\BindKey{\KeyH{}}{\AndII{\GoMode{default}}{\Cmd{blueman-manager}}}
+	\BindKey{\KeyH{\Shift}}{\AndII{\GoMode{default}}{\Cmd{bueman-applet}}}
 }
 %\BindKey{\KeyI{\Super}}{\Cmd{terminal}}
 %\BindKey{\Key{}{2}{6}}{\Cmd{terminal}}
