@@ -3,6 +3,7 @@
 \input keymap-utils.tex
 \input keymap-abstract.tex
 
+\let\isPrintNumpad\YES
 
 %%% Colors %%% (from ucwmac (c) MJ)
 \chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
@@ -154,10 +155,14 @@
 \for i 7 9{\printLine{\the\counti}{}}
 { \setbox5=\vbox{\Key{}{0}{0}\printActKey}\vskip\ht5}
 \for i 9 {11}{\printLine{\the\counti}{}}
-}\hskip \afterAlphaSkip
+}
+\ifx\isPrintNumpad\YES
+\hskip \afterAlphaSkip
 \vbox{
 \for i {11} {16}{\printLine{\the\counti}{}}
 }
+\else
+\fi
 }
 }
 
