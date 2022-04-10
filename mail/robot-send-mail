@@ -1,0 +1,1 @@
+neomutt -e "unset record" -e "unmy_hdr bcc" "$@"
