@@ -156,13 +156,18 @@ l(){
 
 ######################### vim
 e(){
-	nvim "$@"
+	if which nvima >/dev/null 2>/dev/null
+	then
+		nvim "$@"
+	else
+		vim "$@"
+	fi
 }
 vi(){
-	nvim "$@"
+	e "$@"
 }
 view(){
-	nvim -R "$@"
+	e -R "$@"
 }
 
 ######################### ping, traceroute
