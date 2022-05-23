@@ -108,6 +108,7 @@ bar \{%
 \BindKey{\Key{\Super}{2}{3}}{\LayoutCont{toggle split}}
 
 \BindKey{\Key{\Shift\Super}{5}{3}}{\FloatingToggleCont}
+\BindKey{\Key{\Ctrl\Super}{5}{3}}{\StickyToggleCont}
 \BindKey{\Key{\Super}{5}{3}}{\FocusWind{mode_toggle}}
 
 \BindKey{\Key{\Super}{3}{1}}{\FocusWind{parent}}
@@ -175,12 +176,15 @@ bar \{%
 \AppWorkspace{4}{9}{WUI}{~/dev/runWUI/run.sh}
 \IiiiLine{for_window [title="WebUpdatingIndicator compare"] floating enable}
 \IiiiLine{for_window [title="Tea Timer"] floating enable}
+\IiiiLine{for_window [title="Tea Timer"] sticky enable}
 
 \AppWorkspace{4}{8}{MAIL}{start-mail}
 \IiiiLine{for_window [title="MAIL"] move container to workspace MAIL}
 
 \AppWorkspace{4}{2}{ZOOM}{zoom}
 \IiiiLine{for_window [class="zoom"] move container to workspace ZOOM}
+\IiiiLine{for_window [title="^zoom$" class="zoom"] floating enable}
+\IiiiLine{for_window [title="Zoom - Free Account" class="zoom"] floating disable}
 
 \IiiiLine{for_window [title="AlwaysOnTop"] floating enable}
 
@@ -250,7 +254,7 @@ bar \{%
 	\BindKey{\Key{}{3}{4}}{\Volume{+}{2}}
 	\BindKey{\Key{}{3}{5}}{\Volume{+}{10}}
 
-	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output DP-1 --off --output HDMI-1 --off --output eDP-1 --pos 0x0; wacom-config output 0}}
+	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output DP-1 --off --output HDMI-1 --off --output eDP-1 --pos 0x0 --mode 1920x1080; wacom-config output 0}}
 	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output DP-1 --pos 0x0 --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500; xsetwacom --set 10 MapToOutput  2560x1440+0+0; wacom-config output 0}}
 	\BindKey{\Key{}{4}{9}}{\Cmd{xrandr --auto ; wacom-config output 0}}
 
@@ -290,6 +294,8 @@ bar \{%
 	\BindKey{\Key{\Shift}{4}{4}}{\OsdDisable{display0}}
 	\BindKey{\Key{}{4}{5}}{\OsdEnable{display1}}
 	\BindKey{\Key{\Shift}{4}{5}}{\OsdDisable{display1}}
+	\BindKey{\KeyH{}}{\AndII{\GoMode{default}}{\Cmd{blueman-manager}}}
+	\BindKey{\KeyH{\Shift}}{\AndII{\GoMode{default}}{\Cmd{bueman-applet}}}
 }
 %\BindKey{\KeyI{\Super}}{\Cmd{terminal}}
 %\BindKey{\Key{}{2}{6}}{\Cmd{terminal}}
@@ -318,7 +324,7 @@ bar \{%
 
 \def\OutputModeIiii{i3}
 \ifx\OutputMode\OutputModeIiii
-\IiiiInline{bindcode 171 }\LedOpSwap{pokojik}{_}{second}\IiiiLine{}
+\IiiiInline{bindcode 171 }\LedOpSwap{jug9/1}{_}{second}\IiiiLine{}
 \IiiiInline{bindcode 173 }\Volume{}{0}\IiiiLine{}
 \IiiiLine{bindcode 172 exec playerctl play-pause}
 \IiiiLine{bindcode 208 exec playerctl play-pause}
@@ -347,4 +353,3 @@ bar \{%
 \PrintKeyboard{{\relax\Super}{\Super\Shift}{\Super\Ctrl}{\Super\Ctrl\Shift}}
 \PrintKeyboard{{\relax}{\Shift}{\Ctrl}{\Ctrl\Shift}}
 \fi
-

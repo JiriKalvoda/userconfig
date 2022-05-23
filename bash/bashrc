@@ -47,7 +47,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+# [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -141,6 +141,9 @@ egrep(){
 }
 
 ######################### ls
+unalias ll 2>/dev/null
+unalias la 2>/dev/null
+unalias l 2>/dev/null
 ll(){
 	ls -alF "$@"
 }
@@ -152,14 +155,21 @@ l(){
 }
 
 ######################### vim
+if which nvima >/dev/null 2>/dev/null
+then
+	EDITOR=nvim
+else
+	EDITOR=vim
+fi
+export EDITOR
 e(){
-	nvim "$@"
+	$EDITOR "$@"
 }
 vi(){
-	nvim "$@"
+	e "$@"
 }
 view(){
-	nvim -R "$@"
+	e -R "$@"
 }
 
 ######################### ping, traceroute
@@ -617,3 +627,20 @@ for i in ~/bin/bashrc/*
 do
 	  . $i
 done 2>/dev/null
+
+mv2md()
+{
+	tr -d "{}"  | pandoc -f mediawiki -t markdown
+}
+
+aux()
+{
+	if [[ "$(pwd)" == /aux/* ]]
+	then
+		cwd 0 home
+	else
+		cwd 0 aux
+	fi
+}
+
+unset MAILCHECK

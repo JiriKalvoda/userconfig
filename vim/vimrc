@@ -212,7 +212,7 @@ function! Compile(isVimRun)
 		execute "AddExec cmake  ".NameDir()." ".CompileArg()
 		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
 	elseif s == "arduino"
-		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()
+		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".CompileArg()
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	elseif s == "ptex"

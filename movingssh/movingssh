@@ -61,6 +61,7 @@ Parametrs:
 	-l	force use local conection
 	-r	force use remote conection
 	-m	sshfs mount
+	-M	sshfs mount without links eval
 	-u	umount
 	-U	force umount
 	-t	Make tunel
@@ -284,8 +285,8 @@ tryLocal()
 	if [ "$ret" = "OK" ]
 	then
 		debug LOCAL OK
+		killallmy ssh
 		echo YES >&3
-		killallmy sleep ssh
 		return 1
 	fi
 	debug LOCAL NO
@@ -306,11 +307,9 @@ tryLocalDownload()
 	download
 	if [[ $? == 0 ]]
 	then
-		killallmy sleep
 		return
 	fi
 	tryLocal
-	killallmy sleep
 }
 
 x11vnc()
@@ -396,7 +395,7 @@ conect()
 	then
 		mosh  $username@$1 --ssh="ssh $envCMD -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs"
 		return $?
-	elif [[ "$minus" == *"m"* ]]
+	elif [[ "$minus" == *"m"* ]] || [[ "$minus" == *"M"* ]]
 	then
 		if [[ -d "$mountpoint" || -f "$mountpoint" ]]
 		then
@@ -409,7 +408,8 @@ conect()
 			exit 100
 		fi
 		mkdir $mountpoint
-		sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
+		[[ "$minus" == *"m"* ]] && sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
+		[[ "$minus" == *"M"* ]] && sshfs -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
 	else
 		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyFileCMD $keyCMD $parametrs
 		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs
@@ -506,7 +506,7 @@ then
 elif [[ "$minus" == *"r"* ]]
 then
 	remote
-elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]] || [[ "$minus" == *"m"* ]]
+elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]] || [[ "$minus" == *"m"* ]] || [[ "$minus" == *"M"* ]]
 then
 	tryLocalDownload
 	echo NO >&3
@@ -522,7 +522,8 @@ else
 	tryLocalDownload &
 	remote
 	r=$?
-	if [ $r = 255 ]
+	debug return $r
+	if [ $r = 255 ] || [ $r = 143 ]
 	then
 		debug START READ PIPE
 		if [ "$(head -n1 <&3)" == "YES" ]

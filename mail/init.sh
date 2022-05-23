@@ -2,6 +2,7 @@
 cd "$(dirname "$0")"
 
 confln mailcap ~/.mailcap
+confln mailcap ~/.mime.types
 
 confln offlineimap-run ~/bin/
 g++ offlineimap-deamon.cpp -o ~/bin/offlineimap-deamon -pthread

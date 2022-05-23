@@ -10,6 +10,8 @@
 #include <string>
 #include <thread>
 
+#define D if(0)
+
 char logName[1234];
 #define LOG(a...) {FILE *f = fopen(logName,"w");fprintf(f,a);fclose(f);}
 using ll = long long;
@@ -58,6 +60,8 @@ int main()
 	int aNew=-1,aTotal=-1;
 	while(scanf(" %[^\n]",in)==1)
 	{
+		D fflush(stdout);
+		D printf("IN |%s|\n",in);
 		{
 			FILE * f = fopen(".cm","r");
 			if(f)
@@ -82,6 +86,11 @@ int main()
 			}
 			//else printf("NO .cm !!!\n");
 		}
+		if(!strcmp(in,"<all> RUN"))
+		{
+			for(auto & it : dirs) it.second.needAct = 1;
+		}
+		else
 		if(strcmp(in,"<if> RUN"))
 		{
 			char name [1234];
@@ -91,7 +100,6 @@ int main()
 			//printf("IN |%s| |%s|\n",name+2,in);
 			auto &it  = dirs[name+2];
 			it.needAct=1;
-			dirs["Sent"].needAct=1;
 		}
 		bool run=0;
 		for(auto & it : dirs)
@@ -107,6 +115,7 @@ int main()
 					sysit += sprintf(sysit,"%s,",it.first.c_str());
 			//printf("%s\n",sys);
 			ret = system(sys);
+			D printf("%s -> %d\n", sys, ret);
 			if(ret==0)
 				for(auto & it : dirs)
 					it.second.needAct=0;

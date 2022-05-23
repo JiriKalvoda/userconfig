@@ -34,7 +34,7 @@ then
 	file=$(echo ${file:1} | sed 's/[^\/]*\(\/.*\)/\1/')
 	file=$(echo ${file:1})
 	if [[ "$file" = "." ]]; then file=""; fi
-	neomutt -f "notmuch://?query=folder:\"$file\""
+	neomutt -f "notmuch://?query=folder:\"$file\"&limit=500"
 	offlineimap-run $file
 elif [[ "$1" == "t" ]]
 then

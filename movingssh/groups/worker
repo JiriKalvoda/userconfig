@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [[ "$name" == "worker"* ]]
+then
+	if [[ "$minus" != *"K"* ]]
+	then
+		config[ipB]=mo-$name.kam.mff.cuni.cz
+		config[portB]=22
+		noDownload=1
+		keyFile=~/.ssh/id_ed25519_secret
+		usernameDefault=cmsuser
+		useAgent=true
+	fi
+fi

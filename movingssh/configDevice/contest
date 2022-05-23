@@ -1,0 +1,3 @@
+keyFile=~/.ssh/id_ed25519_secret
+usernameDefault=cmsuser
+useAgent=true
