@@ -155,13 +155,15 @@ l(){
 }
 
 ######################### vim
+if which nvima >/dev/null 2>/dev/null
+then
+	EDITOR=nvim
+else
+	EDITOR=vim
+fi
+export EDITOR
 e(){
-	if which nvima >/dev/null 2>/dev/null
-	then
-		nvim "$@"
-	else
-		vim "$@"
-	fi
+	$EDITOR "$@"
 }
 vi(){
 	e "$@"
