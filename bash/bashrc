@@ -155,7 +155,7 @@ l(){
 }
 
 ######################### vim
-if which nvima >/dev/null 2>/dev/null
+if which nvim >/dev/null 2>/dev/null
 then
 	EDITOR=nvim
 else
