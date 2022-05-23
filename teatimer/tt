@@ -1,2 +1,2 @@
-teatimer --run="teatimer-done %n jug9 led-hook/timer/$(cat /etc/hostname)" --kill=34 --timer-name="Čaj" $@ 
+teatimer --run="teatimer-done %n jug9 jk/led-hook/timer/$(cat /etc/hostname)" --kill=34 --timer-name="Čaj" $@ 
 #teatimer --run="osdc --duration=10000 --min-duration=5000 'už je' %n\!\!\!" --default_name="Čaj" $@
