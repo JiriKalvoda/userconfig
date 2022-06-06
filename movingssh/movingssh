@@ -115,7 +115,7 @@ exec 3<>$pipeFile
 rm $pipeFile
 
 timeoutCMD="-o ConnectTimeout=$timeout"
-envCMD="-o SendEnv=LD_SSHTYPE"
+envCMD="-o SendEnv=LD_SSHTYPE -o SendEnv=LC_SSHTYPE"
 keyCMD="-o HostKeyAlias=$name"
 useAgent=false
 
@@ -279,7 +279,7 @@ tryLocal()
 		ret=
 		debug LOCAL NO IPA
 	else
-		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyFileCMD $keyCMD $timeoutCMD echo OK 2>/dev/null)
+		ret=$(LD_SSHTYPE=try LC_SSHTYPE=try ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyFileCMD $keyCMD $timeoutCMD echo OK 2>/dev/null)
 	fi
 	#echo -en "\e[92mTRY DONE\e[0m\015" 1>&2
 	if [ "$ret" = "OK" ]
@@ -378,6 +378,8 @@ printGetAddres()
 
 conect()
 {
+	LC_SSHTYPE=$LD_SSHTYPE
+	export LC_SSHTYPE
 	if [[ "$minus" == *"g"* ]]
 	then
 		printGetAddres "$@"
