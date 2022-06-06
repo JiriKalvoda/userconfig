@@ -393,9 +393,24 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 promt_NoGit=0
 promt_parse_git_branch() {
 	if [ $promt_NoGit -eq 0 ]; then 
-		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+		promt_git_branch="$(git branch 2>&1)"
+		if ! [[ "$promt_git_branch" == *"fatal: not a git repository"* ]]
+		then
+			if [[ "$promt_git_branch" == *"fatal: unsafe repository"* ]]
+			then
+				echo "[S]"
+			else
+				promt_git_branch=$(echo "$promt_git_branch" |sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/')
+				if [[ "$promt_git_branch" == '('*')' ]]
+				then
+					echo "$promt_git_branch"
+				else
+					echo "[E]"
+				fi
+			fi
+		fi
 	else
-		echo "?"
+		echo "[?]"
 	fi
 }
 
