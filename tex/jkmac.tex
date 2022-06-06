@@ -1,4 +1,4 @@
-\input ucwmac.tex
+\input ucwmac2.tex
 
 \def\pair#1#2{$\left<#1,#2\right>$}
 \def\E{{\bf E}}
@@ -46,7 +46,10 @@
       \fi
       \def\uppercasesc{\char\uccode`}%
     }%
-\def\LaTeX{L\kern-.36em\raise.3ex\hbox{\sc \uppercasesc a}\kern-.15em\TeX}
+\def\LaTeX{{L\kern-\pnt36em\setbox0\hbox{T}\vbox to \ht0{\hbox{\settextsize{7}A}\vss}\kern-\pnt15em}\TeX}
+\protected\def\Cpp{C{\tt ++}}
+\protected\def\Cis{C{\tt\#}}
+
 
 \def\({\left(}
 \def\){\right)}
