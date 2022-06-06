@@ -1,2 +1,3 @@
 #!/bin/bash
-echo -e "$1" | mosquitto_pub -h `cat ~/.secret/mqtt/rpi0-all.addres` -u `cat ~/.secret/mqtt/rpi0-led-daemon.user` -P `cat ~/.secret/mqtt/rpi0-led-daemon.passwd` -t cm -s -r 
+#echo -e "$1" | mosquitto_pub -h `cat ~/.secret/mqtt/rpi0-all.addres` -u `cat ~/.secret/mqtt/rpi0-led-daemon.user` -P `cat ~/.secret/mqtt/rpi0-led-daemon.passwd` -t cm -s -r 
+echo -e "$1" | mqtt-pub jug9 jk/cm 

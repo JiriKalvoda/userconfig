@@ -1,3 +1,5 @@
+\def\AllMode{}
+
 \def\maph{16}
 \def\mapw{14}
 
@@ -49,6 +51,7 @@
 \def\ModeName{#1}
 \bindnullkeys
 #2
+\AllMode
 \if\isFirstPrintKeyboard 1 \PrintKeyboard{\allmod} \fi
 \csname onModeEnd\endcsname
 }

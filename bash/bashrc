@@ -155,14 +155,21 @@ l(){
 }
 
 ######################### vim
+if which nvim >/dev/null 2>/dev/null
+then
+	EDITOR=nvim
+else
+	EDITOR=vim
+fi
+export EDITOR
 e(){
-	nvim "$@"
+	$EDITOR "$@"
 }
 vi(){
-	nvim "$@"
+	e "$@"
 }
 view(){
-	nvim -R "$@"
+	e -R "$@"
 }
 
 ######################### ping, traceroute
