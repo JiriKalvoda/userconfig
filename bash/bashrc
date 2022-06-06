@@ -517,13 +517,13 @@ fi
 ######################### configuration by connection types
 if [ "$SSH_CONNECTION" != "" ];
 then 
-	if [ "$LD_SSHTYPE" = "localhost" ];
+	if [ "$LD_SSHTYPE" = "localhost" ] || [ "$LC_SSHTYPE" = "localhost" ]
 	then
 		true
-	elif [ "$LD_SSHTYPE" = "second" ];
+	elif [ "$LD_SSHTYPE" = "second" ] || [ "$LC_SSHTYPE" = "second" ]
 	then 
 		promt_color_user=33
-	elif [ "$LD_SSHTYPE" = "local" ];
+	elif [ "$LD_SSHTYPE" = "local" ] || [ "$LC_SSHTYPE" = "local" ]
 	then 
 		promt_color_user=96
 	else
