@@ -6,4 +6,3 @@
 [core]
 	 #autocrlf=auto
 [pull]
-	rebase = true
