@@ -36,11 +36,11 @@ root_win = display.screen().root
 root_win.change_attributes(event_mask=Xlib.X.PropertyChangeMask)
 
 
-# root_win.delete_property(queue_atom)
 
 
 def get_queue():
     queue_atom = display.get_atom(ATOP_PREFIX + "QUEUE")
+    root_win.delete_property(queue_atom)
     while True:
         e = display.next_event()
         if e.type == Xlib.X.PropertyNotify:
