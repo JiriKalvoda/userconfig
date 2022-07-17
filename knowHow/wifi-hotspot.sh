@@ -1,1 +1,1 @@
-sudo create_ap wlp3s0 enp2s0 arch NejlepsiLinux843
+sudo create_ap wlp1s0 wlp1s0 arch NejlepsiLinux843
