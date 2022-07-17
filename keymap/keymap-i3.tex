@@ -55,9 +55,18 @@
 
 %%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % workspaces
-\def\GoWorkspace#1{\addoutput{workspace "#1"}}
-\def\ContWorkspace#1{\addoutput{move container to workspace "#1"}}
-\def\ContGoWorkspace#1{\ContWorkspace{#1}\addoutput{; }\GoWorkspace{#1}}
+\def\GoWorkspace#1{\Cmd{i3-workspace goto-workspace -w #1}}
+\def\ContWorkspace#1{\Cmd{i3-workspace container-to -w #1}}
+\def\ContGoWorkspace#1{\Cmd{i3-workspace goto-with-container-to -w #1}}
+
+\def\GoMasterWorkspace#1{\Cmd{i3-workspace goto-workspace -m #1}}
+\def\ContMasterWorkspace#1{\Cmd{i3-workspace container-to -m #1}}
+\def\ContGoMasterWorkspace#1{\Cmd{i3-workspace goto-with-container-to -m #1}}
+
+\def\GoSlaveWorkspace#1{\Cmd{i3-workspace goto-workspace -s #1}}
+\def\ContSlaveWorkspace#1{\Cmd{i3-workspace container-to -s #1}}
+\def\ContGoSlaveWorkspace#1{\Cmd{i3-workspace goto-with-container-to -s #1}}
+
 \def\MoveWorkspace#1{\addoutput{ move workspace to output #1}}
 % Container
 \def\FocusWind#1{\addoutput{ focus #1}}
