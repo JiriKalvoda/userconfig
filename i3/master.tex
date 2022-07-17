@@ -15,6 +15,16 @@
 	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContWorkspace{#3}}
 	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoWorkspace{#3}}
 }
+\def\WorkspaceMasterAll#1#2#3{
+	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoMasterWorkspace{#3}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContMasterWorkspace{#3}}
+	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoMasterWorkspace{#3}}
+}
+\def\WorkspaceSlaveAll#1#2#3{
+	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoSlaveWorkspace{#3}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContSlaveWorkspace{#3}}
+	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoSlaveWorkspace{#3}}
+}
 
 \def\BindArrUp#1#2{
 	\BindKey{\Key{#1}{3}{8}}{#2}
@@ -83,11 +93,12 @@ bar \{%
 \IiiiLine{floating_modifier $mod} %$
 
 %%%%%%%%%%%%%% Standard workspaces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\IiiiLine{exec_always i3-workspace-daemon}
 \for{I}{0}{13}{\countJ\countI
-\WorkspaceAll{1}{\the\countI}{\the\countJ}
+\WorkspaceSlaveAll{1}{\the\countI}{\the\countJ}
 }
-\for{I}{1}{13}{\countJ\countI \advance\countJ 20\relax
-\WorkspaceAll{0}{\the\countI}{\the\countJ}
+\for{I}{1}{13}{\countJ\countI\relax
+\WorkspaceMasterAll{0}{\the\countI}{\the\countJ}
 }
 
 %%%%%%%%%%%%%% WM Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -173,12 +184,13 @@ bar \{%
 
 \BindKey{\Key{\Ctrl\Shift\Super}{4}{2}}{\Cmd{zathura}}
 
-\AppWorkspace{4}{9}{WUI}{~/dev/runWUI/run.sh}
+% \BindKey{\Key{\Super}{4}{9}}{\GoWorkspace{1}}
+
 \IiiiLine{for_window [title="WebUpdatingIndicator compare"] floating enable}
 \IiiiLine{for_window [title="Tea Timer"] floating enable}
 \IiiiLine{for_window [title="Tea Timer"] sticky enable}
 
-\AppWorkspace{4}{8}{MAIL}{start-mail}
+\AppWorkspace{4}{8}{MAIL}{terminal -e m-daemon}
 \IiiiLine{for_window [title="MAIL"] move container to workspace MAIL}
 
 \AppWorkspace{4}{2}{ZOOM}{zoom}
