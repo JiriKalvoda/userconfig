@@ -11,17 +11,20 @@ function! ExecHere()
 	let g:toExec = ""
 endfunction
 
+packadd plug
 call plug#begin("~/.config/nvim/plugged")
 Plug 'glacambre/firenvim', { 'do': { _ -> firenvim#install(0) } }
 Plug 'neovim/nvim-lspconfig'
 call plug#end()
 
-
+" Exceptions for Firenvim
+if exists('g:started_by_firenvim')
+	set laststatus=0
+endif
 
 " Language server
 lua <<AMEN
 	require'lspconfig'.pylsp.setup{
-	log_file = "/tmp/lsplog",
 		log_level = vim.lsp.protocol.MessageType.Log,
 		-- message_level = vim.lsp.protocol.MessageType.Error,
 		settings = {
@@ -58,7 +61,8 @@ nnoremap <silent> gr    <cmd>lua vim.lsp.buf.references()<CR>
 nnoremap <silent> gR    <cmd>lua vim.lsp.buf.rename()<CR>
 nnoremap <silent> g0    <cmd>lua vim.lsp.buf.document_symbol()<CR>
 nnoremap <silent> gW    <cmd>lua vim.lsp.buf.workspace_symbol()<CR>
-nnoremap <silent> <Bslash>d <cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>
+nnoremap <silent> <Bslash>d <cmd>lua vim.diagnostic.open_float()<CR>
+
 
 function! s:termclose() abort
 	q
@@ -67,7 +71,7 @@ endfunction
 autocmd TermClose *:$SHELL,*:\$SHELL call s:termclose()
 tnoremap <silent> <C-[><C-[> <C-\><C-n>
 
-autocmd TermOpen * setlocal nonumber norelativenumber
+autocmd TermOpen * setlocal nonumber norelativenumber nospell
 "au TermOpen * au <buffer> BufEnter,WinEnter redraw!
 
 "augroup terminal_settings
