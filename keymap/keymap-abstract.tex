@@ -23,15 +23,15 @@
 % workspaces
 \def\GoWorkspace#1{\UndefKey}
 \def\ContWorkspace#1{\UndefKey}
-\def\ContGoWorkspace#1{\UndefKey}
+\def\ContGoWorkspace#1{\And{\ContWorkspace{#1}}{\GoWorkspace{#1}}}
 
 \def\GoMasterWorkspace#1{\UndefKey}
 \def\ContMasterWorkspace#1{\UndefKey}
-\def\ContGoMasterWorkspace#1{\Cmd{}}
+\def\ContGoMasterWorkspace#1{\And{\ContMasterWorkspace{#1}}{\GoMasterWorkspace{#1}}}
 
 \def\GoSlaveWorkspace{\GoWorkspace}
 \def\ContSlaveWorkspace{\ContWorkspace}
-\def\ContGoSlaveWorkspace#1{\UndefKey}
+\def\ContGoSlaveWorkspace#1{\And{\ContSlaveWorkspace{#1}}{\GoSlaveWorkspace{#1}}}
 
 \def\MoveWorkspace#1{\UndefKey}
 % Container
