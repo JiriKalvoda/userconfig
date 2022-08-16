@@ -18,6 +18,83 @@ from dataclasses import dataclass
 
 import signal
 
+VERSION = "0.0.1"
+
+LICENCE_HELP = """
+LICENCE
+=======
+
+i3-workspace - Two-dimensional workspace manager for i3wm
+(c)   2022 Jiri Kalvoda <jirikalvoda@kam.mff.cuni.cz>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <https://www.gnu.org/licenses/>.
+"""
+
+QT_HELP = """
+BASE CONCEPT
+============
+I3 workspace manager is an addition to i3 window manager.
+It should manage 2D array of workspaces.
+"""
+
+QT_HELP = """
+MANAGER HELP
+============
+
+You can see scrollable list of all workspaces with screenshots and windows informations.
+Screenshot of each workspace is taken when you leave it by `i3-workspace` command
+(for example by key press) or by going to other output.
+Windows information (I3 container tree) is loaded on each jump to GUI by `i3-workspace gui`
+or on key `T` press.
+
+On click on workspace it will be shown.
+On click on container/window, it will be focused.
+
+You can search in windows name by tipping search term to`Find input area.
+Input should contain at least 3 character ad it will be procesed as regex.
+See <https://docs.python.org/3/library/re.html> for supported terms.
+
+There is one active workspace marked with red border. Active workspace is important for most of keyboard shortcuts. Initially it is last used workspace. You can change it by shortcuts (see below).
+
+Shortcuts:
+----------
+?                - Show this help
+/                - Begin of search (start input mode)
+n                - focus next workspace with find match
+N                - focus previous workspace with find match
+<DOWN> / <UP>
+or j / k         - Focus next / previous nonempty master
+Shift + <DOWN> / <UP>
+or J / K - Focus next / previous master
+<RIGHT> / <LEFT>
+or l / h         - Focus next / previous nonempty slave
+Shift + <RIGHT> / <LEFT>
+or L / H         - Focus next / previous slave
+<ENTER>          - go to focused workspace
+<ESC>            - go to previous used workspace
+w / e            - advance / reduce screenshot size
+`, 1-9, 0, -, =  - focus corresponding slave
+F1-F12           - focus corresponding master
+
+Shortcuts in search bar (input mode):
+-------------------------------------
+<ESC>          - Clear search and exit input mode
+<ENTER>        - Exit input mode
+<DOWN> / <UP>  - Focus next / previous search match workspace
+And standard shortcuts with extra CTRL
+"""
+
 parser = argparse.ArgumentParser(description='I3 workspace switcher')
 parser.add_argument('-q', "--qt", action='store_true')
 parser.add_argument('-d' , "--debug-qt-task", action='store_true')
@@ -30,7 +107,7 @@ if USE_QT:
     from PyQt5.QtCore import *
     from PyQt5.QtGui import *
     from PyQt5.QtWidgets import *
-    import regex
+    import re
 
     qtoverride = lambda x: x  # only documentation of code
 
@@ -874,17 +951,32 @@ def qt_main():
     global qt_thread_tasker
     qt_thread_tasker = Tasker()
 
-    class I3WindowNodeWidget(QLabel):
+    class I3NodeWidget(QWidget):
         def __init__(self, t, parent=None):
             super().__init__(parent)
+            self.container_id = t.id
+
+        @qtoverride
+        def mousePressEvent(self, event):
+            print(event, type(event), event.pos(), int(event.flags()), event.buttons())
+            event.accept()
+            i3.value.command(f'[con_id={self.container_id}] focus')
+
+    class I3WindowNodeWidget(I3NodeWidget):
+        def __init__(self, t, parent=None):
+            super().__init__(t, parent)
+            self.hlay = no_space(QHBoxLayout(self))
+            self.name = QLabel(self)
             self.title = t.name
-            self.setText(self.title)
+            self.title_label = QLabel(self)
+            self.title_label.setText(t.name)
             self.setAutoFillBackground(True)
+            self.setLayout(self.hlay)
+            self.hlay.addWidget(self.title_label)
 
-
-    class I3InnerNodeWidget(QWidget):
+    class I3InnerNodeWidget(I3NodeWidget):
         def __init__(self, t, parent=None):
-            super().__init__(parent)
+            super().__init__(t, parent)
             self.hlay = no_space(QHBoxLayout(self))
             self.head = QLabel(self)
             self.list = QWidget(self)
@@ -949,12 +1041,12 @@ def qt_main():
 
         def find(self, r):
             for win in self.all_window_nodes:
-                m = r.search(win.title, partial=False)
+                m = r.search(win.title)
                 if m:
                     span = m.span()
 
                     t = win.title
-                    win.setText(t[:span[0]] + "<b>" + t[span[0]:span[1]] + "</b>" + t[span[1]:])
+                    win.title_label.setText(t[:span[0]] + "<b>" + t[span[0]:span[1]] + "</b>" + t[span[1]:])
                     p = QPalette()
                     p.setColor(win.backgroundRole(), QColor(255,255,0))
                     win.setPalette(p)
@@ -965,7 +1057,7 @@ def qt_main():
                 p = QPalette()
                 p.setColor(win.backgroundRole(), QColor(0,0,0,0))
                 win.setPalette(p)
-                win.setText(win.title)
+                win.title_label.setText(win.title)
             self.find_matchs = []
 
 
@@ -1033,7 +1125,7 @@ def qt_main():
                     rect = outputs[o].rect
                 except KeyError:
                     return
-            self.screenshot = s.grabWindow(QApplication.desktop().winId(), rect.x, rect.y, rect.x+rect.width, rect.y+rect.height)
+            self.screenshot = s.grabWindow(QApplication.desktop().winId(), rect.x, rect.y, rect.width, rect.height)
             self.screenshot_is_old = False
             self.redraw_pic()
 
@@ -1090,6 +1182,101 @@ def qt_main():
             self.setPalette(pal)
 
 
+    class TextShowWidget(QWidget):
+        def __init__(self, text, parent=None):
+            super().__init__(parent)
+
+            self.lay = no_space(QVBoxLayout(self))
+            self.text_area = QTextBrowser(self)
+            self.bar_lay = QHBoxLayout()
+            self.find_input = QLineEdit(self)
+            self.find_msg = QLabel(self)
+
+            self.find_input.setPlaceholderText("Find")
+            self.find_msg.setAutoFillBackground(True)
+
+            self.bar_lay.addWidget(self.find_input)
+            self.bar_lay.addWidget(self.find_msg)
+            self.lay.addWidget(self.text_area)
+            self.lay.addItem(self.bar_lay)
+            self.setLayout(self.lay)
+
+            self.find_input.setFocus()
+            self.find_input.textChanged.connect(self.find_changed)
+
+            self.text_area.setReadOnly(True)
+            self.text_area.setPlainText(text)
+            self.html = self.text_area.toHtml()
+            self.find_error = None
+            self.find_count = None
+
+        def find(self, s):
+            def parse_html(html):
+                strings = []
+                tags = []
+                i = 0
+                while True:
+                    l = html.find('<', i)
+                    if l == -1:
+                        strings.append(html[i:])
+                        break
+                    r = html.find('>', l)
+                    strings.append(html[i:l])
+                    tags.append(html[l:r+1])
+                    i = r + 1
+                return strings, tags
+
+            self.clear_find()
+            try:
+                find_regex = re.compile(s, re.IGNORECASE)
+            except re.error as e:
+                self.find_error = e
+                self.set_find_msg()
+                return
+            find_error = None
+            self.find_count = 0
+            def mark_find(s):
+                m = find_regex.search(s)
+                if m:
+                    span = m.span()
+                    self.find_count += 1
+                    s = s[:span[0]] + '<span style="background-color:#FFCC00">' + s[span[0]:span[1]] + "</span>" + mark_find(s[span[1]:])
+                return s
+            strings, tags = parse_html(self.html)
+            x = "".join([a+b for (a,b) in zip(tags + [], map(mark_find, strings))])
+            self.text_area.setHtml(x)
+
+            self.set_find_msg()
+
+        def clear_find(self):
+            self.find_count = None
+            self.text_area.setHtml(self.html)
+
+        def set_find_msg(self):
+            p = QPalette()
+            if self.find_error:
+                self.find_msg.setText(str(self.find_error))
+                p.setColor(self.find_msg.backgroundRole(), QColor(255,100,0))
+            elif self.find_count is None:
+                self.find_msg.setText(f"")
+                p.setColor(self.find_msg.backgroundRole(), QColor(255,255,255))
+            elif self.find_count > 0:
+                self.find_msg.setText(f"{self.find_count}")
+                p.setColor(self.find_msg.backgroundRole(), QColor(0,255,0))
+            else:
+                self.find_msg.setText("Not found")
+                p.setColor(self.find_msg.backgroundRole(), QColor(255,0,0))
+            self.find_msg.setPalette(p)
+
+        @pyqtSlot()
+        def find_changed(self):
+            s = self.find_input.text()
+            if len(s) >= 3:
+                self.find(s)
+            else:
+                self.clear_find()
+
+
 
     class MainWindow(QWidget):
         def __init__(self, parent=None):
@@ -1098,7 +1285,6 @@ def qt_main():
             self.screenshot_size = 300
 
             self.lay = no_space(QVBoxLayout(self))
-            self.lay.setContentsMargins(0, 0, 0, 0)
             self.scroll = QNoArrowScrollArea(self)
             self.scroll_widget = QWidget(self)
             self.scroll_lay = no_space(QVBoxLayout(self.scroll_widget))
@@ -1143,6 +1329,8 @@ def qt_main():
             self.find_regex = None
             self.find_error = None
             self.find_matchs = []
+
+            self.help_window = TextShowWidget(QT_HELP)
 
         def focus_workspace(self, n_master, n_slave):
             def f(x):
@@ -1208,8 +1396,8 @@ def qt_main():
             self.clear_find()
             print("FIND", s)
             try:
-                self.find_regex = regex.compile(s, regex.IGNORECASE)
-            except regex.error as e:
+                self.find_regex = re.compile(s, re.IGNORECASE)
+            except re.error as e:
                 self.find_error = e
                 self.set_find_msg()
                 return
@@ -1257,7 +1445,6 @@ def qt_main():
             self.find_msg.setPalette(p)
 
 
-        
         def find_next(self, direction):
             index = GUI_WORKSPACES_ORDER.index((self.focused_widget.master, self.focused_widget.slave))
             print("FN", direction)
@@ -1290,25 +1477,6 @@ def qt_main():
         def keyPressEvent(self, event):
             SHIFT = Qt.ShiftModifier
             CTRL = Qt.ControlModifier
-            print(event, type(event), event.text(), event.key(), int(event.modifiers()))
-            event.accept()
-            mod = int(event.modifiers())
-            key = int(event.key())
-            if mod == 0 and key == ord('R'):
-                for i in self.workspaces.values():
-                    i.metadata_changed()
-            if mod == 0 and key == ord('T'):
-                self.load_i3_tree()
-            if mod == 0 and key == ord('A'):
-                try:
-                    self.set_screenshot_size([x for x in SCREENSHOTS_SIZES if x > self.screenshot_size][0])
-                except IndexError:
-                    pass
-            if mod == 0 and key == ord('S'):
-                try:
-                    self.set_screenshot_size([x for x in SCREENSHOTS_SIZES if x < self.screenshot_size][-1])
-                except IndexError:
-                    pass
             F_KEYS = {v: k+1 for k, v in enumerate([
                 16777264, 16777265, 16777266, 16777267, 16777268,
                 16777269, 16777270, 16777271, 16777272, 16777273,
@@ -1322,60 +1490,95 @@ def qt_main():
             UP_KEYS = {ord('J'), Qt.Key_Up}
             DOWN_KEYS = {ord('K'), Qt.Key_Down}
             RIGHT_KEYS = {ord('L'), Qt.Key_Right}
-            if mod == 0 and key in ORD_TO_WORKSPACE:
-                self.change_focused_forkspace(workspace_cmd=ORD_TO_WORKSPACE[key])
-            if mod == 0 and key in NUM_KEYS:
-                self.change_focused_forkspace(slave_cmd=NUM_KEYS[key])
-            if mod == 0 and key in F_KEYS:
-                self.change_focused_forkspace(master_cmd=F_KEYS[key])
+            print(event, type(event), event.text(), event.key(), int(event.modifiers()))
+            mod = int(event.modifiers())
+            key = int(event.key())
 
-            if mod == 0 and key in LEFT_KEYS:
-                self.change_focused_forkspace(slave_cmd="prev-skip")
-            if mod == SHIFT and key in LEFT_KEYS:
-                self.change_focused_forkspace(slave_cmd="prev-limit")
-            if mod == 0 and key in RIGHT_KEYS:
-                self.change_focused_forkspace(slave_cmd="next-skip")
-            if mod == SHIFT and key in RIGHT_KEYS:
-                self.change_focused_forkspace(slave_cmd="next-limit")
+            event.accept()
+            def keyPressEvent_main(key, mod):
+                if key == ord('?') and mod == SHIFT:
+                    self.show_help()
+                elif mod == 0 and key == ord('R'): # Undocumented
+                    for i in self.workspaces.values():
+                        i.metadata_changed()
+                elif mod == 0 and key == ord('T'):
+                    self.load_i3_tree()
+                elif mod == 0 and key == ord('W'):
+                    try:
+                        self.set_screenshot_size([x for x in SCREENSHOTS_SIZES if x > self.screenshot_size][0])
+                    except IndexError:
+                        pass
+                elif mod == 0 and key == ord('E'):
+                    try:
+                        self.set_screenshot_size([x for x in SCREENSHOTS_SIZES if x < self.screenshot_size][-1])
+                    except IndexError:
+                        pass
+                elif mod == 0 and key in ORD_TO_WORKSPACE:
+                    self.change_focused_forkspace(workspace_cmd=ORD_TO_WORKSPACE[key])
+                elif mod == 0 and key in NUM_KEYS:
+                    self.change_focused_forkspace(slave_cmd=NUM_KEYS[key])
+                elif mod == 0 and key in F_KEYS:
+                    self.change_focused_forkspace(master_cmd=F_KEYS[key])
 
-            if mod == 0 and key in UP_KEYS:
-                self.change_focused_forkspace(master_cmd="prev-skip")
-            if mod == SHIFT and key in UP_KEYS:
-                self.change_focused_forkspace(master_cmd="prev")
-            if mod == 0 and key in DOWN_KEYS:
-                self.change_focused_forkspace(master_cmd="next-skip")
-            if mod == SHIFT and key in DOWN_KEYS:
-                self.change_focused_forkspace(master_cmd="next")
+                elif mod == 0 and key in LEFT_KEYS:
+                    self.change_focused_forkspace(slave_cmd="prev-skip")
+                elif mod == SHIFT and key in LEFT_KEYS:
+                    self.change_focused_forkspace(slave_cmd="prev-limit")
+                elif mod == 0 and key in RIGHT_KEYS:
+                    self.change_focused_forkspace(slave_cmd="next-skip")
+                elif mod == SHIFT and key in RIGHT_KEYS:
+                    self.change_focused_forkspace(slave_cmd="next-limit")
 
-            if mod == CTRL and key in LEFT_KEYS:
-                self.find_next(-1)
-            if mod == CTRL and key in RIGHT_KEYS:
-                self.find_next(1)
-            if mod == SHIFT and key == ord("N"):
-                self.find_next(-1)
-            if mod == 0 and key == ord("N"):
-                self.find_next(1)
+                elif mod == 0 and key in UP_KEYS:
+                    self.change_focused_forkspace(master_cmd="prev-skip")
+                elif mod == SHIFT and key in UP_KEYS:
+                    self.change_focused_forkspace(master_cmd="prev")
+                elif mod == 0 and key in DOWN_KEYS:
+                    self.change_focused_forkspace(master_cmd="next-skip")
+                elif mod == SHIFT and key in DOWN_KEYS:
+                    self.change_focused_forkspace(master_cmd="next")
 
-            if mod == 0 and key == ord('/'):
-                self.find_input.setFocus()
-            print(key, 6777216 == key)
-            if mod == 0 and key == 16777216:  # ESCAPE
-                if app.focusWidget() == self.find_input:
+                elif mod == CTRL and key in LEFT_KEYS:
+                    self.find_next(-1)
+                elif mod == CTRL and key in RIGHT_KEYS:
+                    self.find_next(1)
+                elif mod == SHIFT and key == ord("N"):
+                    self.find_next(-1)
+                elif mod == 0 and key == ord("N"):
+                    self.find_next(1)
+
+                elif mod == 0 and key == ord('/'):
+                    self.find_input.setFocus()
+                elif mod == 0 and key == 16777216:  # ESCAPE
+                    with lock.read:
+                        w = get_workspace()
+                    i3.value.command(f'workspace {workspace(*w)}')
+                elif mod == 0 and key == 16777220:  # ENTER
+                    i3.value.command(f'workspace {workspace(self.focused_master, self.focused_slave)}')
+
+            def keyPressEvent_find(key, mod):
+                if mod == 0 and key == 16777216:  # ESCAPE
                     self.clear_find()
                     self.find_input.setText("")
                     self.find_error = None
                     self.set_find_msg()
-                if app.focusWidget() == self.scroll:
-                    with lock.read:
-                        w = get_workspace()
-                    i3.value.command(f'workspace {workspace(*w)}')
-                else:
                     self.scroll.setFocus()
-            if mod == 0 and key == 16777220:  # ENTER
-                if app.focusWidget() == self.find_input:
+                elif mod == 0 and key == 16777220:  # ENTER
                     self.scroll.setFocus()
+                elif mod == 0 and key == Qt.Key_Up:
+                    self.find_next(-1)
+                elif mod == 0 and key == Qt.Key_Down:
+                    self.find_next(1)
                 else:
-                    i3.value.command(f'workspace {workspace(self.focused_master, self.focused_slave)}')
+                    print("CMCT", mod, mod & ~CTRL)
+                    keyPressEvent_main(key, mod & ~CTRL)
+            if app.focusWidget() == self.find_input:
+                keyPressEvent_find(key, mod)
+            else:
+                keyPressEvent_main(key, mod)
+
+        def show_help(self):
+            self.help_window.show()
 
     m_win = MainWindow()
     m_win.show()
