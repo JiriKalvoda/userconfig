@@ -9,7 +9,6 @@ import Xlib
 import Xlib.display
 import Xlib.X
 
-import argparse
 
 import i3ipc
 import time
@@ -21,16 +20,32 @@ import signal
 from i3_workspace_shared import *
 from i3_workspace_lib import *
 import i3_workspace_util as util
+import i3_workspace_help as help
 from i3_workspace_watch import i3_watch
 from i3_workspace_main_functions import main_functions
 from i3_workspace_constants import *
 
 
 
-parser = argparse.ArgumentParser(description='I3 workspace switcher')
-parser.add_argument('-g', "--gui", action='store_true')
+parser = argparse.ArgumentParser(description='I3 2D workspace manager daemon', epilog='See -H option for more information about i3-workspace.')
+parser.add_argument('-H', "--usage", action='store_true', help="Show text about how to use whole i3-workspace manager.")
+parser.add_argument('-l', "--license", action='store_true', help="Show license of this program.")
+parser.add_argument('-V', "--version", action='store_true', help="Show current version.")
+parser.add_argument('-g', "--gui", action='store_true', help="Prepare window with list of workspaces. Use `i3-workspace gui` to open it.")
 # parser.add_argument('-d' , "--debug-qt-task", action='store_true')
 params = parser.parse_args()
+
+if params.usage:
+    print(help.daemon_usage)
+    exit(0)
+
+if params.license:
+    print(help.LICENSE_ALL)
+    exit(0)
+
+if params.version:
+    print(help.VERSION)
+    exit(0)
 
 USE_QT = params.gui
 # DEBUG_QT_TASK = params.debug_qt_task
@@ -77,7 +92,12 @@ def x_main():
         if len(msg) >= 1:
             try:
                 with shared.lock:
-                    main_functions[msg[0]](msg)
+                    f = main_functions[msg[0]]
+                    parser = util.ArgumentParserNoFail()
+                    for (args, kvargs) in f.args:
+                        parser.add_argument(*args, **kvargs)
+                    params = parser.parse_args(msg[1:])
+                    f.f(params)
             except WorkspaceOutOfRange:
                 osd.notify("No more workspaces", color="magenta", to='display', min_duration=0)
             except Exception as e:

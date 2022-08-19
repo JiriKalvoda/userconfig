@@ -1,4 +1,5 @@
 import threading
+import argparse
 
 class NoneContext:
     def __enter__(self):
@@ -55,4 +56,8 @@ def defautl_val(*ar):
 
 def run(*arg, **kvarg):
     return lambda f: f(*arg, *kvarg)
+
+class ArgumentParserNoFail(argparse.ArgumentParser):
+    def error(self, message):
+        raise RuntimeError(message)
 

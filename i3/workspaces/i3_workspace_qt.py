@@ -638,7 +638,7 @@ def qt_main():
             self.find_error = None
             self.find_matchs = []
 
-            self.help_window = TextShowWidget(help.QT_HELP)
+            self.help_window = TextShowWidget(help.qt)
 
         def focus_workspace(self, n_master, n_slave):
             def f(x):
