@@ -197,7 +197,7 @@ def qt_main():
             return
         if slave > MAX_MASTERED_SLAVE:
             master = None
-        return f(m_win.workspaces[(master, slave)])
+        return f(m_win._workspaces[(master, slave)])
 
     SCREENSHOTS_SIZES = [120, 150, 200, 250, 300, 400, 500, 750, 1000]
 
@@ -272,39 +272,37 @@ def qt_main():
     class I3WindowNodeWidget(I3NodeWidget):
         def __init__(self, t, parent=None):
             super().__init__(t, parent)
-            self.hlay = no_space(QHBoxLayout(self))
-            self.name = QLabel(self)
+            self._hlay = no_space(QHBoxLayout(self))
+            self._name = QLabel(self)
             self.title = t.name
-            self.title_label = QLabel(self)
-            self.title_label.setText(t.name)
+            self._title = QLabel(self)
+            self._title.setText(t.name)
             self.setAutoFillBackground(True)
-            self.setLayout(self.hlay)
-            self.hlay.addWidget(self.title_label)
+            self.setLayout(self._hlay)
+            self._hlay.addWidget(self._title)
 
     class I3InnerNodeWidget(I3NodeWidget):
         def __init__(self, t, parent=None):
             super().__init__(t, parent)
-            self.hlay = no_space(QHBoxLayout(self))
-            self.head = QLabel(self)
-            self.list = QWidget(self)
-            self.list_lay = no_space(QVBoxLayout(self.list))
+            self._hlay = no_space(QHBoxLayout(self))
+            self._head = QLabel(self)
+            self._list = no_space(QVBoxLayout())
 
-            self.list.setLayout(self.list_lay)
-            self.setLayout(self.hlay)
-            self.hlay.addWidget(self.head)
-            self.hlay.addWidget(self.list)
+            self.setLayout(self._hlay)
+            self._hlay.addWidget(self._head)
+            self._hlay.addItem(self._list)
 
-            self.head.setText({
+            self._head.setText({
                 "splith": "H",
                 "splitv": "V",
                 "tabbed": "T",
                 "stacked": "S"
             }.get(t.layout, "?"))
-            self.head.setFixedWidth(13)
+            self._head.setFixedWidth(13)
 
-            self.nodes = [i3_tree_widget_create(i, self) for i in  t.nodes]
+            self.nodes = [i3_tree_widget_create(i, self) for i in t.nodes]
             for i in self.nodes:
-                self.list_lay.addWidget(i)
+                self._list.addWidget(i)
 
     def i3_tree_widget_create(t, parent):
         if t.nodes:
@@ -315,14 +313,14 @@ def qt_main():
     class I3TreeWidget(QWidget):
         def __init__(self, parent=None):
             super().__init__(parent)
-            self.lay = no_space(QVBoxLayout(self))
-            self.setLayout(self.lay)
+            self._lay = no_space(QVBoxLayout(self))
+            self.setLayout(self._lay)
             self.all_inner_nides = []
             self.all_window_nodes = []
             self.find_matchs = []
 
         def clear(self):
-            while (i := self.lay.takeAt(0)):
+            while (i := self._lay.takeAt(0)):
                 i.widget().hide()
             self.all_inner_nides = []
             self.all_window_nodes = []
@@ -339,12 +337,12 @@ def qt_main():
                         go(i)
             r = i3_tree_widget_create(t, self)
             go(r)
-            self.lay.addWidget(r)
+            self._lay.addWidget(r)
             for i in t.floating_nodes:
                 for j in i.nodes:
                     f = i3_tree_widget_create(j, self)
                     go(f)
-                    self.lay.addWidget(f)
+                    self._lay.addWidget(f)
 
         def find(self, r):
             for win in self.all_window_nodes:
@@ -353,7 +351,7 @@ def qt_main():
                     span = m.span()
 
                     t = win.title
-                    win.title_label.setText(t[:span[0]] + "<b>" + t[span[0]:span[1]] + "</b>" + t[span[1]:])
+                    win._title.setText(t[:span[0]] + "<b>" + t[span[0]:span[1]] + "</b>" + t[span[1]:])
                     p = QPalette()
                     p.setColor(win.backgroundRole(), QColor(255,255,0))
                     win.setPalette(p)
@@ -364,7 +362,7 @@ def qt_main():
                 p = QPalette()
                 p.setColor(win.backgroundRole(), QColor(0,0,0,0))
                 win.setPalette(p)
-                win.title_label.setText(win.title)
+                win._title.setText(win.title)
             self.find_matchs = []
 
 
@@ -380,18 +378,18 @@ def qt_main():
             self.setFrameShape(QFrame.Box)
             self.master = master
             self.slave = slave
-            self.lay = no_space(QVBoxLayout(self))
-            self.l_name = QLabel(self)
-            self.l_screenshot = QLabel(self)
-            self.l_tree = I3TreeWidget(self)
+            self._lay = no_space(QVBoxLayout(self))
+            self._name = QLabel(self)
+            self._screenshot = QLabel(self)
+            self._tree = I3TreeWidget(self)
 
 
-            self.lay.addWidget(self.l_name)
-            self.lay.addWidget(self.l_screenshot)
-            self.lay.addWidget(self.l_tree)
-            self.lay.addStretch()
-            self.setLayout(self.lay)
-            self.l_name.setAlignment(Qt.AlignCenter)
+            self._lay.addWidget(self._name)
+            self._lay.addWidget(self._screenshot)
+            self._lay.addWidget(self._tree)
+            self._lay.addStretch()
+            self.setLayout(self._lay)
+            self._name.setAlignment(Qt.AlignCenter)
 
 
             self.metadata_changed()
@@ -418,11 +416,10 @@ def qt_main():
                     painter.drawLine(0, 0, s.width(), s.height())
                     painter.drawLine(0, s.height(), s.width(), 0)
                     painter.end()
-                self.l_screenshot.setPixmap(s)
-                self.l_screenshot.setScaledContents(False)
+                self._screenshot.setPixmap(s)
+                self._screenshot.setScaledContents(False)
             else:
-                self.l_screenshot.clear()
-
+                self._screenshot.clear()
 
         def make_screenshot(self):
             self.exist = True
@@ -450,14 +447,14 @@ def qt_main():
             self.screenshot = None
             self.exist = False
             self.redraw_pic()
-            self.l_tree.clear()
+            self._tree.clear()
 
         def metadata_changed(self):
-            self.l_name.setText(f"<b>{workspace(self.master, self.slave)}")
+            self._name.setText(f"<b>{workspace(self.master, self.slave)}")
             p_name = QPalette()
             p_name.setColor(QPalette.WindowText, QColor(0,0,0))
 
-            self.l_name.setAutoFillBackground(True)
+            self._name.setAutoFillBackground(True)
             with shared.lock.read:
                 try:
                     if shared.outputs[shared.output_of_workspace[self.master][self.slave]].primary:
@@ -477,12 +474,12 @@ def qt_main():
                                 p_name.setColor(QPalette.WindowText, QColor(0,0,255))
                                 break
 
-            self.l_name.setPalette(p_name)
+            self._name.setPalette(p_name)
 
         def parse_i3_tree(self, t):
             s = ""
             print(s)
-            self.l_tree.set_tree(t)
+            self._tree.set_tree(t)
 
         def setColor(self, color):
             pal = self.palette()
@@ -494,27 +491,27 @@ def qt_main():
         def __init__(self, text, parent=None):
             super().__init__(parent)
 
-            self.lay = no_space(QVBoxLayout(self))
-            self.text_area = QTextBrowser(self)
-            self.bar_lay = QHBoxLayout()
-            self.find_input = QLineEdit(self)
-            self.find_msg = QLabel(self)
+            self._lay = no_space(QVBoxLayout(self))
+            self._text_area = QTextBrowser(self)
+            self._bar_lay = QHBoxLayout()
+            self._find_input = QLineEdit(self)
+            self._find_msg = QLabel(self)
 
-            self.find_input.setPlaceholderText("Find")
-            self.find_msg.setAutoFillBackground(True)
+            self._find_input.setPlaceholderText("Find")
+            self._find_msg.setAutoFillBackground(True)
 
-            self.bar_lay.addWidget(self.find_input)
-            self.bar_lay.addWidget(self.find_msg)
-            self.lay.addWidget(self.text_area)
-            self.lay.addItem(self.bar_lay)
-            self.setLayout(self.lay)
+            self._bar_lay.addWidget(self._find_input)
+            self._bar_lay.addWidget(self._find_msg)
+            self._lay.addWidget(self._text_area)
+            self._lay.addItem(self._bar_lay)
+            self.setLayout(self._lay)
 
-            self.find_input.setFocus()
-            self.find_input.textChanged.connect(self.find_changed)
+            self._find_input.setFocus()
+            self._find_input.textChanged.connect(self.find_changed)
 
-            self.text_area.setReadOnly(True)
-            self.text_area.setPlainText(text)
-            self.html = self.text_area.toHtml()
+            self._text_area.setReadOnly(True)
+            self._text_area.setPlainText(text)
+            self.html = self._text_area.toHtml()
             self.find_error = None
             self.find_count = None
 
@@ -552,33 +549,33 @@ def qt_main():
                 return s
             strings, tags = parse_html(self.html)
             x = "".join([a+b for (a,b) in zip(tags + [], map(mark_find, strings))])
-            self.text_area.setHtml(x)
+            self._text_area.setHtml(x)
 
             self.set_find_msg()
 
         def clear_find(self):
             self.find_count = None
-            self.text_area.setHtml(self.html)
+            self._text_area.setHtml(self.html)
 
         def set_find_msg(self):
             p = QPalette()
             if self.find_error:
-                self.find_msg.setText(str(self.find_error))
-                p.setColor(self.find_msg.backgroundRole(), QColor(255,100,0))
+                self._find_msg.setText(str(self.find_error))
+                p.setColor(self._find_msg.backgroundRole(), QColor(255,100,0))
             elif self.find_count is None:
-                self.find_msg.setText(f"")
-                p.setColor(self.find_msg.backgroundRole(), QColor(255,255,255))
+                self._find_msg.setText(f"")
+                p.setColor(self._find_msg.backgroundRole(), QColor(255,255,255))
             elif self.find_count > 0:
-                self.find_msg.setText(f"{self.find_count}")
-                p.setColor(self.find_msg.backgroundRole(), QColor(0,255,0))
+                self._find_msg.setText(f"{self.find_count}")
+                p.setColor(self._find_msg.backgroundRole(), QColor(0,255,0))
             else:
-                self.find_msg.setText("Not found")
-                p.setColor(self.find_msg.backgroundRole(), QColor(255,0,0))
-            self.find_msg.setPalette(p)
+                self._find_msg.setText("Not found")
+                p.setColor(self._find_msg.backgroundRole(), QColor(255,0,0))
+            self._find_msg.setPalette(p)
 
         @pyqtSlot()
         def find_changed(self):
-            s = self.find_input.text()
+            s = self._find_input.text()
             if len(s) >= 3:
                 self.find(s)
             else:
@@ -592,43 +589,48 @@ def qt_main():
 
             self.screenshot_size = 300
 
-            self.lay = no_space(QVBoxLayout(self))
-            self.scroll = QNoArrowScrollArea(self)
-            self.scroll_widget = QWidget(self)
-            self.scroll_lay = no_space(QVBoxLayout(self.scroll_widget))
-            self.master_widget = {i: QWidget(self) for i in GUI_MASTERS}
-            self.master_lay = {i: FlowLayout(self.master_widget[i]) for i in GUI_MASTERS}
-            self.workspaces = {(master,slave): WorkspaceWidget(master, slave, self) for (master, slave) in GUI_WORKSPACES_ORDER}
-            self.bar_lay = QHBoxLayout()
-            self.find_input = QLineEdit(self)
-            self.find_msg = QLabel(self)
+            self._lay = no_space(QVBoxLayout(self))
+            self._scroll = QNoArrowScrollArea(self)
+            self._scroll_widget = QWidget(self)
+            self._scroll_lay = no_space(QVBoxLayout(self._scroll_widget))
+            self._master_widgets = {i: QWidget(self) for i in GUI_MASTERS}
+            self._master_lays = {i: FlowLayout(self._master_widgets[i]) for i in GUI_MASTERS}
+            self._workspaces = {(master,slave): WorkspaceWidget(master, slave, self) for (master, slave) in GUI_WORKSPACES_ORDER}
+            self._bar_lay = QHBoxLayout()
+            self._help_label = QPushButton(self)
+            self._find_input = QLineEdit(self)
+            self._find_msg = QLabel(self)
+            self._help_label.clicked.connect(self._find_msg_clicked)
 
-            self.scroll.setWidgetResizable(True)
+            self._scroll.setWidgetResizable(True)
 
             #self.scroll_widget.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
 
             for i in GUI_MASTERS:
-                self.scroll_lay.addWidget(self.master_widget[i])
-                self.master_widget[i].setLayout(self.master_lay[i])
-                self.master_lay[i].setSpacing(0)
-                self.master_lay[i].setContentsMargins(0, 0, 0, 0)
+                self._scroll_lay.addWidget(self._master_widgets[i])
+                self._master_widgets[i].setLayout(self._master_lays[i])
+                self._master_lays[i].setSpacing(0)
+                self._master_lays[i].setContentsMargins(0, 0, 0, 0)
 
 
-            for ((master, slave), widget) in self.workspaces.items():
-                self.master_lay[master].addWidget(widget)
+            for ((master, slave), widget) in self._workspaces.items():
+                self._master_lays[master].addWidget(widget)
 
-            self.find_input.setPlaceholderText("Find")
-            self.find_input.textChanged.connect(self.find_changed)
-            self.find_msg.setAutoFillBackground(True)
+            self._find_input.setPlaceholderText("Find")
+            self._find_input.textChanged.connect(self.find_changed)
+            self._find_msg.setAutoFillBackground(True)
 
-            self.scroll_widget.setLayout(self.scroll_lay)
-            self.scroll.setWidget(self.scroll_widget)
-            self.bar_lay.addWidget(self.find_input)
-            self.bar_lay.addWidget(self.find_msg)
-            self.lay.addWidget(self.scroll)
-            self.lay.addItem(self.bar_lay)
-            self.setLayout(self.lay)
-            
+            self._help_label.setText("Help (?)")
+            self._help_label.setFocusPolicy(Qt.NoFocus)
+
+            self._scroll_widget.setLayout(self._scroll_lay)
+            self._scroll.setWidget(self._scroll_widget)
+            self._bar_lay.addWidget(self._help_label)
+            self._bar_lay.addWidget(self._find_input)
+            self._bar_lay.addWidget(self._find_msg)
+            self._lay.addWidget(self._scroll)
+            self._lay.addItem(self._bar_lay)
+            self.setLayout(self._lay)
 
             self.focused_master = None
             self.focused_slave = None
@@ -638,7 +640,11 @@ def qt_main():
             self.find_error = None
             self.find_matchs = []
 
-            self.help_window = TextShowWidget(help.qt)
+            self._help_window = TextShowWidget(help.qt)
+
+        @pyqtSlot(bool)
+        def _find_msg_clicked(self, x):
+            self.show_help()
 
         def focus_workspace(self, n_master, n_slave):
             def f(x):
@@ -648,7 +654,7 @@ def qt_main():
                     self.focused_master = n_master
                 self.focused_slave = n_slave
                 self.focused_widget = x
-                self.scroll.ensureWidgetVisible(x)
+                self._scroll.ensureWidgetVisible(x)
                 x.setColor(QColor(255,0,0))
                 if self.find_regex:
                     self.set_find_msg()
@@ -678,27 +684,27 @@ def qt_main():
             # ppr(t, 0)
             def go(x):
                 if x.type == "workspace":
-                    qt_workspace_widget_func(*parse_workspace(x.name), lambda y: y.l_tree.set_tree(x))
+                    qt_workspace_widget_func(*parse_workspace(x.name), lambda y: y._tree.set_tree(x))
                 else:
                     for y in x.nodes:
                         go(y)
             go(t)
 
             if self.find_regex:
-                for w in self.workspaces.values():
-                    w.l_tree.find(self.find_regex)
+                for w in self._workspaces.values():
+                    w._tree.find(self.find_regex)
 
         def set_screenshot_size(self, val):
             self.screenshot_size = val
-            for i in self.workspaces.values():
+            for i in self._workspaces.values():
                 i.redraw_pic()
             self.focus_workspace(self.focused_master, self.focused_slave)
 
         def clear_find(self):
             self.find_regex = None
             self.find_error = None
-            for w in self.workspaces.values():
-                w.l_tree.clear_find()
+            for w in self._workspaces.values():
+                w._tree.clear_find()
 
         def find(self, s):
             self.clear_find()
@@ -710,11 +716,11 @@ def qt_main():
                 self.set_find_msg()
                 return
             find_error = None
-            for w in self.workspaces.values():
-                w.l_tree.find(self.find_regex)
+            for w in self._workspaces.values():
+                w._tree.find(self.find_regex)
             for i in GUI_WORKSPACES_ORDER:
-                w = self.workspaces[i]
-                if len(w.l_tree.find_matchs) > 0:
+                w = self._workspaces[i]
+                if len(w._tree.find_matchs) > 0:
                     self.change_focused_forkspace(w.master, w.slave)
                     break
             self.set_find_msg()
@@ -722,8 +728,8 @@ def qt_main():
         def set_find_msg(self):
             p = QPalette()
             if self.find_error:
-                self.find_msg.setText(str(self.find_error))
-                p.setColor(self.find_msg.backgroundRole(), QColor(255,100,0))
+                self._find_msg.setText(str(self.find_error))
+                p.setColor(self._find_msg.backgroundRole(), QColor(255,100,0))
             elif self.find_regex:
                 tot_ws = 0
                 tot_win = 0
@@ -731,8 +737,8 @@ def qt_main():
                 act_win = None
                 act_win_to = None
                 for i in GUI_WORKSPACES_ORDER:
-                    w = self.workspaces[i]
-                    l = len(w.l_tree.find_matchs)
+                    w = self._workspaces[i]
+                    l = len(w._tree.find_matchs)
                     if l:
                         tot_ws += 1
                     if i == (self.focused_widget.master, self.focused_widget.slave):
@@ -741,16 +747,16 @@ def qt_main():
                         act_win_to = tot_win + l
                     tot_win += l
                 if tot_ws:
-                    self.find_msg.setText(f"{act_ws}/{tot_ws} window {act_win}-{act_win_to}/{tot_win}")
-                    p.setColor(self.find_msg.backgroundRole(), QColor(0,255,0))
+                    self._find_msg.setText(f"{act_ws}/{tot_ws} window {act_win}-{act_win_to}/{tot_win}")
+                    p.setColor(self._find_msg.backgroundRole(), QColor(0,255,0))
                 else:
-                    self.find_msg.setText("Not found")
-                    p.setColor(self.find_msg.backgroundRole(), QColor(255,0,0))
+                    self._find_msg.setText("Not found")
+                    p.setColor(self._find_msg.backgroundRole(), QColor(255,0,0))
             else:
-                self.find_msg.setText("")
-                p.setColor(self.find_msg.backgroundRole(), QColor(0,0,0,0))
+                self._find_msg.setText("")
+                p.setColor(self._find_msg.backgroundRole(), QColor(0,0,0,0))
             print("SET PALETTE", p)
-            self.find_msg.setPalette(p)
+            self._find_msg.setPalette(p)
 
 
         def find_next(self, direction):
@@ -759,17 +765,17 @@ def qt_main():
             while True:
                 index += direction
                 try:
-                    w = self.workspaces[GUI_WORKSPACES_ORDER[index]]
+                    w = self._workspaces[GUI_WORKSPACES_ORDER[index]]
                 except IndexError:
                     return
-                if len(w.l_tree.find_matchs) > 0:
+                if len(w._tree.find_matchs) > 0:
                     self.change_focused_forkspace(w.master, w.slave)
                     print("FN", w.master, w.slave)
                     return
 
         @pyqtSlot()
         def find_changed(self):
-            s = self.find_input.text()
+            s = self._find_input.text()
             if len(s) >= 3:
                 self.find(s)
             else:
@@ -807,7 +813,7 @@ def qt_main():
                 if key == ord('?') and mod == SHIFT:
                     self.show_help()
                 elif mod == 0 and key == ord('R'): # Undocumented
-                    for i in self.workspaces.values():
+                    for i in self._workspaces.values():
                         i.metadata_changed()
                 elif mod == 0 and key == ord('T'):
                     self.load_i3_tree()
@@ -856,7 +862,7 @@ def qt_main():
                     self.find_next(1)
 
                 elif mod == 0 and key == ord('/'):
-                    self.find_input.setFocus()
+                    self._find_input.setFocus()
                 elif mod == 0 and key == 16777216:  # ESCAPE
                     with shared.lock.read:
                         w = get_workspace()
@@ -867,12 +873,12 @@ def qt_main():
             def keyPressEvent_find(key, mod):
                 if mod == 0 and key == 16777216:  # ESCAPE
                     self.clear_find()
-                    self.find_input.setText("")
+                    self._find_input.setText("")
                     self.find_error = None
                     self.set_find_msg()
-                    self.scroll.setFocus()
+                    self._scroll.setFocus()
                 elif mod == 0 and key == 16777220:  # ENTER
-                    self.scroll.setFocus()
+                    self._scroll.setFocus()
                 elif mod == 0 and key == Qt.Key_Up:
                     self.find_next(-1)
                 elif mod == 0 and key == Qt.Key_Down:
@@ -880,13 +886,13 @@ def qt_main():
                 else:
                     print("CMCT", mod, mod & ~CTRL)
                     keyPressEvent_main(key, mod & ~CTRL)
-            if app.focusWidget() == self.find_input:
+            if app.focusWidget() == self._find_input:
                 keyPressEvent_find(key, mod)
             else:
                 keyPressEvent_main(key, mod)
 
         def show_help(self):
-            self.help_window.show()
+            self._help_window.show()
 
         def move_to_gui_workspace(self):
             print(shared.i3.value.command(f'[id={int(self.winId())}] move container to workspace 0'))
