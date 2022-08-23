@@ -14,6 +14,13 @@ from dataclasses import dataclass
 import i3_workspace_util as util
 from i3_workspace_constants import *
 
+class I3CmdException(Exception):
+    def __init__(self, cmd, r, i):
+        super().__init__(f"{cmd}: {i.error}\n{i.__dict__}")
+        self.error = i.error
+        self.cmd = cmd
+        self.reply = r
+        self.reply_fail_part = i
 
 class Shared:
     output = None
@@ -42,5 +49,14 @@ class Shared:
             return otherwise()
         with self.lock.pause_only_read_if_locked():
             self.qt_thread_tasker.f(*arg)
+    
+    def i3_cmd(self, cmd):
+        print(cmd)
+        r = self.i3.value.command(cmd)
+        for i in r:
+            if not i.success:
+                print(i.__dict__)
+                raise I3CmdException(cmd, r, i)
+
 
 shared = Shared()

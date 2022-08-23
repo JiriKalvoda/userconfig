@@ -48,6 +48,9 @@ or on key `T` press.
 
 When you click on a workspace, you will be moved to it.
 When you click on a container or a window, it will be focused.
+On left-click on a container, layout will be changed.
+On middle-click on a container, floating will be toggled.
+You can use drag-and-drop for windows/containers or wholw workspaces.
 
 You can search for a window by its name by typing the query to the relevant
 input field (labeled find).
@@ -55,29 +58,42 @@ The query must contain at least 3 characters and it is interpreted as a
 case-insensitive regular expression.
 See <https://docs.python.org/3/library/re.html> for supported terms.
 
-The active workspace is marked by a red border. Most keyboard shortcuts are
-dispatched to the active workspace. Initially it is the last used workspace.
-You can switch the active workspace by keyboard shortcuts below.
+The active workspace is marked by a red border with bright red background.
+Most keyboard shortcuts are dispatched to the active workspace. Initially it is
+the last used workspace. You can switch the active workspace by keyboard
+shortcuts below.
 
 Shortcuts:
 ----------
 ?                - Show this help
 /                - Begin of search (start input mode)
-n                - Focus next workspace with matched window
-N                - Focus previous workspace with matched window
+n                - Next workspace with matched window will be active
+N                - Previous workspace with matched window will be active
 <DOWN> / <UP>
-or j / k         - Focus next / previous nonempty master
+or j / k         - Next / previous nonempty master will be active
 Shift + <DOWN> / <UP>
-or J / K - Focus next / previous master
+or J / K         - Next / previous master will be active
 <RIGHT> / <LEFT>
-or l / h         - Focus next / previous nonempty slave
+or l / h         - Next / previous nonempty slave will be active
 Shift + <RIGHT> / <LEFT>
-or L / H         - Focus next / previous slave
-<ENTER>          - Go to the focused workspace
+or L / H         - Focus next / previous slave will be active
+<ENTER>          - Go to the active workspace
 <ESC>            - Go to the previous used workspace
 w / e            - Increase / decrease screenshot size
-`, 1-9, 0, -, =  - Focus the corresponding slave
-F1-F12           - Focus the corresponding master
+`, 1-9, 0, -, =  - Active the corresponding slave
+F1-F12           - Active the corresponding master
+f<id>            - Focus window/container
+g<id>            - Move window/container to active workspace
+m<id><id><key>   - Move window/container near other container
+  where <key>: n       - move next to the container
+               i       - move in front of the container
+               h/v/t/s - move to new horizontal/vertical/tabbed/stacked layout
+               H/V/T/S - move to new layout before the target container
+               o       - expand (move all elements from source container) next to the container
+               m       - expand in front of
+               j/b/y/d - expand to new horizontal/vertical/tabbed/stacked layout
+               J/B/Y/D - expand to new layout before the target container
+                    (the second part is the same moved one key right)
 
 Shortcuts in search bar (input mode):
 -------------------------------------
@@ -95,6 +111,8 @@ Background color of the workspace name denotes the workspace output.
 
 Text color of workspace name is green if workspace is currently visible (on other output).
 Red is on current slave for some master and blue is on slave for master on any output.
+
+Window is red if it has urgen flag.
 """[1:-1]
 
 LICENSE = """

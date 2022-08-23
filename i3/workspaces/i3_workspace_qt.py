@@ -23,11 +23,18 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 import re
+import random
+import string
 
 from i3_workspace_shared import *
 from i3_workspace_lib import *
 import i3_workspace_help as help
 from i3_workspace_constants import *
+
+def p(x):
+    # print i3msg reply
+    for i in x:
+        print(i.__dict__)
 
 qtoverride = lambda x: x  # only documentation of code
 
@@ -178,6 +185,76 @@ class QNoArrowScrollArea(QScrollArea):
         else:
             super().keyPressEvent(event)
 
+class DragFeature(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.press_event_pos = None
+        self.press_event_buttons = None
+
+
+    @qtoverride
+    def mousePressEvent(self, event):
+        event.accept()
+        self.press_event_pos = event.pos()
+        self.press_event_buttons = event.buttons()
+
+    @qtoverride
+    def mouseReleaseEvent(self, event):
+        if self.press_event_pos is not None:
+            if (event.pos() - self.press_event_pos).manhattanLength() < QApplication.startDragDistance():
+                self.clicked(self.press_event_pos, self.press_event_buttons)
+            self.press_event_pos = None
+
+    @qtoverride
+    def mouseMoveEvent(self, event):
+        if self.press_event_pos is not None:
+            if (event.pos() - self.press_event_pos).manhattanLength() >= QApplication.startDragDistance():
+                self.drag(self.press_event_pos, self.press_event_buttons)
+                self.press_event_pos = None
+        event.accept()
+
+    def clicked(self, pos, buttons):
+        pass
+
+    def drag(self, pos, buttons):
+        d = QDrag(self)
+        mimeData = QMimeData()
+        d.setMimeData(mimeData)
+
+        dropAction = d.exec()
+
+def get_shortcuts(counts_by_priority):
+    max_depths = []
+    depth = 0
+    empty = 1
+    keys = "fjdkslaqpwoeirughtyvncmbxz"
+    ab_len = len(keys)
+    for i in counts_by_priority:
+        while 2 * i > empty: # use at most 1/2 of empty keys
+            depth += 1
+            empty *= ab_len
+        empty -= i
+        max_depths.append(depth)
+    to_use = [""]
+    to_use_index = 0
+    for count, max_depth in zip(counts_by_priority, max_depths):
+        for i in range(count):
+            d = max_depth
+            upgrade_eat_empty = (ab_len - 1) * ab_len**(depth - d)
+            if empty >= upgrade_eat_empty:
+                d -= 1
+                empty -= upgrade_eat_empty
+            while len(to_use[to_use_index]) < d:
+                to_use += [to_use[to_use_index] + x for x in keys]
+                to_use_index += 1
+            yield to_use[to_use_index]
+            to_use_index += 1
+            
+
+    reaming_options = len(keys)**max_depth
+    reaming_shortcuts = sum(counts_by_priority)
+
+
 
 def qt_main():
 
@@ -201,7 +278,6 @@ def qt_main():
 
     SCREENSHOTS_SIZES = [120, 150, 200, 250, 300, 400, 500, 750, 1000]
 
-    # An object containing methods you want to run in a thread
     class Tasker(QObject):
         do = pyqtSignal(object)
         func = {}
@@ -244,10 +320,13 @@ def qt_main():
             @func_add
             def screenshot_and_goto(n_master, n_slave, master, slave):
                 qt_workspace_widget_func(master, slave, lambda x: x.make_screenshot())
-                shared.i3.value.command(f'workspace {workspace(n_master, n_slave)}')
+                shared.i3_cmd(f'workspace {workspace(n_master, n_slave)}')
                 if (n_master, n_slave) == GUI_WORKSPACE:
                     m_win.move_to_gui_workspace()
 
+            @func_add
+            def screenshot(master, slave):
+                qt_workspace_widget_func(master, slave, lambda x: x.make_screenshot())
 
             @func_add
             def gui_focused():
@@ -258,66 +337,348 @@ def qt_main():
 
     shared.qt_thread_tasker = Tasker()
 
-    class I3NodeWidget(QWidget):
-        def __init__(self, t, parent=None):
+    class TmpWin(QWidget):
+        def __init__(self):
+            self.title = "i3-workspace-daemon-tmp-window-" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(15))
+            super().__init__()
+            self.setWindowTitle(self.title)
+            self.show()
+            self.id = int(self.winId())
+            shared.i3_cmd(f'[id={self.id}] move container to workspace tmp')
+
+
+    class I3NodeWidget(QFrame, DragFeature):
+        def __init__(self, t, workspace_widget, parent=None):
             super().__init__(parent)
+            self.workspace_widget = workspace_widget
             self.container_id = t.id
+            self.shortcut = None
+
+            self.setObjectName(f"{id(self)}");
+
+            self.setAcceptDrops(True)
+
+            self.dropPlace = None  # 0: top 1: mid 2: bottom
+            self.ignore_drop = False
+            self.marked = None
+
+        def focus(self):
+            shared.i3_cmd(f'[con_id={self.container_id}] focus')
+
+        def move_to_workspace(self, master, slave):
+            self.workspace_widget.screenshot_changed()
+            m_win._workspaces[(master, slave)].screenshot_changed()
+            shared.i3_cmd(f'[con_id={self.container_id}] move container to workspace {workspace(master, slave)}')
+
+        def expand_to_workspace(self, master, slave):
+            self.workspace_widget.screenshot_changed()
+            m_win._workspaces[(master, slave)].screenshot_changed()
+            if type(self) != I3InnerNodeWidget:
+                self.move_to_workspace(master, slave)
+            else:
+                marks = []
+                for (i, it) in enumerate(self.nodes):
+                    shared.i3_cmd(f'[con_id={it.container_id}] mark tmp_from_{i}')
+                    marks.append(f"tmp_from_{i}")
+                shared.i3_cmd(f'[con_mark="{"|".join(marks)}"] move container to to workspace {workspace(master, slave)}')
+
+        def move_to(self, target):
+            self.workspace_widget.screenshot_changed()
+            target.workspace_widget.screenshot_changed()
+            shared.i3_cmd(f'[con_id={target.container_id}] mark tmp')
+            shared.i3_cmd(f'[con_id={self.container_id}] move container to mark tmp')
+
+        def move_after(self, target):
+            self.workspace_widget.screenshot_changed()
+            target.workspace_widget.screenshot_changed()
+            if type(target) == I3WindowNodeWidget:
+                self.move_to(target)
+            else:
+                tmp_win = TmpWin()
+                shared.i3_cmd(f'[con_id={target.container_id}] swap container with id {tmp_win.id}')
+                shared.i3_cmd(f'[id={tmp_win.id}] mark tmp')
+                shared.i3_cmd(f'[con_id={self.container_id}] move container to mark tmp')
+                try:
+                    shared.i3_cmd(f'[con_id={target.container_id}] swap container with id {tmp_win.id}')
+                except I3CmdException:
+                    pass  # Could fail whem moving the only window from container to upper container
+
+        def move_before(self, target):
+            self.move_after(target)
+            target.move_after(self)
+            # target.move_to(self)
+            # if type(self) == I3InnerNodeWidget:
+                # p = target.parentWidget()
+                # print("A")
+                # if isinstance(p, I3InnerNodeWidget):
+                    # print("B")
+                    # target.move_to(p)
+
+
+        def expand_after(self, target):
+            self.workspace_widget.screenshot_changed()
+            target.workspace_widget.screenshot_changed()
+            if type(self) != I3InnerNodeWidget:
+                self.move_after(target)
+            else:
+                marks = []
+                for (i, it) in enumerate(self.nodes):
+                    shared.i3_cmd(f'[con_id={it.container_id}] mark tmp_from_{i}')
+                    marks.append(f"tmp_from_{i}")
+                if type(target) == I3WindowNodeWidget:
+                    tmp_win = TmpWin()
+                    shared.i3_cmd(f'[con_id={target.container_id}] swap container with id {tmp_win.id}')
+                    shared.i3_cmd(f'[id={tmp_win.id}] mark tmp')
+                else:
+                    shared.i3_cmd(f'[con_id={target.container_id}] mark tmp')
+                shared.i3_cmd(f'[con_mark="{"|".join(marks)}"] move container to mark tmp')
+                if type(target) == I3WindowNodeWidget:
+                    shared.i3_cmd(f'[con_id={target.container_id}] swap container with id {tmp_win.id}')
+
+        def expand_before(self, target):
+            if type(self) != I3InnerNodeWidget:
+                self.move_before(target)
+            else:
+                self.expand_after(target)
+                target.move_before(self.nodes[0])
+
+        def move_to_new_container_with(self, target, orientation=None, before=False, expand=False):
+            target.put_in_new_container(orientation)
+            getattr(self, f'{"expand" if expand else "move"}_{"before" if before else "after"}')(target)
+            #if before:
+            #    self.move_to(target)
+            #    t_new = shared.i3.value.get_tree()
+            #    container_id = t_new.find_by_id(target.container_id).parent.id
+            #    shared.i3_cmd(f'[con_id={container_id}] mark tmp')
+            #    if type(target) == I3InnerNodeWidget:
+            #        shared.i3_cmd(f'[con_id={self.container_id}] move container to mark tmp')
+            #        print("ZDE")
+            #    target.move_to(self)
+            #    if type(self) == I3InnerNodeWidget:
+            #        print("ZDE4")
+            #        shared.i3_cmd(f'[con_id={target.container_id}] move container to mark tmp')
+            #else:
+            #    if type(target) == I3WindowNodeWidget:
+            #        self.move_after(target)
+            #    else:
+            #        self.move_to(target)
+            #        t_new = shared.i3.value.get_tree()
+            #        container_id = t_new.find_by_id(target.container_id).parent.id
+            #        shared.i3_cmd(f'[con_id={container_id}] mark tmp')
+            #        shared.i3_cmd(f'[con_id={self.container_id}] move container to mark tmp')
+
+        def do_float(self, state=None):
+            self.workspace_widget.screenshot_changed()
+            shared.i3_cmd(f'[con_id={self.container_id}] floating { {None:"toggle", True:"enable", False:"disable"}[state] }')
+
+        def put_in_new_container(self, orientation=None):
+            if orientation is None:
+                shared.i3_cmd(f'[con_id={self.container_id}] split toggle')
+            elif orientation == "splith":
+                shared.i3_cmd(f'[con_id={self.container_id}] split horizontal')
+            elif orientation == "splitv":
+                shared.i3_cmd(f'[con_id={self.container_id}] split vertical')
+            else:
+                shared.i3_cmd(f'[con_id={self.container_id}] split vertical')
+                shared.i3_cmd(f'[con_id={self.container_id}] layout {orientation}')
+
+        def clicked(self, pos, buttons):
+            try:
+                if buttons == Qt.LeftButton:
+                    self.focus()
+                if buttons == Qt.MiddleButton:
+                    self.do_float()
+                    m_win.load_i3_tree()
+            except I3CmdException as e:
+                m_win.cmd_msg(e.error, QColor(255, 100, 100))
+                traceback.print_exc()
+                m_win.load_i3_tree()
+
+        def drag(self, pos, buttons):
+            d = QDrag(self)
+            mimeData = QMimeData()
+            d.setMimeData(mimeData)
+            self.marked = QColor(255,0,0)
+            self.redraw()
+
+            dropAction = d.exec()
+
+            self.marked = None
+            self.redraw()
+
 
         @qtoverride
-        def mousePressEvent(self, event):
-            print(event, type(event), event.pos(), int(event.flags()), event.buttons())
-            event.accept()
-            shared.i3.value.command(f'[con_id={self.container_id}] focus')
+        def dragEnterEvent(self, event):
+            s = event.source()
+            if s is not None and isinstance(s, WorkspaceWidget) or isinstance(s, I3NodeWidget):
+                self.ignore_drop = False
+                x = self
+                while x is not None:
+                    if x == s:
+                        self.ignore_drop = True
+                    x = x.parentWidget()
+                event.acceptProposedAction()
+
+
+        @qtoverride
+        def dropEvent(self, event):
+            if self.ignore_drop:
+                return
+            s = event.source()
+            if isinstance(s, WorkspaceWidget) or isinstance(s, I3NodeWidget):
+                m_win.cmd_msg_clean()
+                button = s.press_event_buttons
+                try:
+                    if isinstance(s, WorkspaceWidget):
+                        for f in s._tree.floating_nodes:
+                            f.move_to_workspace(self.workspace_widget.master, self.workspace_widget.slave)
+                        s = s._tree.root_node
+                        if s is None: return
+                    if s.press_event_buttons == Qt.RightButton:
+                        [s.expand_before, lambda self: s.move_to_new_container_with(self, expand=True), s.expand_after][self.drop_place](self)
+                    else:
+                        [s.move_before, s.move_to_new_container_with, s.move_after][self.drop_place](self)
+                    m_win.load_i3_tree()
+                    self.setStyleSheet(f"")
+                    self.redraw()
+                except I3CmdException as e:
+                    m_win.cmd_msg(e.error, QColor(255, 100, 100))
+                    traceback.print_exc()
+                    m_win.load_i3_tree()
+
+        @qtoverride
+        def dragLeaveEvent(self, event):
+            self.setStyleSheet(f"")
+            self.redraw()
+
+
+        @qtoverride
+        def dragMoveEvent(self, event):
+            event.acceptProposedAction()
+            if self.ignore_drop:
+                return
+            y = event.answerRect().center().y()
+            h = self.height()
+            if y < h//4:
+                self.drop_place = 0
+            elif y >= h - h//4:
+                self.drop_place = 2
+            else:
+                self.drop_place = 1
+            s = event.source()
+            if s is not None and isinstance(s, WorkspaceWidget) or isinstance(s, I3NodeWidget):
+                style = ["border-top: 3px solid green;", "background-color: green;", "border:no; border-bottom: 3px solid green;"][self.drop_place]
+                self.setStyleSheet(f"#{id(self)} {{ {style} }}");
 
     class I3WindowNodeWidget(I3NodeWidget):
-        def __init__(self, t, parent=None):
-            super().__init__(t, parent)
+        def __init__(self, t, workspace_widget, parent=None):
+            super().__init__(t, workspace_widget, parent)
             self._hlay = no_space(QHBoxLayout(self))
             self._name = QLabel(self)
             self.title = t.name
+            self.urgent = t.urgent
+            self.title_with_find = None
             self._title = QLabel(self)
-            self._title.setText(t.name)
             self.setAutoFillBackground(True)
             self.setLayout(self._hlay)
             self._hlay.addWidget(self._title)
+            self.redraw()
+
+        def redraw(self):
+            p = QPalette()
+            if self.title_with_find is not None:
+                t = self.title_with_find
+                p.setColor(self.backgroundRole(), QColor(255, 255, 0))
+            else:
+                t = self.title
+            if self.urgent:
+                p.setColor(self.foregroundRole(), QColor(255, 0, 0))
+            else:
+                p.setColor(self.foregroundRole(), QColor(0, 0, 0))
+            if self.marked is not None:
+                p.setColor(self.backgroundRole(), self.marked)
+            if self.shortcut is not None:
+                self._title.setText(f"[{self.shortcut}] {t}")
+            else:
+                self._title.setText(self.title)
+            self.setPalette(p)
+
+            
+
 
     class I3InnerNodeWidget(I3NodeWidget):
-        def __init__(self, t, parent=None):
-            super().__init__(t, parent)
+        def __init__(self, t, workspace_widget, parent=None):
+            super().__init__(t, workspace_widget, parent)
             self._hlay = no_space(QHBoxLayout(self))
             self._head = QLabel(self)
             self._list = no_space(QVBoxLayout())
+
+            self.setAutoFillBackground(True)
 
             self.setLayout(self._hlay)
             self._hlay.addWidget(self._head)
             self._hlay.addItem(self._list)
 
-            self._head.setText({
-                "splith": "H",
-                "splitv": "V",
-                "tabbed": "T",
-                "stacked": "S"
-            }.get(t.layout, "?"))
             self._head.setFixedWidth(13)
+            self.layout = t.layout
 
-            self.nodes = [i3_tree_widget_create(i, self) for i in t.nodes]
+            self.nodes = [i3_tree_widget_create(i, workspace_widget, self) for i in t.nodes]
             for i in self.nodes:
                 self._list.addWidget(i)
+            self.redraw()
 
-    def i3_tree_widget_create(t, parent):
+        def redraw(self):
+            p = QPalette()
+            p.setColor(self._head.foregroundRole(), QColor(0, 0, 0))
+            if self.marked is not None:
+                p.setColor(self.backgroundRole(), self.marked)
+            if self.shortcut is not None:
+                self._head.setText(f"{self.shortcut}")
+            else:
+                self._head.setText({
+                    "splith": "H",
+                    "splitv": "V",
+                    "tabbed": "T",
+                    "stacked": "S"
+                }.get(self.layout, "?"))
+            self.setPalette(p)
+
+        def change_layout(self, new_layout=None):
+            if new_layout is None:
+                new_layout = {
+                        "splith": "splitv",
+                        "splitv": "tabbed",
+                        "tabbed": "stacked",
+                        "stacked": "splith",
+                        }.get(self.layout, "splith")
+            shared.i3_cmd(f'[con_id={self.nodes[0].container_id}] layout {new_layout}')
+            self.layout = new_layout
+            self.redraw()
+
+        def clicked(self, pos, buttons):
+            if buttons == Qt.RightButton:
+                self.change_layout()
+            else:
+                super().clicked(pos, buttons)
+
+    def i3_tree_widget_create(t, workspace_widget, parent):
         if t.nodes:
-            return I3InnerNodeWidget(t, parent)
+            return I3InnerNodeWidget(t, workspace_widget, parent)
         else:
-            return I3WindowNodeWidget(t, parent)
+            return I3WindowNodeWidget(t, workspace_widget, parent)
 
     class I3TreeWidget(QWidget):
         def __init__(self, parent=None):
             super().__init__(parent)
+            self.workspace_widget = parent
             self._lay = no_space(QVBoxLayout(self))
             self.setLayout(self._lay)
+            self.root_node = None
+            self.floating_nodes = []
             self.all_inner_nides = []
             self.all_window_nodes = []
             self.find_matchs = []
+            self.container_id = None
 
         def clear(self):
             while (i := self._lay.takeAt(0)):
@@ -325,9 +686,14 @@ def qt_main():
             self.all_inner_nides = []
             self.all_window_nodes = []
             self.find_matchs = []
+            self.container_id = None
+            self.all_inner_nides = []
+            self.root_node = None
+            self.floating_nodes = []
 
         def set_tree(self, t):
             self.clear()
+            self.container_id = t.id
             def go(x):
                 if isinstance(x, I3WindowNodeWidget):
                     self.all_window_nodes.append(x)
@@ -335,45 +701,41 @@ def qt_main():
                     self.all_inner_nides.append(x)
                     for i in x.nodes:
                         go(i)
-            r = i3_tree_widget_create(t, self)
+            r = i3_tree_widget_create(t, self.workspace_widget, self)
+            self.root_node = r
             go(r)
             self._lay.addWidget(r)
             for i in t.floating_nodes:
                 for j in i.nodes:
-                    f = i3_tree_widget_create(j, self)
+                    f = i3_tree_widget_create(j, self.workspace_widget, self)
                     go(f)
                     self._lay.addWidget(f)
+                    self.floating_nodes.append(f)
 
         def find(self, r):
             for win in self.all_window_nodes:
-                m = r.search(win.title)
+                t = win.title
+                m = r.search(t)
                 if m:
                     span = m.span()
-
-                    t = win.title
-                    win._title.setText(t[:span[0]] + "<b>" + t[span[0]:span[1]] + "</b>" + t[span[1]:])
-                    p = QPalette()
-                    p.setColor(win.backgroundRole(), QColor(255,255,0))
-                    win.setPalette(p)
+                    win.title_with_find = t[:span[0]] + "<b>" + t[span[0]:span[1]] + "</b>" + t[span[1]:]
+                    win.redraw()
                     self.find_matchs.append((win, m))
 
         def clear_find(self):
             for win,m in self.find_matchs:
-                p = QPalette()
-                p.setColor(win.backgroundRole(), QColor(0,0,0,0))
-                win.setPalette(p)
-                win._title.setText(win.title)
+                win.title_with_find = None
+                win.redraw()
             self.find_matchs = []
 
 
 
-    class WorkspaceWidget(QFrame):
+    class WorkspaceWidget(QFrame, DragFeature):
         screenshot = None
         screenshot_is_old = False
         exist = False
 
         def __init__(self, master, slave, parent):
-            self.m_win = parent
             super().__init__(parent)
             self.setFrameShape(QFrame.Box)
             self.master = master
@@ -383,6 +745,8 @@ def qt_main():
             self._screenshot = QLabel(self)
             self._tree = I3TreeWidget(self)
 
+            self.setAutoFillBackground(True)
+            self._name.setAutoFillBackground(True)
 
             self._lay.addWidget(self._name)
             self._lay.addWidget(self._screenshot)
@@ -391,17 +755,17 @@ def qt_main():
             self.setLayout(self._lay)
             self._name.setAlignment(Qt.AlignCenter)
 
+            self.focused = False
+            self.on_primary_output = False
+            self.name_color = QColor(255, 255, 255)
 
             self.metadata_changed()
 
-        @qtoverride
-        def mousePressEvent(self, event):
-            print(event, type(event), event.pos(), int(event.flags()), event.buttons())
-            event.accept()
-            shared.i3.value.command(f'workspace {workspace(self.master, self.slave)}')
+            self.setAcceptDrops(True)
+
 
         def redraw_pic(self):
-            w = self.m_win.screenshot_size
+            w = m_win.screenshot_size
             self.setMaximumSize(w,2*w+1000)
             if self.exist:
                 if self.screenshot:
@@ -449,43 +813,84 @@ def qt_main():
             self.redraw_pic()
             self._tree.clear()
 
+        def redraw(self):
+            p = QPalette()
+            p_name = QPalette()
+            p_name.setColor(self._name.foregroundRole(), self.name_color)
+            if self.focused:
+                p.setColor(QPalette.WindowText, QColor(255, 0, 0))
+                p.setColor(self.backgroundRole(), QColor(255, 200, 200))
+            else:
+                if self.on_primary_output is not None:
+                    if self.on_primary_output:
+                        p_name.setColor(self._name.backgroundRole(), QColor(255, 255, 255))
+                    else:
+                        p_name.setColor(self._name.backgroundRole(), QColor(180, 180, 180))
+            self.setPalette(p)
+            self._name.setPalette(p_name)
+
         def metadata_changed(self):
             self._name.setText(f"<b>{workspace(self.master, self.slave)}")
-            p_name = QPalette()
-            p_name.setColor(QPalette.WindowText, QColor(0,0,0))
+            self.name_color = QColor(0, 0, 0)
 
-            self._name.setAutoFillBackground(True)
             with shared.lock.read:
                 try:
-                    if shared.outputs[shared.output_of_workspace[self.master][self.slave]].primary:
-                        p_name.setColor(QPalette.Window, QColor(255, 255, 255))
-                    else:
-                        p_name.setColor(QPalette.Window, QColor(180, 180, 180))
+                    self.on_primary_output = shared.outputs[shared.output_of_workspace[self.master][self.slave]].primary
                 except KeyError:
-                    pass
+                    self.on_primary_output = None
                 if (self.master, self.slave) in shared.workspace_on.values():
-                        p_name.setColor(QPalette.WindowText, QColor(0,255,0))
+                     self.name_color = QColor(0,255,0)
                 elif self.master is not None:
                     if shared.slave_for[self.master] == self.slave:
-                        p_name.setColor(QPalette.WindowText, QColor(255,0,0))
+                        self.name_color =  QColor(255,0,0)
                     else:
                         for x in shared.slave_on_for.values():
                             if x is not None and x[self.master] == self.slave:
-                                p_name.setColor(QPalette.WindowText, QColor(0,0,255))
-                                break
+                                self.name_color = QColor(0,0,255)
+            self.redraw()
 
-            self._name.setPalette(p_name)
 
         def parse_i3_tree(self, t):
-            s = ""
-            print(s)
             self._tree.set_tree(t)
 
-        def setColor(self, color):
-            pal = self.palette()
-            pal.setColor(QPalette.WindowText, color)
-            self.setPalette(pal)
+        def clicked(self, pos, buttons):
+            shared.i3_cmd(f'workspace {workspace(self.master, self.slave)}')
 
+        @qtoverride
+        def dragEnterEvent(self, event):
+            s = event.source()
+            if s is not None and isinstance(s, WorkspaceWidget) or isinstance(s, I3NodeWidget):
+                event.acceptProposedAction()
+
+        @qtoverride
+        def dropEvent(self, event):
+            s = event.source()
+            if isinstance(s, WorkspaceWidget) or isinstance(s, I3NodeWidget):
+                m_win.cmd_msg_clean()
+                button = s.press_event_buttons
+                try:
+                    if isinstance(s, WorkspaceWidget):
+                        for f in s._tree.floating_nodes:
+                            f.move_to_workspace(self.master, self.slave)
+                        s = s._tree.root_node
+                        if s is None: return
+                        if button == Qt.RightButton:
+                            s.expand_to_workspace(self.master, self.slave)
+                        else:
+                            if len(s.nodes) == 1:
+                                s.nodes[0].move_to_workspace(self.master, self.slave)
+                            else:
+                                s.move_to_workspace(self.master, self.slave)
+                    else:
+                        if button == Qt.RightButton:
+                            s.expand_to_workspace(self.master, self.slave)
+                        else:
+                            s.move_to_workspace(self.master, self.slave)
+                    m_win.load_i3_tree()
+                except I3CmdException as e:
+                    m_win.cmd_msg(e.error, QColor(255, 100, 100))
+                    traceback.print_exc()
+                    m_win.load_i3_tree()
 
     class TextShowWidget(QWidget):
         def __init__(self, text, parent=None):
@@ -600,6 +1005,10 @@ def qt_main():
             self._help_label = QPushButton(self)
             self._find_input = QLineEdit(self)
             self._find_msg = QLabel(self)
+            self._cmd_msg = QLabel(self)
+
+            self._cmd_msg.setFixedWidth(200)
+            self._cmd_msg.setAutoFillBackground(True)
             self._help_label.clicked.connect(self._find_msg_clicked)
 
             self._scroll.setWidgetResizable(True)
@@ -628,6 +1037,7 @@ def qt_main():
             self._bar_lay.addWidget(self._help_label)
             self._bar_lay.addWidget(self._find_input)
             self._bar_lay.addWidget(self._find_msg)
+            self._bar_lay.addWidget(self._cmd_msg)
             self._lay.addWidget(self._scroll)
             self._lay.addItem(self._bar_lay)
             self.setLayout(self._lay)
@@ -640,6 +1050,10 @@ def qt_main():
             self.find_error = None
             self.find_matchs = []
 
+            self.get_continuing_key = None
+            self.get_continuing_key_readed_keys = None
+            self.cmd_msg_show_get_continuing_key = False
+
             self._help_window = TextShowWidget(help.qt)
 
         @pyqtSlot(bool)
@@ -649,31 +1063,31 @@ def qt_main():
         def focus_workspace(self, n_master, n_slave):
             def f(x):
                 if self.focused_widget:
-                    self.focused_widget.setColor(QColor(0,0,0))
+                    self.focused_widget.focused = False
+                    self.focused_widget.redraw()
                 if n_slave <= MAX_MASTERED_SLAVE:
                     self.focused_master = n_master
                 self.focused_slave = n_slave
                 self.focused_widget = x
                 self._scroll.ensureWidgetVisible(x)
-                x.setColor(QColor(255,0,0))
+                x.focused = True
+                x.redraw()
                 if self.find_regex:
                     self.set_find_msg()
 
             qt_workspace_widget_func(n_master, n_slave, f)
 
         def change_focused_forkspace(self, *arg, **kvarg):
-            print("change_focused_forkspace", arg, kvarg, self.focused_master, self.focused_slave)
             with shared.lock.read:
                 try:
                     w = get_workspace(*arg, **kvarg, old_master=self.focused_master, old_slave=self.focused_slave, gui=True)
                 except WorkspaceOutOfRange:
                     osd.notify("No more workspaces", color="magenta", to='display', min_duration=0)
-                    print("change_focused_forkspace", "->", "ERR")
                     return
-            print("change_focused_forkspace", "->", w)
             self.focus_workspace(*w)
 
         def load_i3_tree(self):
+            self.end_get_continuing_key()
             def ppr(x, t, fl=False):
                 print("  "*t, "F" if fl else "", x.type, x.name, x.layout)
                 for y in x.nodes:
@@ -773,6 +1187,120 @@ def qt_main():
                     print("FN", w.master, w.slave)
                     return
 
+        def shortcuts_begin(self, cmd, fail=lambda: None, filter=lambda x: True, pre_filter=lambda x: True):
+            by_priority = [[] for i in range(2*2*3)]
+            shortcuts = {}
+            def priority(m, s):
+                if m == self.focused_master:
+                    if s == self.focused_slave:
+                        return 0
+                    return 1
+                return 2
+            for (m, s), w in self._workspaces.items():
+                for nd in w._tree.all_window_nodes:
+                    if pre_filter(nd):
+                        by_priority[(0 if nd.title_with_find else 6) + 2*priority(m, s)].append(nd)
+                for nd in w._tree.all_inner_nides:
+                    if pre_filter(nd):
+                        by_priority[6 + 2*priority(m, s)+1].append(nd)
+            gen = get_shortcuts([len(x) for x in by_priority])
+            for x in by_priority:
+                for nd in x:
+                    shortcut = next(gen)
+                    if filter(nd):
+                        nd.shortcut = shortcut
+                        shortcuts_node = shortcuts
+                        for c in nd.shortcut[:-1]:
+                            shortcuts_node.setdefault(c, {})
+                            shortcuts_node = shortcuts_node[c]
+                        shortcuts_node[nd.shortcut[-1]] = nd
+                        nd.redraw()
+
+            def shortcuts_go(key, mod):
+                nonlocal shortcuts
+                if key is None:
+                    shortcuts_end()
+                elif mod != 0 or not (ord('A') <= key and key <= ord('Z')):
+                    shortcuts_end()
+                else:
+                    c = chr(key).lower()
+                    if c not in shortcuts:
+                        shortcuts_end()
+                    else:
+                        for (i, nd) in shortcuts.items():
+                            if i == c:
+                                def go(x):
+                                    if type(x) == dict:
+                                        for i in x.values(): go(i)
+                                    else:
+                                        x.shortcut = x.shortcut[1:]
+                                        x.redraw()
+                                go(nd)
+                            else:
+                                def go(x):
+                                    if type(x) == dict:
+                                        for i in x.values(): go(i)
+                                    else:
+                                        x.shortcut = None
+                                        x.redraw()
+                                go(nd)
+                        shortcuts = shortcuts[c]
+                        if type(shortcuts) != dict:
+                            shortcuts_end(True)
+                            return cmd(shortcuts)
+                        return shortcuts_go
+
+            def shortcuts_end(success=False):
+                if not success:
+                    fail()
+                if shortcuts is not None:
+                    def go(x):
+                        if type(x) == dict:
+                            for i in x.values():
+                                go(i)
+                        else:
+                            x.shortcut = None
+                            x.redraw()
+                    go(shortcuts)
+            return shortcuts_go
+
+        def cmd_msg(self, msg, bg_color=None, is_get_continuing_key=False):
+            self.cmd_msg_show_get_continuing_key = is_get_continuing_key
+            self._cmd_msg.setText(msg)
+            p = QPalette()
+            if bg_color is not None:
+                p.setColor(self._cmd_msg.backgroundRole(), bg_color)
+            self._cmd_msg.setPalette(p)
+
+        def cmd_msg_clean(self):
+            if not self.cmd_msg_show_get_continuing_key:
+                self.cmd_msg("")
+
+        def begin_get_continuing_key(self, l, key, mod):
+            self.get_continuing_key = l
+            self.get_continuing_key_readed_keys = ""
+            self.append_key_to_cmd_msg(key, mod)
+
+        def end_get_continuing_key(self):
+            if self.get_continuing_key is not None:
+                self.get_continuing_key_readed_keys = None
+                if self.cmd_msg_show_get_continuing_key:
+                    self.cmd_msg("")
+                get_continuing_key = self.get_continuing_key  # Prevent cyclic recursion
+                self.get_continuing_key = None
+                get_continuing_key(None, None)
+
+        def append_key_to_cmd_msg(self, key, mod):
+            if mod != 0 or not (ord('A') <= key and key <= ord('Z')):
+                c = "?"
+            else:
+                c = chr(key).lower()
+                if mod & Qt.ShiftModifier != 0:
+                    c.upper()
+            self.get_continuing_key_readed_keys += c
+            self.cmd_msg(self.get_continuing_key_readed_keys + "...", QColor(200,200,255), is_get_continuing_key=True)
+
+
         @pyqtSlot()
         def find_changed(self):
             s = self._find_input.text()
@@ -781,14 +1309,13 @@ def qt_main():
             else:
                 self.clear_find()
 
-
-
         @qtoverride
         def closeEvent(self, event):
             event.ignore()
 
         @qtoverride
         def keyPressEvent(self, event):
+            MOD_KEYS = (16781694, 16777248, 16777249, 16777299, 16777251, 16777400)
             SHIFT = Qt.ShiftModifier
             CTRL = Qt.ControlModifier
             F_KEYS = {v: k+1 for k, v in enumerate([
@@ -804,15 +1331,88 @@ def qt_main():
             UP_KEYS = {ord('J'), Qt.Key_Up}
             DOWN_KEYS = {ord('K'), Qt.Key_Down}
             RIGHT_KEYS = {ord('L'), Qt.Key_Right}
+            ESCAPE = 16777216;
             print(event, type(event), event.text(), event.key(), int(event.modifiers()))
             mod = int(event.modifiers())
             key = int(event.key())
 
             event.accept()
+
+            if key not in MOD_KEYS:
+                self.cmd_msg_clean()
+
             def keyPressEvent_main(key, mod):
-                if key == ord('?') and mod == SHIFT:
+                if mod == 0 and self.get_continuing_key is not None and key == ESCAPE:
+                    self.end_get_continuing_key()
+                elif self.get_continuing_key is not None:
+                    if key not in MOD_KEYS:
+                        self.append_key_to_cmd_msg(key, mod)
+                        self.get_continuing_key = self.get_continuing_key(key, mod)
+                        if self.get_continuing_key is None:
+                            if self.cmd_msg_show_get_continuing_key:
+                                self.cmd_msg("")
+                elif key == ord('?') and mod == SHIFT:
                     self.show_help()
-                elif mod == 0 and key == ord('R'): # Undocumented
+                elif mod == 0 and key == ord('F'):
+                    self.begin_get_continuing_key(self.shortcuts_begin(lambda nd: nd.focus()), key, mod)
+                elif mod == 0 and key == ord('G'):
+                    def l(nd):
+                        nd.move_to_workspace(self.focused_master, self.focused_slave)
+                        self.load_i3_tree()
+                        self.cmd_msg("OK")
+                    self.begin_get_continuing_key(self.shortcuts_begin(l), key, mod)
+                elif mod == 0 and key == ord('M'):
+                    def l(nd_from):
+                        nd_from.marked = QColor(255,0,0);
+                        nd_from.redraw()
+                        def end():
+                            nd_from.marked = None
+                            nd_from.redraw()
+                        def ll(nd_to):
+                            nd_to.marked = QColor(0,255,0);
+                            nd_to.redraw()
+                            def lll(key, mod):
+                                nd_to.marked = None
+                                nd_to.redraw()
+                                end()
+                                if key is None:
+                                    return
+                                elif mod == 0 and key == ord('N'):
+                                    nd_from.move_after(nd_to)
+                                elif mod == 0 and key == ord('M'):
+                                    nd_from.expand_after(nd_to)
+                                elif mod == 0 and key == ord('I'):
+                                    nd_from.move_before(nd_to)
+                                elif mod == 0 and key == ord('O'):
+                                    nd_from.expand_before(nd_to)
+                                elif mod in [0, SHIFT] and key == ord('H'):
+                                    nd_from.move_to_new_container_with(nd_to, "splith", before=mod==SHIFT)
+                                elif mod in [0, SHIFT] and key == ord('V'):
+                                    nd_from.move_to_new_container_with(nd_to, "splitv", before=mod==SHIFT)
+                                elif mod in [0, SHIFT] and key == ord('T'):
+                                    nd_from.move_to_new_container_with(nd_to, "tabbed", before=mod==SHIFT)
+                                elif mod in [0, SHIFT] and key == ord('S'):
+                                    nd_from.move_to_new_container_with(nd_to, "stacked", before=mod==SHIFT)
+                                elif mod in [0, SHIFT] and key == ord('J'):
+                                    nd_from.move_to_new_container_with(nd_to, "splith", before=mod==SHIFT, expand=True)
+                                elif mod in [0, SHIFT] and key == ord('B'):
+                                    nd_from.move_to_new_container_with(nd_to, "splitv", before=mod==SHIFT, expand=True)
+                                elif mod in [0, SHIFT] and key == ord('Y'):
+                                    nd_from.move_to_new_container_with(nd_to, "tabbed", before=mod==SHIFT, expand=True)
+                                elif mod in [0, SHIFT] and key == ord('D'):
+                                    nd_from.move_to_new_container_with(nd_to, "stacked", before=mod==SHIFT, expand=True)
+                                self.load_i3_tree()
+                                self.cmd_msg("OK")
+                            return lll
+                        def filter(nd):
+                            while nd is not None:
+                                if nd == nd_from:
+                                    return False
+                                nd = nd.parentWidget()
+                            return True
+                        return self.shortcuts_begin(ll, fail=end, filter=filter)
+                    self.begin_get_continuing_key(self.shortcuts_begin(l), key, mod)
+                elif mod == 0 and key == ord('R'):  # Undocumented
                     for i in self._workspaces.values():
                         i.metadata_changed()
                 elif mod == 0 and key == ord('T'):
@@ -863,12 +1463,12 @@ def qt_main():
 
                 elif mod == 0 and key == ord('/'):
                     self._find_input.setFocus()
-                elif mod == 0 and key == 16777216:  # ESCAPE
+                elif mod == 0 and key == ESCAPE:  # ESCAPE
                     with shared.lock.read:
                         w = get_workspace()
-                    shared.i3.value.command(f'workspace {workspace(*w)}')
+                    shared.i3_cmd(f'workspace {workspace(*w)}')
                 elif mod == 0 and key == 16777220:  # ENTER
-                    shared.i3.value.command(f'workspace {workspace(self.focused_master, self.focused_slave)}')
+                    shared.i3_cmd(f'workspace {workspace(self.focused_master, self.focused_slave)}')
 
             def keyPressEvent_find(key, mod):
                 if mod == 0 and key == 16777216:  # ESCAPE
@@ -886,16 +1486,22 @@ def qt_main():
                 else:
                     print("CMCT", mod, mod & ~CTRL)
                     keyPressEvent_main(key, mod & ~CTRL)
-            if app.focusWidget() == self._find_input:
-                keyPressEvent_find(key, mod)
-            else:
-                keyPressEvent_main(key, mod)
+            try:
+                if app.focusWidget() == self._find_input:
+                    keyPressEvent_find(key, mod)
+                else:
+                    keyPressEvent_main(key, mod)
+            except I3CmdException as e:
+                self.end_get_continuing_key()
+                self.cmd_msg(e.error, QColor(255, 100, 100))
+                traceback.print_exc()
+                m_win.load_i3_tree()
 
         def show_help(self):
             self._help_window.show()
 
         def move_to_gui_workspace(self):
-            print(shared.i3.value.command(f'[id={int(self.winId())}] move container to workspace 0'))
+            print(shared.i3_cmd(f'[id={int(self.winId())}] move container to workspace 0'))
 
     m_win = MainWindow()
     m_win.show()

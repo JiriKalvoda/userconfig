@@ -47,11 +47,11 @@ def parse_workspace(w_str):
 
 def goto_workspace(n_master, n_slave):
     master, slave = shared.workspace_on[shared.output]
-    shared.qt_task("screenshot_and_goto", n_master, n_slave, master, slave) or shared.i3.value.command(f'workspace {workspace(n_master, n_slave)}')
+    shared.qt_task("screenshot_and_goto", n_master, n_slave, master, slave) or shared.i3_cmd(f'workspace {workspace(n_master, n_slave)}')
 
 
 def move_container(master, slave):
-    shared.i3.value.command(f'move container to workspace {workspace(master, slave)}')
+    shared.i3_cmd(f'move container to workspace {workspace(master, slave)}')
     shared.qt_task("ws_changed", master, slave)
 
 

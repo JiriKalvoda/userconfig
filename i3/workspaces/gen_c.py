@@ -62,7 +62,7 @@ for f in main_functions_list:
         need_argument = "action" not in kvargs
         short = args[0][1:]
         long = args[1][2:]
-        short_opts.append(args[0][1:] + ":" if need_argument else "")
+        short_opts.append(args[0][1:] + (":" if need_argument else ""))
         long_opts.append((long, b"required_argument" if need_argument else b"no_argument", None, char(short)))
         def assert_in(l):
             switch.append(f"case {c(char(short))}: {{")

@@ -106,19 +106,22 @@ int main(int argc, char ** argv)
 		puts(LICENSE);
 		exit(0);
 	}
-	check(argc, argv);
+	if(!strcmp(argv[arg_index], "-d"))
+		arg_index++;
+	else
+		check(argc, argv);
 	char buf[BLEN+10];
 	char * it = buf;
-	for(int i=1;i<argc;i++)
+	for(;arg_index<argc;arg_index++)
 	{
 		*it++ = '>';
-		for(int j=0; argv[i][j]; j++)
+		for(int j=0; argv[arg_index][j]; j++)
 		{
 			if(it >= buf+BLEN) die("Too long message");
-			if(argv[i][j]=='\n')
+			if(argv[arg_index][j]=='\n')
 				die("Unsupported char '\n' in arguments.");
 			else
-				*it++ = argv[i][j];
+				*it++ = argv[arg_index][j];
 		}
 		*it++ = '\n';
 	}
