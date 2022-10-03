@@ -1,6 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
+confln notmuch-config ~/.notmuch-config
 confln mailcap ~/.mailcap
 confln mailcap ~/.mime.types
 
