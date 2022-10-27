@@ -43,6 +43,7 @@
 \def\Ctrl{ctrl+}
 \def\Shift{shift+}
 \def\Super{Mod4+}
+\def\Alt{Mod1+}
 \def\Key#1#2#3{%
 #1\csname keyCodeK#2K#3\endcsname%
 }
@@ -55,17 +56,17 @@
 
 %%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % workspaces
-\def\GoWorkspace#1{\Cmd{i3-workspace goto-workspace -w #1}}
-\def\ContWorkspace#1{\Cmd{i3-workspace container-to -w #1}}
-\def\ContGoWorkspace#1{\Cmd{i3-workspace goto-with-container-to -w #1}}
+\def\GoWorkspace#1{\Cmd{i3-woman goto-workspace -w #1}}
+\def\ContWorkspace#1{\Cmd{i3-woman container-to -w #1}}
+\def\ContGoWorkspace#1{\Cmd{i3-woman goto-with-container-to -w #1}}
 
-\def\GoMasterWorkspace#1{\Cmd{i3-workspace goto-workspace -m #1}}
-\def\ContMasterWorkspace#1{\Cmd{i3-workspace container-to -m #1}}
-\def\ContGoMasterWorkspace#1{\Cmd{i3-workspace goto-with-container-to -m #1}}
+\def\GoMasterWorkspace#1{\Cmd{i3-woman goto-workspace -m #1}}
+\def\ContMasterWorkspace#1{\Cmd{i3-woman container-to -m #1}}
+\def\ContGoMasterWorkspace#1{\Cmd{i3-woman goto-with-container-to -m #1}}
 
-\def\GoSlaveWorkspace#1{\Cmd{i3-workspace goto-workspace -s #1}}
-\def\ContSlaveWorkspace#1{\Cmd{i3-workspace container-to -s #1}}
-\def\ContGoSlaveWorkspace#1{\Cmd{i3-workspace goto-with-container-to -s #1}}
+\def\GoSlaveWorkspace#1{\Cmd{i3-woman goto-workspace -s #1}}
+\def\ContSlaveWorkspace#1{\Cmd{i3-woman container-to -s #1}}
+\def\ContGoSlaveWorkspace#1{\Cmd{i3-woman goto-with-container-to -s #1}}
 
 \def\MoveWorkspace#1{\addoutput{ move workspace to output #1}}
 % Container
