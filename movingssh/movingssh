@@ -75,7 +75,8 @@ Parametrs:
 	-s	use moSh
 	-2	use second tunel (port number plus one)
 	-A	do not use key agent
-	-a	do not use key agent
+	-a	use key agent
+	-e	tunel ssh agEnt
 EOF
 	exit 0
 fi
@@ -147,12 +148,27 @@ keyFileCMD=""
 
 ####################### AGENT #######################################
 
+
+
 [[ "$minus" == *"a"* ]] && useAgent=true
 [[ "$minus" == *"A"* ]] && useAgent=false
 
+[[ "$minus" == *"e"* ]] && useAgent=false
 if $useAgent
 then
 	eval $(ssh-agent -s -t 30 | head -n2)
+	if [[ "$keyFile" != "" ]]
+	then
+		ssh-add "$keyFile"
+	fi
+fi
+
+if [[ "$minus" == *"e"* ]]
+then
+	eval $(ssh-agent -s)
+	agentTumelCMD="-A"
+	ssh-add ~/.ssh/id_ed25519
+	ssh-add ~/.ssh/id_rsa
 	if [[ "$keyFile" != "" ]]
 	then
 		ssh-add "$keyFile"
@@ -413,8 +429,8 @@ conect()
 		[[ "$minus" == *"m"* ]] && sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
 		[[ "$minus" == *"M"* ]] && sshfs -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
 	else
-		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyFileCMD $keyCMD $parametrs
-		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs
+		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyFileCMD $keyCMD $parametrs $agentTumelCMD
+		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs $agentTumelCMD
 		return $?
 	fi
 }
@@ -528,7 +544,9 @@ else
 	if [ $r = 255 ] || [ $r = 143 ]
 	then
 		debug START READ PIPE
-		if [ "$(head -n1 <&3)" == "YES" ]
+		from_pipe="$(head -n1 <&3)"
+		debug FROM PIPE "$from_pipe"
+		if [ "$from_pipe" == "YES" ]
 		then
 			debug END HEAD
 			parseAddresFile
