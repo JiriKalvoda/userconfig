@@ -301,7 +301,7 @@ endfunction
 "##%endfunction
 function! XournalLaunch()
 		"execute "AddExec ( xournalpp ".expand('<cfile>:p:r').".xopp; xournalpp ".expand('<cfile>:p:r').".xopp --create-pdf ".expand('<cfile>:p:r').".pdf ) 2>/dev/null >/dev/null & echo" 
-		execute "AddExec ~/bin/vim_launcher xournalppp ".expand('<cfile>')
+		execute "! ~/bin/vim_launcher xournalppp ".expand('<cfile>')
 endfunction
 
 function! RunTests(isVimRun)

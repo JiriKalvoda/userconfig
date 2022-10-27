@@ -12,6 +12,5 @@ if [[ "$type" == "xournalppp" ]]
 then
 	echo ZDE "$f.xopp"
 	[[ -e "$f.xopp" ]] || cp ~/.basicFile/basicFile.xopp "$f.xopp"
-	( ( xournalppp "$f.xopp" && xournalppp "$f.xopp" --create-pdf "$f.pdf" && osdc "Xournall pdf OK" ) || osdc --color=red "Xurnalpp error $?" ) >/dev/null 2>/dev/null &
+	( ( x "$f.xopp" ; x "$f.xopp" --create-pdf "$f.pdf"  ) || osdc --color=red "Xurnalpp error $?" ) >/dev/null 2>/dev/null &
 fi
-
