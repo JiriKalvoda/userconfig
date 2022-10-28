@@ -68,8 +68,8 @@ $lineUser
 Environment=HOME=$home
 Environment=PATH=$path
 ExecStart=$exePath $par
-Restart=always\n\
-RestartSec=10\n\
+Restart=always
+RestartSec=10
 $opt
 
 [Install]
