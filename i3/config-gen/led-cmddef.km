@@ -1,0 +1,97 @@
+led_names_prefix = ""
+
+def led_join_name(a, b):
+    if not a: return b
+    if not b: return a
+    return a + "/" + b
+
+def led_whole_name(names):
+    if isinstance(names, str):
+        return led_join_name(led_names_prefix, names)
+    else:
+        return [ led_whole_name(i) for i in names]
+
+@ACTION_INIT()
+def led_abstract(self, names):
+    if isinstance(names, str):
+        names = [names]
+    names = led_whole_name(names)
+    self.names = names
+
+led_abstract.prefix = lambda self: f'led "{" ".join(self.names)}" '
+
+class add_led_prefix:
+    def __init__(self, add):
+        self.add = add
+    def __enter__(self):
+        global led_names_prefix
+        self.old = led_names_prefix
+        led_names_prefix = led_join_name(led_names_prefix, self.add)
+        return self
+    def __exit__(self, exc_type, exc_value, exc_traceback):
+        led_names_prefix = self.old
+
+
+
+def action_intit_led(f):
+    def g(self, names, *arg, **kvarg):
+        led_abstract.__init__(self, names)
+        f(self, *arg, **kvarg)
+    g.__name__ = f.__name__
+    return ACTION_INIT(base=led_abstract)(g)
+
+
+@action_intit_led
+def led_light(self, light):
+    self.light = light
+
+@ACTION_IMPLEMENT(led_light)
+def f(self):
+    return CMD(self.prefix() + f"l {self.light}")
+
+@action_intit_led
+def led_color(self, light):
+    self.light = light
+
+@ACTION_IMPLEMENT(led_color)
+def f(self):
+    return CMD(self.prefix() + f"l {self.light}")
+
+def m_led_light(key, name, boost=0):
+    for i in range(4):
+        M(key(add_col=i), led_light(name, i))
+
+def m_led_color(key, name):
+    for i in range(4):
+        M(key(add_col=i), led_color(name, i))
+
+
+@ACTION_INIT()
+def mqtt_pub(self, mqtt_name, topic, text, retain=False):
+    self.mqtt_name = mqtt_name
+    self.topic = topic
+    self.text = text
+    self.retain = retain
+
+@ACTION_IMPLEMENT(mqtt_pub)
+def f(self):
+    return CMD(f"mqtt-pub{' -r' if self.retain else ''} '{self.mqtt_name}' '{self.topic}' '{self.text}'")
+
+def m_base_keys(name, boost=1):
+    m_led_light(K_F1, "", boost=boost)
+    M(K_F7, GO_MODE(led_set_mode("")))
+    m_led_color(K_F9, "")
+
+def led_mode(name):
+    mode = STD_MODE(f"LED-{led_whole_name(name)}", )
+    mode.connected_contexts.append(add_led_prefix(name))
+    with mode:
+        m_led_base_keys("")
+    return mode
+
+def led_set_mode(name):
+    mode = STD_MODE(f"LED-{led_whole_name(name)}-set", )
+    mode.connected_contexts.append(add_led_prefix(name))
+    with mode:
+        pass
+    return mode

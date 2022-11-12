@@ -1,0 +1,199 @@
+#!/bin/env keymap-i3
+
+def workspace_slave_all(k, workspace):
+    M(k.with_mod(SUPER), GOTO_WORKSPACE(slave=workspace))
+    M(k.with_mod(SUPER|SHIFT), CONT_WORKSPACE(slave=workspace))
+    M(k.with_mod(SUPER|CTRL), CONT_AND_GOTO_WORKSPACE(slave=workspace))
+    M(k.with_mod(SUPER|CTRL|SHIFT), SWAP_WORKSPACE(slave=workspace))
+
+def workspace_master_all(k, workspace):
+    M(k.with_mod(SUPER), GOTO_WORKSPACE(master=workspace))
+    M(k.with_mod(SUPER|SHIFT), CONT_WORKSPACE(master=workspace))
+    M(k.with_mod(SUPER|CTRL), CONT_AND_GOTO_WORKSPACE(master=workspace))
+    M(k.with_mod(SUPER|CTRL|SHIFT), SWAP_MASTER_WORKSPACE(master=workspace))
+
+def m_up(mod, *arg, **kvarg):
+    M(K_Up(mod), *arg, **kvarg)
+    M(K_K(mod), *arg, **kvarg)
+def m_left(mod, *arg, **kvarg):
+    M(K_Left(mod), *arg, **kvarg)
+    M(K_H(mod), *arg, **kvarg)
+def m_right(mod, *arg, **kvarg):
+    M(K_Right(mod), *arg, **kvarg)
+    M(K_L(mod), *arg, **kvarg)
+def m_down(mod, *arg, **kvarg):
+    M(K_Down(mod), *arg, **kvarg)
+    M(K_J(mod), *arg, **kvarg)
+
+
+def app_workspace(key, workspace, cmd):
+    M(key(SUPER), GOTO_WORKSPACE(workspace))
+    M(key(SUPER|SHIFT), AND(GOTO_WORKSPACE(workspace), CMD(cmd), main=1))
+    M(key(SUPER|CTRL), CONT_AND_GOTO_WORKSPACE(workspace))
+
+################ On start run ################
+EXEC_ON_STARTUP("xrdb ~/.Xresources")
+cmd_set_xkbmap = "setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch"
+EXEC_ON_STARTUP(cmd_set_xkbmap)
+EXEC_ON_STARTUP("sleep 2; osdd-run & sleep 1;osdc --color=red START")
+EXEC_ON_STARTUP("/usr/bin/gnome-keyring-deamon --start --components=secrets")
+EXEC_ON_STARTUP("numlockx on")
+EXEC_ON_STARTUP("sleep 5; terminal -e m-daemon")
+
+################ View option ################
+
+I3_DIRECT("""
+client.focused          #FF0000 #285577 #FFFFFF #FF0000   #FF0000
+client.focused_inactive #000000 #000000 #FFFFFF #000000   #000000
+client.unfocused        #000000 #000000 #888888 #000000   #000000
+client.urgent           #2F343A #900000 #FFFFFF #900000   #900000
+client.placeholder      #000000 #0C0C0C #FFFFFF #000000   #000000
+client.background       #FFFFFF
+for_window [class=".*"] border pixel 1
+font pango:monospace 9
+"""[1:-1])
+
+I3_DIRECT("""
+bar {
+        status_command "~/bin/i3csstatus i3 -c .config/i3/i3csstatus.conf -i 2>~/.i3csstatus.log"
+}
+"""[1:-1])
+
+
+################ Mouse ################
+I3_DIRECT("floating_modifier Mod4")
+
+with ADD_MODIFICATOR(SUPER):
+
+    ################ Standard workspaces ################
+    EXEC_ON_STARTUP("i3-woman exit; i3-woman-daemon --gui", always=True)
+    I3_DIRECT("""
+    for_window [title="^i3-woman$"] move to workspace 0
+    for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp
+    """[1:-1])
+
+    for i in range(13):
+        workspace_slave_all(KEY(1, i), i)
+
+    for i in range(1, 13):
+        workspace_master_all(KEY(0, i), i)
+
+    M(K("/"), WORKSPACE_GUI())
+    M(K("."), MOVE_WORKSPACE("next"))
+    M(K(","),            GOTO_WORKSPACE         (slave="alloc", notify=True))
+    M(K(",", SHIFT),      GOTO_WORKSPACE         (master="alloc", notify=True))
+    M(K(",", CTRL),       CONT_AND_GOTO_WORKSPACE(slave="alloc", notify=True))
+    M(K(",", SHIFT|CTRL), CONT_AND_GOTO_WORKSPACE(master="alloc", notify=True))
+    m_down (CTRL,       GOTO_WORKSPACE(master="next-skip", notify=True))
+    m_up   (CTRL,       GOTO_WORKSPACE(master="next-skip", notify=True))
+    m_left (CTRL,       GOTO_WORKSPACE(slave="next-skip", notify=True))
+    m_right(CTRL,       GOTO_WORKSPACE(slave="prev-skip", notify=True))
+    m_down (CTRL|SHIFT, GOTO_WORKSPACE(master="next", notify=True))
+    m_up   (CTRL|SHIFT, GOTO_WORKSPACE(master="next", notify=True))
+    m_left (CTRL|SHIFT, GOTO_WORKSPACE(slave="next-limit", notify=True))
+    m_right(CTRL|SHIFT, GOTO_WORKSPACE(slave="prev-limit", notify=True))
+
+    ################ WM Control  ################
+    M(K_V, SPLIT_CONT("splitv"))
+    M(K_G, SPLIT_CONT("splith"))
+    M(K_T, SPLIT_CONT("tabbed"))
+
+    M(K_E, LAYOUT_CONT("toogle split"))
+    M(K_S, LAYOUT_CONT("stacking"))
+    M(K_W, LAYOUT_CONT("tabbed"))
+
+    directions = ["left", "right", "up", "down"]
+
+    for d in directions:
+        locals()[f'm_{d}'](MODIFICATOR_NONE, FOCUS_CONT(d))
+        locals()[f'm_{d}'](SHIFT,            MOVE_CONT(d))
+
+
+    with M(K_R, GO_MODE(STD_MODE("resize"))).action.mode:
+        for d in directions:
+            locals()[f'm_{d}'](0, RESIZE_CONT(d, 12))
+            locals()[f'm_{d}'](SHIFT, RESIZE_CONT(d, 2))
+
+    M(K_Space, FOCUS_CONT("floating"))
+    M(K_A, FOCUS_CONT("parent"))
+    M(K_A(SHIFT), FOCUS_CONT("child"))
+
+    M(K_F,           CONT_TOGGLE("fullscreen"))
+    M(K_Space(SHIFT), CONT_TOGGLE("floating"))
+    M(K_Space(CTRL),  CONT_TOGGLE("sticky"))
+
+    M(K_R(SHIFT), RESTART_MANAGER())
+    M(K_R(CTRL|SHIFT), RESTART_MANAGER("v2"))
+    M(K_E(SHIFT), EXIT_PROG())
+    M(K_S(SHIFT), EXIT_SHUTDOWN())
+    M(K_S(CTRL), EXIT_SUSPEND())
+    M(K_R(CTRL), EXIT_RESTART())
+
+    M(K_P, CMD("~/.config/i3/i3-toggle-border"))
+
+    M(K_Q, CMD("~/.config/i3/i3-kill"))
+    M(K_Q(SHIFT), release_action=CMD("xkill"))
+    M(K_Q(CTRL), release_action=CMD("killall xkill"))
+
+    with M(K_ESC, GO_MODE(MODE("LOCK-MOD-ESC"))).action.mode:
+        M(K_ESC(SUPER), GO_MODE(GET_MODE(-2)))
+    with M(K_ESC(SHIFT), GO_MODE(MODE("LOCK-MOD-SHIFT-ESC"))).action.mode:
+        M(K_ESC(SUPER|SHIFT), GO_MODE(GET_MODE(-2)))
+
+    ################ APPS ################
+    # terminal
+    M(K_Enter, CMD("xdg-terminal"))
+    M(K_Not, CMD("terminal"))
+
+    # app launcher
+    M(K_D, CMD("rofi -show combi"))
+    M(K_D(CTRL), CMD("xfce-appfinder"))
+    M(K_D(SHIFT), CMD("dmenu_run"))
+    M(K_D(SHIFT|CTRL), CMD("xdg-terminal \"$(dmenu_path | dmenu)\""))
+
+    # web
+    M(K_C, CMD("chromium"))
+    M(K_C(SHIFT), CMD("chromium --incognito"))
+    M(K_C(CTRL|SHIFT), CMD("chromium --user-data-dir=$(mktemp -d)"))
+    M(K_C(CTRL), CMD("firefox"))
+
+    # Tea timer
+    I3_DIRECT("""
+    for_window [title="Tea Timer"] floating enable
+    for_window [title="Tea Timer"] sticky enable
+    """)
+    M(K(";"), CMD("tt"))
+    M(K(";")(SHIFT), CMD("tt 2:00"))
+    M(K(";")(CTRL), CMD("tt 3:00"))
+    M(K(";")(CTRL|SHIFT), CMD("tt 5:00"))
+
+    # Mail
+    I3_DIRECT('for_window [title="MAIL"] move container to workspace MAIL')
+    app_workspace(K_M, "MAIL", "terminal -e m-daemon")
+
+    # Zoom
+    I3_DIRECT("""
+    for_window [class="zoom"] move container to workspace ZOOM
+    for_window [title="^zoom$" class="zoom"] floating enable
+    for_window [title="Zoom - Free Account" class="zoom"] floating disable
+    """)
+    app_workspace(K_Z, "MAIL", "zoom")
+
+    # File browser
+    M(K_N, CMD("nemo"))
+
+    # Pasman
+    def bind_pasman(key, getter):
+        M(key, CMD(f"pasman-osd {getter} xall"))
+        M(key(SHIFT), CMD(f"pasman-osd {getter} xuser"))
+        M(key(CTRL), CMD(f"pasman-osd {getter} xpasswd"))
+
+    bind_pasman(K_U, "rofi")
+    bind_pasman(K_I, "clip")
+    bind_pasman(K_O, "chrome")
+    bind_pasman(K("["), "roficlip")
+    bind_pasman(K("]"), "rofichrome")
+
+    with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
+        LOAD("led-jug9-1.km")
+
