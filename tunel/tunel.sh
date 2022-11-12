@@ -41,7 +41,7 @@ do
 		do
 			sleep 10
 			echo DOING ECHO >&2
-			echo -n a
+			echo -n a || exit 0
 		done
 	) |  ssh $tunel $user@$server -oServerAliveInterval=300 "./bin/tunel-server -- $name port $port from \$SSH_CLIENT local $(myip) start at \$(date \"+%y-%m-%d %H:%M:%S\")"  &
 	pid_ssh=$!
