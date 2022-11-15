@@ -45,7 +45,7 @@ def SPLIT_CONT(self, argument):
     self.argument = argument
 @action_init()
 def LAYOUT_CONT(self, argument):
-    assert_in(argument, ["stacking", "tabbed", "splith", "splitv", "toogle split"])
+    assert_in(argument, ["stacking", "tabbed", "splith", "splitv", "toggle split"])
     self.argument = argument
 
 @action_init()
@@ -85,6 +85,7 @@ action_init("EXIT_PROG")()
 action_init("EXIT_SHUTDOWN")()
 action_init("EXIT_SUSPEND")()
 action_init("EXIT_RESTART")()
+action_init("EXIT_LOCK")()
 
 @action_implement("EXIT_SHUTDOWN")
 def f(self):
@@ -98,3 +99,43 @@ def f(self):
 @action_implement("EXIT_PROG")
 def f(self):
     return CONFIRM_CMD("i3-msg exit", "Do you really want to EXIT i3?")
+@action_implement("EXIT_LOCK")
+def f(self):
+    return CMD("xtrlock")
+
+@action_init()
+def LIGHT(self, raw=None, val=None, change=None):
+    self.raw = raw
+    self.val = val
+    self.change = change
+@action_implement("LIGHT")
+def f(self):
+    if self.raw is not None:
+        return CMD(f"light H {self.raw}; lightGUI")
+    if self.val is not None:
+        return CMD(f"light = {self.val}; lightGUI")
+    if self.change is not None:
+        if self.change >= 0:
+            return CMD(f"light + {self.change}; lightGUI")
+        else:
+            return CMD(f"light - {-self.change}; lightGUI")
+@action_init()
+def DISPLAY_POWER(self, val):
+    self.val = val
+@action_implement("DISPLAY_POWER")
+def f(self):
+    return CMD(f"echo {self.val} > /run/display_power")
+
+@action_init()
+def VOLUME(self, val=None, change=None):
+    self.val = val
+    self.change = change
+@action_implement("VOLUME")
+def f(self):
+    if self.val is not None:
+        return CMD(f"amixer sset Master -q {self.val*100}%; sleep 0.05; volumeGUI")
+    if self.change is not None:
+        if self.change >= 0:
+            return CMD(f"amixer sset Master -q {+self.change*100}%+; sleep 0.05; volumeGUI")
+        else:
+            return CMD(f"amixer sset Master -q {-self.change*100}%-; sleep 0.05; volumeGUI")

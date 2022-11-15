@@ -6,11 +6,12 @@ print(tex_template.template)
 
 def print_mod(mod):
     r = ""
-    if mod & Modificator.SHIFT: r = "Shift + " + r
-    if mod & Modificator.CTRL: r = "Ctrl+" + r
-    if mod & Modificator.SUPER: r = "Super+" + r
-    if mod & Modificator.ALT: r = "Alt+" + r
-    return r[:-1]
+    if mod & Modificator.SHIFT: r = "Shif " + r
+    if mod & Modificator.CTRL: r = "Ctr " + r
+    r += "$nl "
+    if mod & Modificator.SUPER: r = "Super " + r
+    if mod & Modificator.ALT: r = "Alt " + r
+    return r
 
 def te(x):
     return x.replace("[", "").replace("]", "").replace("$", "")
@@ -118,7 +119,7 @@ load_main()
 def print_keyboard(m, modificators):
     print(f"$def$modlist[")
     for modificator in modificators:
-        print(f"$modificatorbox[{modificator}]")
+        print(f"$modificatorbox[{print_mod(modificator)}]")
     print(f"]")
     for i,x in enumerate(m.map_by_keys()):
         for j,k in enumerate(x):

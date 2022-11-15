@@ -1,5 +1,5 @@
 from copy import copy
-import sys
+import sys, os
 import key_names
 
 
@@ -27,7 +27,9 @@ set_global("INF")(INF)
 
 
 @set_global()
-def load(fname, share_vars=False):
+def load(fname, share_vars=False, only_if_exists=False):
+    if only_if_exists and not os.path.exists(fname):
+        return
     vars = None
     if share_vars:
         vars = load_stack[-1].vars
