@@ -120,11 +120,11 @@ def f(self):
         else:
             return CMD(f"light - {-self.change}; lightGUI")
 @action_init()
-def DISPLAY_POWER(self, val):
+def MONITOR_POWER(self, val):
     self.val = val
-@action_implement("DISPLAY_POWER")
+@action_implement("MONITOR_POWER")
 def f(self):
-    return CMD(f"echo {self.val} > /run/display_power")
+    return CMD(f"echo {self.val} > /run/monitor_power")
 
 @action_init()
 def VOLUME(self, val=None, change=None):
