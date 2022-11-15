@@ -55,7 +55,7 @@ def led_color(self, light):
 
 @ACTION_IMPLEMENT(led_color)
 def f(self):
-    return CMD(self.prefix() + f"l {self.light}")
+    return CMD(self.prefix() + f"c {self.light}")
 
 def m_led_light(key, name, boost=0):
     for i in range(4):

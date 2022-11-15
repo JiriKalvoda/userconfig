@@ -1,5 +1,7 @@
 #!/bin/env keymap-i3
 
+LOAD("local.km", only_if_exists=True)
+
 def workspace_slave_all(k, workspace):
     M(k.with_mod(SUPER), GOTO_WORKSPACE(slave=workspace))
     M(k.with_mod(SUPER|SHIFT), CONT_WORKSPACE(slave=workspace))
@@ -98,7 +100,7 @@ with ADD_MODIFICATOR(SUPER):
     M(K_G, SPLIT_CONT("splith"))
     M(K_T, SPLIT_CONT("tabbed"))
 
-    M(K_E, LAYOUT_CONT("toogle split"))
+    M(K_E, LAYOUT_CONT("toggle split"))
     M(K_S, LAYOUT_CONT("stacking"))
     M(K_W, LAYOUT_CONT("tabbed"))
 
@@ -128,6 +130,7 @@ with ADD_MODIFICATOR(SUPER):
     M(K_S(SHIFT), EXIT_SHUTDOWN())
     M(K_S(CTRL), EXIT_SUSPEND())
     M(K_R(CTRL), EXIT_RESTART())
+    M(K_E(CTRL), EXIT_LOCK())
 
     M(K_P, CMD("~/.config/i3/i3-toggle-border"))
 
@@ -139,6 +142,21 @@ with ADD_MODIFICATOR(SUPER):
         M(K_ESC(SUPER), GO_MODE(GET_MODE(-2)))
     with M(K_ESC(SHIFT), GO_MODE(MODE("LOCK-MOD-SHIFT-ESC"))).action.mode:
         M(K_ESC(SUPER|SHIFT), GO_MODE(GET_MODE(-2)))
+
+    with M(K_X, GO_MODE(STD_MODE("System-modifikator"))).action.mode:
+        M(KEY(2,1), LIGHT(raw=0))
+        M(KEY(2,2), LIGHT(change=-0.9))
+        M(KEY(2,3), LIGHT(change=-0.15))
+        M(KEY(2,4), LIGHT(change=+0.15))
+        M(KEY(2,5), LIGHT(change=+0.9))
+
+        M(KEY(3,1), VOLUME(val=0))
+        M(KEY(3,2), VOLUME(change=-0.1))
+        M(KEY(3,3), VOLUME(change=-0.02))
+        M(KEY(3,4), VOLUME(change=+0.02))
+        M(KEY(3,5), VOLUME(change=+0.1))
+
+
 
     ################ APPS ################
     # terminal
