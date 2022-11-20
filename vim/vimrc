@@ -329,6 +329,8 @@ function! Run(isVimRun,input)
 	let s = Syntax()
 	if s == "cpp"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
+	elseif s == "run"
+		execute "AddExec ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "c"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
 	elseif s == "sh"

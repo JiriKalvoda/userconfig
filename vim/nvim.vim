@@ -7,6 +7,7 @@ se ls=0
 function! ExecHere()
 	AddBash
 	execute "tabnew | terminal ".g:toExec."echo"
+	tabm -1
 	normal i
 	let g:toExec = ""
 endfunction
