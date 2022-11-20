@@ -206,9 +206,9 @@ run(){
 	$@;
 }
 zath(){
-	for i in $@
+	for i in "$@"
 	do
-		zathura $i & sleep 0.2
+		zathura "$i" & sleep 0.2
 	done
 }
 
