@@ -77,7 +77,6 @@ template = r"""
 {
 \def\ModeName{#1}
 #2
-\PrintKeyboard
 \vfil \break
 }
 }
@@ -219,8 +218,7 @@ template = r"""
 
 \def\isFirstPrintKeyboard{1}
 
-\def\PrintKeyboard#1{
-\ex\def\ex\localAllMod\ex{#1}
+\def\PrintKeyboard{
 \if\isFirstPrintKeyboard 1
 \def\isFirstPrintKeyboard{0}
 {\hhdfont \ModeName }%

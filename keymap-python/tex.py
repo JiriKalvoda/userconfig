@@ -131,11 +131,17 @@ def print_keyboard(m, modificators):
                 else:
                     print("$printemptykey")
             print(f"]")
+    print("$PrintKeyboard")
     
 
 for m in all_modes:
     print(f'$Mode[{te(m.name)}][')
-    print_keyboard(m, m.used_modificators())
+    used_modificators = m.used_modificators()
+    if len(used_modificators)>4:
+        print_keyboard(m, [x for x in used_modificators if not x & Modificator.SUPER])
+        print_keyboard(m, [x for x in used_modificators if x & Modificator.SUPER])
+    else:
+        print_keyboard(m, used_modificators)
     print(f"]")
 
 

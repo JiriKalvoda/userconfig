@@ -7,6 +7,7 @@ class KeyMapException(Exception):
     pass
 
 g = {}
+g_ph = {}
 modes_stack = []
 all_modes = []
 
@@ -19,6 +20,18 @@ def set_global(name=None):
                 name = name[len("GLOBAL__"):]
         assert name not in g
         g[name] = f
+        return f
+    return l
+
+def set_global_ph(name=None):
+    def l(f):
+        nonlocal name
+        if name is None:
+            name = f.__name__
+            if name.startswith("ph_"):
+                name = name[len("ph_"):]
+        assert name not in g_ph
+        g_ph[name] = f
         return f
     return l
 
@@ -85,6 +98,9 @@ class Key(KeyAbstract):
         if add_mod: dup.mod |= add_mod
         if add_col: dup.col += add_col
         return dup
+    
+    def __repr__(self):
+        return f"K({self.row}, {self.col}, {self.mod})"
 
 
 @set_global("K")
@@ -125,6 +141,22 @@ def exec_on_startup(cmd, always=False):
 def get_mode(index=-1):
     return modes_stack[index]
 
+post_hooks = []
+
+@set_global()
+class PostHook():
+    def __init__(self, priority, func, print_name=None):
+        if print_name is None:
+            print_name = lambda: func.__name__()
+        self.print_name = print_name
+        self.priority = priority
+        self.func = func
+        post_hooks.append(self)
+    
+    def __repr__(self):
+        return f"PostHook with prioroty {self.priority}: {self.print_name()}"
+
+
 @set_global()
 class Mode:
     def __init__(self, name):
@@ -132,9 +164,13 @@ class Mode:
         self.key_changer = lambda x:x
         self.name = name
         self.table = []
+        self.id = len(all_modes)
         if name in [x.name for x in all_modes]:
             raise KeyMapException(f"Duplicit mode name {name}")
         all_modes.append(self)
+
+    def __repr__(self):
+        return f"<mode {self.name}>"
 
     def __enter__(self):
         modes_stack.append(self)
@@ -203,12 +239,13 @@ def mode_by_name(name):
 
 
 @set_global()
-def std_mode(name):
+def std_mode(name, propagate_threshold=1):
     m = Mode(name)
     m.parrent = get_mode()
     with m:
         KeyMap(g["K_ESC"], g["GO_MODE"](g["ROOT_MODE"]))
         KeyMap(g["K_Enter"], g["GO_MODE"](m.parrent))
+        add_post_hook(0)(ph_propagate, propagate_threshold)
     return m
 
 
@@ -217,7 +254,7 @@ class KeyMap():
     def __init__(self, key, press_action=None, release_action=None, mode=None, propagate=0):
         action = press_action or release_action
         self.propagate = propagate
-        if mode==None:
+        if mode is None:
             mode = get_mode()
         key = mode.key_changer(key)
         self.key = key
@@ -225,9 +262,28 @@ class KeyMap():
         self.press_action = press_action
         self.release_action = release_action
         if key in [x.key for x in mode.table]:
-            raise KeyMapException(f"Duplicit map of key {key} in {mode} mode")
+            raise KeyMapException(f"Duplicit map of key {key} in {mode}")
         mode.table.append(self)
 
+@set_global()
+def add_post_hook(nice, new_mode_first=False, mode=None):
+    def l(func, *arg, **kvarg):
+        if isinstance(func, str):
+            func = g_ph[func]
+        nonlocal mode
+        if mode is None:
+            mode = get_mode()
+        id = len(post_hooks)
+        priority = (nice, -mode.id-1 if new_mode_first else mode.id, id)
+        PostHook(priority, lambda: func(mode, *arg, **kvarg), lambda: f"function {func.__name__} for {mode}")
+    return l
+
+@set_global_ph()
+def ph_propagate(mode, threshold, gnore_duplicit=True):
+    with mode:
+        for i in mode.parrent.table:
+            if i.propagate >= threshold:
+                KeyMap(key=i.key, press_action=i.press_action, release_action=i.release_action, propagate=i.propagate)
 
 def create_load_globals():
     return g.copy()
@@ -239,13 +295,17 @@ def load_main():
     with Mode("") as root_mode:
         set_global("ROOT_MODE")(root_mode)
         load(sys.argv[1])
+    post_hooks.sort(key=lambda x: x.priority)
+    for ph in post_hooks:
+        print_stderr("Running",ph)
+        ph.func()
 
 
 class Action():
     pass
 
-@set_global()
-def global__print(*arg, **kvarg):
+@set_global("PRINT")
+def print_stderr(*arg, **kvarg):
     print(*arg, **kvarg, file=sys.stderr)
 
 @set_global()
