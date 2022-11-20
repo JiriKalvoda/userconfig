@@ -65,6 +65,10 @@ bar {
 ################ Mouse ################
 I3_DIRECT("floating_modifier Mod4")
 
+M(K_PrtSc,CMD("maim -suo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"), propagate=100)
+M(K_PrtSc(SHIFT),CMD("maim -uo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"), propagate=100)
+M(K_PrtSc(SUPER),CMD("maim -uo > ~/screenshot.png && gimp ~/screenshot.png"), propagate=100)
+
 with ADD_MODIFICATOR(SUPER):
 
     ################ Standard workspaces ################
