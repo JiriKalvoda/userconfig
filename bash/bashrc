@@ -659,3 +659,8 @@ aux()
 }
 
 unset MAILCHECK
+
+lpl()
+{
+	lp -o Duplex=DuplexTumble -o XRFold=BiFoldStaple -o XROutputMode=HighResolution "$@"
+}
