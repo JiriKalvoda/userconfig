@@ -38,6 +38,20 @@ def set_global_ph(name=None):
 INF = 1000
 set_global("INF")(INF)
 
+@set_global()
+def which(cmd):
+    import shutil
+    return shutil.which(cmd)
+
+@set_global()
+def alternatives(*cmds_list):
+    for i in cmds_list:
+        if which(i.split()[0]):
+            return i
+    print_stderr(f"Warning: No working alternative for [{'|'.join(cmds_list)}]")
+    return i[0]
+
+
 
 @set_global()
 def load(fname, share_vars=False, only_if_exists=False):

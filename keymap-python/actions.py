@@ -10,6 +10,39 @@ def CMD(self, cmd):
     self.cmd = cmd
 
 @action_init()
+def TERMINAL_ABSTRACT(self, cmd=None, wd=None):
+    self.cmd = cmd
+    self.wd = wd
+
+@set_global()
+def action_init_terminal(f):
+    def g(self, cmd=None, wd=None, *arg, **kvarg):
+        TERMINAL_ABSTRACT.__init__(self, cmd, wd)
+        f(self, *arg, **kvarg)
+    g.__name__ = f.__name__
+    return action_init(base=TERMINAL_ABSTRACT)(g)
+
+@action_init_terminal
+def TERMINAL(self, terminal_type=0):
+    self.terminal_type = terminal_type
+
+@action_init_terminal
+def TERMINAL_TERMINAL(self):
+    pass
+
+@action_implement("TERMINAL")
+def f(self):
+    return TERMINAL_TERMINAL(self.cmd, self.wd)
+
+@action_implement("TERMINAL_TERMINAL")
+def f(self):
+    if self.cmd is None:
+        # TODO expand
+        return CMD(f"terminal -e bash -c '{self.cmd}'")
+    return CMD(f"terminal")
+
+
+@action_init()
 def GO_MODE(self, mode):
     print(mode, file=sys.stderr)
     if isinstance(mode, str):
