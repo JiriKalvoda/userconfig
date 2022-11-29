@@ -30,17 +30,17 @@ def m_down(mod, *arg, **kvarg):
 
 def app_workspace(key, workspace, cmd):
     M(key(SUPER), GOTO_WORKSPACE(workspace))
-    M(key(SUPER|SHIFT), AND(GOTO_WORKSPACE(workspace), CMD(cmd), main=1))
+    M(key(SUPER|SHIFT), AND(GOTO_WORKSPACE(workspace), cmd, main=1))
     M(key(SUPER|CTRL), CONT_AND_GOTO_WORKSPACE(workspace))
 
 ################ On start run ################
-EXEC_ON_STARTUP("xrdb ~/.Xresources")
-cmd_set_xkbmap = "setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch"
+EXEC_ON_STARTUP(CMD("xrdb ~/.Xresources"))
+cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch")
 EXEC_ON_STARTUP(cmd_set_xkbmap)
-EXEC_ON_STARTUP("sleep 2; osdd-run & sleep 1;osdc --color=red START")
-EXEC_ON_STARTUP("/usr/bin/gnome-keyring-deamon --start --components=secrets")
-EXEC_ON_STARTUP("numlockx on")
-EXEC_ON_STARTUP("sleep 5; terminal -e m-daemon")
+EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
+EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
+EXEC_ON_STARTUP(CMD("numlockx on"))
+EXEC_ON_STARTUP(TERMINAL("m-daemon"))
 
 ################ View option ################
 
@@ -72,12 +72,6 @@ M(K_PrtSc(SUPER),CMD("maim -uo > ~/screenshot.png && gimp ~/screenshot.png"), pr
 with ADD_MODIFICATOR(SUPER):
 
     ################ Standard workspaces ################
-    EXEC_ON_STARTUP("i3-woman exit; i3-woman-daemon --gui", always=True)
-    I3_DIRECT("""
-    for_window [title="^i3-woman$"] move to workspace 0
-    for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp
-    """[1:-1])
-
     for i in range(13):
         workspace_slave_all(KEY(1, i), i)
 
@@ -164,19 +158,19 @@ with ADD_MODIFICATOR(SUPER):
 
     ################ APPS ################
     # terminal
-    M(K_Enter, CMD("xdg-terminal"))
-    M(K_Not, CMD("terminal"))
+    M(K_Enter, TERMINAL(1))
+    M(K_Not, TERMINAL(0))
 
     # app launcher
-    M(K_D, CMD("rofi -show combi"))
+    M(K_D, CMD(ALTERNATIVES("rofi -show combi", "dmenu_run")))
     M(K_D(CTRL), CMD("xfce-appfinder"))
     M(K_D(SHIFT), CMD("dmenu_run"))
-    M(K_D(SHIFT|CTRL), CMD("xdg-terminal \"$(dmenu_path | dmenu)\""))
+    M(K_D(SHIFT|CTRL), TERMINAL("\"$(dmenu_path | dmenu)\""))
 
     # web
-    M(K_C, CMD("chromium"))
-    M(K_C(SHIFT), CMD("chromium --incognito"))
-    M(K_C(CTRL|SHIFT), CMD("chromium --user-data-dir=$(mktemp -d)"))
+    M(K_C, CMD(ALTERNATIVES("chromium", "google-chrome", "firefox")))
+    M(K_C(SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --incognito"))
+    M(K_C(CTRL|SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --user-data-dir=$(mktemp -d)"))
     M(K_C(CTRL), CMD("firefox"))
 
     # Tea timer
@@ -191,7 +185,7 @@ with ADD_MODIFICATOR(SUPER):
 
     # Mail
     I3_DIRECT('for_window [title="MAIL"] move container to workspace MAIL')
-    app_workspace(K_M, "MAIL", "terminal -e m-daemon")
+    app_workspace(K_M, "MAIL", TERMINAL("m-daemon"))
 
     # Zoom
     I3_DIRECT("""
@@ -199,7 +193,7 @@ with ADD_MODIFICATOR(SUPER):
     for_window [title="^zoom$" class="zoom"] floating enable
     for_window [title="Zoom - Free Account" class="zoom"] floating disable
     """)
-    app_workspace(K_Z, "MAIL", "zoom")
+    app_workspace(K_Z, "ZOOM", CMD("zoom"))
 
     # File browser
     M(K_N, CMD("nemo"))
