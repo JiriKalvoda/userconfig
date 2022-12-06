@@ -95,7 +95,7 @@ def f(self):
     if self.variant == "v2":
         return "restart"
     else:
-        return "exec "+cmd_expand(f"cd ~/.config/i3/; terminal -e bash -c './config-gen > config-tmp && mv config-tmp config && i3-msg restart || read'")
+        return g["TERMINAL"]('./config-gen > config-tmp && mv config-tmp config && i3-msg restart || read', wd="~/.config/i3").serialize()
 @action_implement("EXIT_PROG")
 def f(self):
     return g["CONFIRM_CMD"]("i3-msg exit", "Do you really want to EXIT i3?")
@@ -104,7 +104,7 @@ def f(self):
 load_main()
 if have_i3_woman:
     with g["ROOT_MODE"]:
-        exec_on_startup(g["CMD"]("i3-woman exit; i3-woman-daemon --gui"), always=True)
+        exec_on_startup(g["CMD"]("i3-woman exit;sleep 0.1;i3-woman exit;sleep 0.1;i3-woman-daemon --gui"), always=True)
         i3_direct("""
         for_window [title="^i3-woman$"] move to workspace 0
         for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp
@@ -136,7 +136,7 @@ for m in all_modes:
             if isinstance(i.key, ExecOnStartupMapper):
                 x = i.action
                 while not isinstance(x, g["CMD"]): x = x.implement()
-                print(tabs+f"exec{'_always' if i.key.always else ''} {cmd_expand(i.action.cmd)}")
+                print(tabs+f"exec{'_always' if i.key.always else ''} {cmd_expand(x.cmd)}")
 
     if m.name=="":
         print_mode("")

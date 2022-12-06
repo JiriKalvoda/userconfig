@@ -6,6 +6,13 @@ def AND(self, *arg, main=0):
     self.main = main
 
 @action_init()
+def ROOT_MODE_AND(self, action):
+    self.action = action
+@action_implement("ROOT_MODE_AND")
+def f(self):
+    return AND(GO_MODE(g["ROOT_MODE"]), self.action)
+
+@action_init()
 def CMD(self, cmd):
     self.cmd = cmd
 
@@ -32,14 +39,17 @@ def TERMINAL_TERMINAL(self):
 
 @action_implement("TERMINAL")
 def f(self):
-    return TERMINAL_TERMINAL(self.cmd, self.wd)
+    return TERMINAL_TERMINAL(cmd=self.cmd, wd=self.wd)
 
 @action_implement("TERMINAL_TERMINAL")
 def f(self):
-    if self.cmd is None:
+    cmd = "terminal"
+    if self.wd is not None:
+        cmd += f" --working-directory {self.wd}"
+    if self.cmd is not None:
         # TODO expand
-        return CMD(f"terminal -e bash -c '{self.cmd}'")
-    return CMD(f"terminal")
+        return CMD(f"{cmd} -e bash -c '{self.cmd}'")
+    return CMD(f"{cmd}")
 
 
 @action_init()

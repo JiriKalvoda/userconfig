@@ -65,9 +65,26 @@ bar {
 ################ Mouse ################
 I3_DIRECT("floating_modifier Mod4")
 
+################ PrintScreen ################
 M(K_PrtSc,CMD("maim -suo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"), propagate=100)
 M(K_PrtSc(SHIFT),CMD("maim -uo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"), propagate=100)
 M(K_PrtSc(SUPER),CMD("maim -uo > ~/screenshot.png && gimp ~/screenshot.png"), propagate=100)
+
+################ OSD ################
+for k in [K_Not, K_BackSlash(SUPER)]:
+	M(k,CMD('osdc --duration=1 --output=loglast ""'))
+	M(k(SHIFT),CMD('osdc --cmd-now=skip --do-not-que= --output=no --duration=1 ""'))
+	M(k(CTRL),CMD('osd-clock --output=display'))
+	M(k(CTRL+SHIFT),TERMINAL('tail -n500 ~/.osdd_log;read'))
+
+################ PLAYERCTL ################
+M(K_X(SUPER+SHIFT), CMD("playerctl play-pause"))
+
+################ PLAYERCTL ################
+M(K_PlayPause, CMD("playerctl play-pause"))
+M(K_PlayPause2, CMD("playerctl play-pause"))
+M(K_PlayPause3, CMD("playerctl play-pause"))
+M(K_Next, CMD("playerctl play-pause"))
 
 with ADD_MODIFICATOR(SUPER):
 
@@ -154,12 +171,26 @@ with ADD_MODIFICATOR(SUPER):
         M(KEY(3,4), VOLUME(change=+0.02))
         M(KEY(3,5), VOLUME(change=+0.1))
 
+        M(KEY(4,1), CMD('osdd-run & sleep 1;osdc --color=red RESTART'))
+        M(KEY(4,1, SHIFT), CMD('osdc --color=red test --color=blue 123456789 --color=green 123456789123456789123456789123456789123456789123456789 --color=white 123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789'))
+        def bind_osd_enable(k, output):
+            M(k, CMD('osdc --cmd-now=enable:{output} --color=red Enable {output}'))
+            M(k(SHIFT), CMD('osdc --cmd-after=disable:{output} --color=red Disable {output}'))
+        bind_osd_enable(KEY(4, 2), "led")
+        bind_osd_enable(KEY(4, 3), "loglast")
+        bind_osd_enable(KEY(4, 4), "display0")
+        bind_osd_enable(KEY(4, 5), "display1")
+
+        M(K_B, cmd_set_xkbmap)
+        M(K_H, ROOT_MODE_AND(CMD("blueman-manager")))
+        M(K_Y, ROOT_MODE_AND(CMD("alsamixer")))
+
 
 
     ################ APPS ################
     # terminal
-    M(K_Enter, TERMINAL(1))
-    M(K_Not, TERMINAL(0))
+    M(K_Enter, TERMINAL(terminal_type=1))
+    M(K_Not, TERMINAL(terminal_type=0))
 
     # app launcher
     M(K_D, CMD(ALTERNATIVES("rofi -show combi", "dmenu_run")))

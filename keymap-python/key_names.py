@@ -15,6 +15,7 @@ table = [
     ["N4", "N5", "N6"],
     ["N1", "N2", "N3", "NEnter"],
     ["N0", "N."],
+    ["PlayPause", "PlayPause2", "PlayPause3", "Next", "Prev", "VolUp", "VolDown"]
 ]
 
 
