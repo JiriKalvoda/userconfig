@@ -6,8 +6,51 @@ def AND(self, *arg, main=0):
     self.main = main
 
 @action_init()
+def ROOT_MODE_AND(self, action):
+    self.action = action
+@action_implement("ROOT_MODE_AND")
+def f(self):
+    return AND(GO_MODE(g["ROOT_MODE"]), self.action)
+
+@action_init()
 def CMD(self, cmd):
     self.cmd = cmd
+
+@action_init()
+def TERMINAL_ABSTRACT(self, cmd=None, wd=None):
+    self.cmd = cmd
+    self.wd = wd
+
+@set_global()
+def action_init_terminal(f):
+    def g(self, cmd=None, wd=None, *arg, **kvarg):
+        TERMINAL_ABSTRACT.__init__(self, cmd, wd)
+        f(self, *arg, **kvarg)
+    g.__name__ = f.__name__
+    return action_init(base=TERMINAL_ABSTRACT)(g)
+
+@action_init_terminal
+def TERMINAL(self, terminal_type=0):
+    self.terminal_type = terminal_type
+
+@action_init_terminal
+def TERMINAL_TERMINAL(self):
+    pass
+
+@action_implement("TERMINAL")
+def f(self):
+    return TERMINAL_TERMINAL(cmd=self.cmd, wd=self.wd)
+
+@action_implement("TERMINAL_TERMINAL")
+def f(self):
+    cmd = "terminal"
+    if self.wd is not None:
+        cmd += f" --working-directory {self.wd}"
+    if self.cmd is not None:
+        # TODO expand
+        return CMD(f"{cmd} -e bash -c '{self.cmd}'")
+    return CMD(f"{cmd}")
+
 
 @action_init()
 def GO_MODE(self, mode):

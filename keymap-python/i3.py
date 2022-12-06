@@ -17,15 +17,26 @@ def i3_woman_serialize(cmd, args):
         r += f" --notify"
     return "exec " + cmd_expand(r)
 
+have_i3_woman = not not which("i3-woman")
+
 @action_serialize("GOTO_WORKSPACE")
 def f(self):
-    return i3_woman_serialize("goto-workspace", self)
+    if have_i3_woman:
+        return i3_woman_serialize("goto-workspace", self)
+    else:
+        return "workspace {workspace_num(self)}"
 @action_serialize("CONT_WORKSPACE")
 def f(self):
-    return i3_woman_serialize("container-to", self)
+    if have_i3_woman:
+        return i3_woman_serialize("container-to", self)
+    else:
+        return "movo container to workspace {workspace_num(self)}"
 @action_serialize("CONT_AND_GOTO_WORKSPACE")
 def f(self):
-    return i3_woman_serialize("goto-with-container-to", self)
+    if have_i3_woman:
+        return i3_woman_serialize("goto-with-container-to", self)
+    else:
+        return "movo container to workspace {workspace_num(self)}; workspace {workspace_num(self)}"
 @action_serialize("SWAP_WORKSPACE")
 def f(self):
     return i3_woman_serialize("swap-with-workspace", self)
@@ -84,13 +95,21 @@ def f(self):
     if self.variant == "v2":
         return "restart"
     else:
-        return "exec "+cmd_expand(f"cd ~/.config/i3/; terminal -e bash -c './config-gen > config-tmp && mv config-tmp config && i3-msg restart || read'")
+        return g["TERMINAL"]('./config-gen > config-tmp && mv config-tmp config && i3-msg restart || read', wd="~/.config/i3").serialize()
 @action_implement("EXIT_PROG")
 def f(self):
     return g["CONFIRM_CMD"]("i3-msg exit", "Do you really want to EXIT i3?")
 
 
 load_main()
+if have_i3_woman:
+    with g["ROOT_MODE"]:
+        exec_on_startup(g["CMD"]("i3-woman exit;sleep 0.1;i3-woman exit;sleep 0.1;i3-woman-daemon --gui"), always=True)
+        i3_direct("""
+        for_window [title="^i3-woman$"] move to workspace 0
+        for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp
+        """[1:-1])
+
 
 
 def print_key(key):
@@ -115,7 +134,9 @@ for m in all_modes:
             if isinstance(i.key, I3DirectMapper):
                 print(tabs+f"{i.action}")
             if isinstance(i.key, ExecOnStartupMapper):
-                print(tabs+f"exec{'_always' if i.key.always else ''} {cmd_expand(i.action)}")
+                x = i.action
+                while not isinstance(x, g["CMD"]): x = x.implement()
+                print(tabs+f"exec{'_always' if i.key.always else ''} {cmd_expand(x.cmd)}")
 
     if m.name=="":
         print_mode("")

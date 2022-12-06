@@ -30,17 +30,17 @@ def m_down(mod, *arg, **kvarg):
 
 def app_workspace(key, workspace, cmd):
     M(key(SUPER), GOTO_WORKSPACE(workspace))
-    M(key(SUPER|SHIFT), AND(GOTO_WORKSPACE(workspace), CMD(cmd), main=1))
+    M(key(SUPER|SHIFT), AND(GOTO_WORKSPACE(workspace), cmd, main=1))
     M(key(SUPER|CTRL), CONT_AND_GOTO_WORKSPACE(workspace))
 
 ################ On start run ################
-EXEC_ON_STARTUP("xrdb ~/.Xresources")
-cmd_set_xkbmap = "setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch"
+EXEC_ON_STARTUP(CMD("xrdb ~/.Xresources"))
+cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch")
 EXEC_ON_STARTUP(cmd_set_xkbmap)
-EXEC_ON_STARTUP("sleep 2; osdd-run & sleep 1;osdc --color=red START")
-EXEC_ON_STARTUP("/usr/bin/gnome-keyring-deamon --start --components=secrets")
-EXEC_ON_STARTUP("numlockx on")
-EXEC_ON_STARTUP("sleep 5; terminal -e m-daemon")
+EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
+EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
+EXEC_ON_STARTUP(CMD("numlockx on"))
+EXEC_ON_STARTUP(TERMINAL("m-daemon"))
 
 ################ View option ################
 
@@ -65,19 +65,30 @@ bar {
 ################ Mouse ################
 I3_DIRECT("floating_modifier Mod4")
 
+################ PrintScreen ################
 M(K_PrtSc,CMD("maim -suo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"), propagate=100)
 M(K_PrtSc(SHIFT),CMD("maim -uo | tee ~/screenshot.png | xclip -selection clipboard -t image/png"), propagate=100)
 M(K_PrtSc(SUPER),CMD("maim -uo > ~/screenshot.png && gimp ~/screenshot.png"), propagate=100)
 
+################ OSD ################
+for k in [K_Not, K_BackSlash(SUPER)]:
+	M(k,CMD('osdc --duration=1 --output=loglast ""'))
+	M(k(SHIFT),CMD('osdc --cmd-now=skip --do-not-que= --output=no --duration=1 ""'))
+	M(k(CTRL),CMD('osd-clock --output=display'))
+	M(k(CTRL+SHIFT),TERMINAL('tail -n500 ~/.osdd_log;read'))
+
+################ PLAYERCTL ################
+M(K_X(SUPER+SHIFT), CMD("playerctl play-pause"))
+
+################ PLAYERCTL ################
+M(K_PlayPause, CMD("playerctl play-pause"))
+M(K_PlayPause2, CMD("playerctl play-pause"))
+M(K_PlayPause3, CMD("playerctl play-pause"))
+M(K_Next, CMD("playerctl play-pause"))
+
 with ADD_MODIFICATOR(SUPER):
 
     ################ Standard workspaces ################
-    EXEC_ON_STARTUP("i3-woman exit; i3-woman-daemon --gui", always=True)
-    I3_DIRECT("""
-    for_window [title="^i3-woman$"] move to workspace 0
-    for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp
-    """[1:-1])
-
     for i in range(13):
         workspace_slave_all(KEY(1, i), i)
 
@@ -160,23 +171,37 @@ with ADD_MODIFICATOR(SUPER):
         M(KEY(3,4), VOLUME(change=+0.02))
         M(KEY(3,5), VOLUME(change=+0.1))
 
+        M(KEY(4,1), CMD('osdd-run & sleep 1;osdc --color=red RESTART'))
+        M(KEY(4,1, SHIFT), CMD('osdc --color=red test --color=blue 123456789 --color=green 123456789123456789123456789123456789123456789123456789 --color=white 123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789'))
+        def bind_osd_enable(k, output):
+            M(k, CMD('osdc --cmd-now=enable:{output} --color=red Enable {output}'))
+            M(k(SHIFT), CMD('osdc --cmd-after=disable:{output} --color=red Disable {output}'))
+        bind_osd_enable(KEY(4, 2), "led")
+        bind_osd_enable(KEY(4, 3), "loglast")
+        bind_osd_enable(KEY(4, 4), "display0")
+        bind_osd_enable(KEY(4, 5), "display1")
+
+        M(K_B, cmd_set_xkbmap)
+        M(K_H, ROOT_MODE_AND(CMD("blueman-manager")))
+        M(K_Y, ROOT_MODE_AND(CMD("alsamixer")))
+
 
 
     ################ APPS ################
     # terminal
-    M(K_Enter, CMD("xdg-terminal"))
-    M(K_Not, CMD("terminal"))
+    M(K_Enter, TERMINAL(terminal_type=1))
+    M(K_Not, TERMINAL(terminal_type=0))
 
     # app launcher
-    M(K_D, CMD("rofi -show combi"))
+    M(K_D, CMD(ALTERNATIVES("rofi -show combi", "dmenu_run")))
     M(K_D(CTRL), CMD("xfce-appfinder"))
     M(K_D(SHIFT), CMD("dmenu_run"))
-    M(K_D(SHIFT|CTRL), CMD("xdg-terminal \"$(dmenu_path | dmenu)\""))
+    M(K_D(SHIFT|CTRL), TERMINAL("\"$(dmenu_path | dmenu)\""))
 
     # web
-    M(K_C, CMD("chromium"))
-    M(K_C(SHIFT), CMD("chromium --incognito"))
-    M(K_C(CTRL|SHIFT), CMD("chromium --user-data-dir=$(mktemp -d)"))
+    M(K_C, CMD(ALTERNATIVES("chromium", "google-chrome", "firefox")))
+    M(K_C(SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --incognito"))
+    M(K_C(CTRL|SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --user-data-dir=$(mktemp -d)"))
     M(K_C(CTRL), CMD("firefox"))
 
     # Tea timer
@@ -191,7 +216,7 @@ with ADD_MODIFICATOR(SUPER):
 
     # Mail
     I3_DIRECT('for_window [title="MAIL"] move container to workspace MAIL')
-    app_workspace(K_M, "MAIL", "terminal -e m-daemon")
+    app_workspace(K_M, "MAIL", TERMINAL("m-daemon"))
 
     # Zoom
     I3_DIRECT("""
@@ -199,7 +224,7 @@ with ADD_MODIFICATOR(SUPER):
     for_window [title="^zoom$" class="zoom"] floating enable
     for_window [title="Zoom - Free Account" class="zoom"] floating disable
     """)
-    app_workspace(K_Z, "MAIL", "zoom")
+    app_workspace(K_Z, "ZOOM", CMD("zoom"))
 
     # File browser
     M(K_N, CMD("nemo"))

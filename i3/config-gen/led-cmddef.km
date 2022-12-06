@@ -42,28 +42,41 @@ def action_intit_led(f):
 
 
 @action_intit_led
-def led_light(self, light):
-    self.light = light
+def led_light(self, val, max_val=3):
+    self.val = val
+    self.max_val = max_val
 
 @ACTION_IMPLEMENT(led_light)
 def f(self):
-    return CMD(self.prefix() + f"l {self.light}")
+    return CMD(self.prefix() + f"l {self.val} {self.max_val}")
 
 @action_intit_led
-def led_color(self, light):
-    self.light = light
+def led_light_boost(self, val, max_val=3):
+    self.val = val
+    self.max_val = max_val
+
+@ACTION_IMPLEMENT(led_light_boost)
+def f(self):
+    return CMD(self.prefix() + f"lb {self.val} {self.max_val}")
+
+@action_intit_led
+def led_color(self, val, max_val=3):
+    self.val = val
+    self.max_val = max_val
 
 @ACTION_IMPLEMENT(led_color)
 def f(self):
-    return CMD(self.prefix() + f"c {self.light}")
+    return CMD(self.prefix() + f"c {self.val} {self.max_val}")
 
 def m_led_light(key, name, boost=0):
     for i in range(4):
-        M(key(add_col=i), led_light(name, i))
+        M(key(add_col=i), led_light(name, i, 3))
+    for i in range(boost):
+        M(key(add_col=4+i), led_light_boost(name, i, boost))
 
 def m_led_color(key, name):
     for i in range(4):
-        M(key(add_col=i), led_color(name, i))
+        M(key(add_col=i), led_color(name, i, 3))
 
 
 @ACTION_INIT()
