@@ -1,2 +1,2 @@
-M(K_Pause, MONITOR_POWER("toggle"))
+M(K_Pause, MONITOR_POWER("toggle"), propagate=100)
 

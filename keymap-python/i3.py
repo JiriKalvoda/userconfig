@@ -30,13 +30,13 @@ def f(self):
     if have_i3_woman:
         return i3_woman_serialize("container-to", self)
     else:
-        return "movo container to workspace {workspace_num(self)}"
+        return "move container to workspace {workspace_num(self)}"
 @action_serialize("CONT_AND_GOTO_WORKSPACE")
 def f(self):
     if have_i3_woman:
         return i3_woman_serialize("goto-with-container-to", self)
     else:
-        return "movo container to workspace {workspace_num(self)}; workspace {workspace_num(self)}"
+        return "move container to workspace {workspace_num(self)}; workspace {workspace_num(self)}"
 @action_serialize("SWAP_WORKSPACE")
 def f(self):
     return i3_woman_serialize("swap-with-workspace", self)
