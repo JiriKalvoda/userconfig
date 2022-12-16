@@ -213,10 +213,6 @@ zath(){
 }
 
 ######################### Separators
-h(){
-	 echo ---------- "$@": | lolcat
-	"$@"
-}
 promt(){
 	echo -n "${PS1@P}" | tr -d `char 1``char 2`
 }
@@ -663,4 +659,18 @@ unset MAILCHECK
 lpl()
 {
 	lp -o Duplex=DuplexTumble -o XRFold=BiFoldStaple -o XROutputMode=HighResolution "$@"
+}
+
+
+h(){
+	xdo hide "$WINDOWID";
+	"$@"
+	r=$?
+	xdo show "$WINDOWID"
+	return $r
+}
+
+x()
+{
+	h "$(which x)" "$@"
 }
