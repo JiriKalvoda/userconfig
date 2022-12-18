@@ -69,7 +69,8 @@ then
 	exit 0
 fi
 
-tmpdir="$(mktemp -d -t snapshoter-XXXXXXX)"
+mkdir -p /mnt/snapshoter-rundir
+tmpdir="$(mktemp -d -t XXXXXXX -p /mnt/snapshoter-rundir)"
 chown 700 "$tmpdir"
 snapdir="/mnt/snapshot-manual"
 autosnapdir="/mnt/snapshot"
@@ -84,6 +85,7 @@ if [[ "$snapdrive" != "" ]]
 then
 	mkdir $tmpdir/fs
 	mount $snapdrive $tmpdir/fs || err 100 Mount faild
+	mount -o remount,rw $tmpdir/fs $tmpdir/fs || err 100 Remount faild
 	snapdir=$tmpdir/fs
 fi
 devicedir="$snapdir/$device"
