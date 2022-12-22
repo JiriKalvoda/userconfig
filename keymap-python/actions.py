@@ -16,6 +16,10 @@ def f(self):
 def CMD(self, cmd):
     self.cmd = cmd
 
+@set_member(CMD, "get_cmd")
+def f(self):
+    return self.cmd
+
 @action_init()
 def TERMINAL_ABSTRACT(self, cmd=None, wd=None):
     self.cmd = cmd
@@ -47,8 +51,7 @@ def f(self):
     if self.wd is not None:
         cmd += f" --working-directory {self.wd}"
     if self.cmd is not None:
-        # TODO expand
-        return CMD(f"{cmd} -e bash -c '{self.cmd}'")
+        return CMD(f"{cmd} -e bash -c {escape_bash(self.cmd.get_cmd())}")
     return CMD(f"{cmd}")
 
 

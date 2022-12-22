@@ -52,23 +52,50 @@ def alternatives(*cmds_list):
     return i[0]
 
 
+@set_global()
+def escape_bash(arg):
+    # replace ' to '"'"'
+    return "'" + "".join(i if i != "'" else """'"'"'""" for i in arg) + "'"
+
 
 @set_global()
-def load(fname, share_vars=False, only_if_exists=False):
+def set_member(cls, name):
+    if isinstance(cls, str):
+        cls = g[cls]
+    def l(f):
+        setattr(cls, name, f)
+    return l
+
+
+
+@set_global()
+def load(fname, share_vars=False, only_if_exists=False, allow_duplicit=True):
     if only_if_exists and not os.path.exists(fname):
         return
     vars = None
+    files = None
     if share_vars:
         vars = load_stack[-1].vars
-    load_stack.append(LoadStackItem(vars))
-    with open(fname) as f:
-        exec(f.read(), *load_stack[-1].vars)
+        files = load_stack[-1].files
+    load_stack.append(LoadStackItem(vars, files))
+    if allow_duplicit or fname not in load_stack[-1].files:
+        load_stack[-1].files.append(fname)
+        with open(fname) as f:
+            exec(compile(f.read(), fname, 'exec'), *load_stack[-1].vars)
+    load_stack.pop()
+
+@set_global()
+def load_lib(*arg, **kvarg):
+    load(*arg, **kvarg, share_vars=True, allow_duplicit=False)
 
 class LoadStackItem():
-    def __init__(self, vars=None):
+    def __init__(self, vars=None, files=None):
         if vars is None:
             vars = (create_load_globals(),)
+        if files is None:
+            files = []
         self.vars = vars
+        self.files = files
 
 load_stack = []
 
@@ -346,18 +373,14 @@ def global__action_implement(cls):
     def l(f):
         cls.implement = f
         cls.serialize = lambda self: self.implement().serialize()
+        cls.get_cmd = lambda self: self.implement().get_cmd()
         return f
     return l
 def action_implement(name):
     return global__action_implement(g[name])
 @set_global()
-def global__action_serialize(cls):
-    def l(f):
-        cls.serialize = f
-        return f
-    return l
-def action_serialize(name):
-    return global__action_serialize(g[name])
+def action_serialize(cls):
+    return set_member(cls, "serialize")
 
 
 
