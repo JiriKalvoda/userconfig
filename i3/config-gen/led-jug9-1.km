@@ -11,9 +11,9 @@ with add_led_prefix("jug9/1"):
 
     M(K_F6, ssh("jiri@rpi0", CMD("./.config/alarm/stop; osdc Alarm stopped")))
 
-    M(K_Insert, ssh("jiri@rpi0", MONITOR_POWER("on")))
-    M(K_Delete, ssh("jiri@rpi0", MONITOR_POWER("off")))
+    M(K_Insert, release_action=ssh("jiri@rpi0", MONITOR_POWER("on")))
+    M(K_Delete, release_action=ssh("jiri@rpi0", MONITOR_POWER("off")))
 
-    M(K_PgUp, ssh("jiri@rpi7", MONITOR_POWER("on")))
-    M(K_PgDown, ssh("jiri@rpi7", MONITOR_POWER("off")))
+    M(K_PgUp, release_action=ssh("jiri@rpi7", MONITOR_POWER("on")))
+    M(K_PgDown, release_action=ssh("jiri@rpi7", MONITOR_POWER("off")))
 
