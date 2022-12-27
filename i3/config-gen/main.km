@@ -240,6 +240,8 @@ with ADD_MODIFICATOR(SUPER):
     bind_pasman(K("["), "roficlip")
     bind_pasman(K("]"), "rofichrome")
 
+    M(K_V(SHIFT), release_action=CMD('xdotool keyup super shift ctrl alt; xdotool type --clearmodifiers "$(date +%Y-%m-%d)"'))
+
     with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
         LOAD("led-jug9-1.km")
 
