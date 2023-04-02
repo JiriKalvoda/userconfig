@@ -40,7 +40,7 @@ EXEC_ON_STARTUP(cmd_set_xkbmap)
 EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
 EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
 EXEC_ON_STARTUP(CMD("numlockx on"))
-EXEC_ON_STARTUP(TERMINAL("m-daemon"))
+EXEC_ON_STARTUP(TERMINAL(CMD("m-daemon")))
 
 ################ View option ################
 
@@ -75,7 +75,7 @@ for k in [K_Not, K_BackSlash(SUPER)]:
 	M(k,CMD('osdc --duration=1 --output=loglast ""'))
 	M(k(SHIFT),CMD('osdc --cmd-now=skip --do-not-que= --output=no --duration=1 ""'))
 	M(k(CTRL),CMD('osd-clock --output=display'))
-	M(k(CTRL+SHIFT),TERMINAL('tail -n500 ~/.osdd_log;read'))
+	M(k(CTRL+SHIFT),TERMINAL(CMD('tail -n500 ~/.osdd_log;read')))
 
 ################ PLAYERCTL ################
 M(K_X(SUPER+SHIFT), CMD("playerctl play-pause"))
@@ -103,12 +103,12 @@ with ADD_MODIFICATOR(SUPER):
     M(K(",", SHIFT|CTRL), CONT_AND_GOTO_WORKSPACE(master="alloc", notify=True))
     m_down (CTRL,       GOTO_WORKSPACE(master="next-skip", notify=True))
     m_up   (CTRL,       GOTO_WORKSPACE(master="next-skip", notify=True))
-    m_left (CTRL,       GOTO_WORKSPACE(slave="next-skip", notify=True))
-    m_right(CTRL,       GOTO_WORKSPACE(slave="prev-skip", notify=True))
+    m_left (CTRL,       GOTO_WORKSPACE(slave="prev-skip", notify=True))
+    m_right(CTRL,       GOTO_WORKSPACE(slave="next-skip", notify=True))
     m_down (CTRL|SHIFT, GOTO_WORKSPACE(master="next", notify=True))
     m_up   (CTRL|SHIFT, GOTO_WORKSPACE(master="next", notify=True))
-    m_left (CTRL|SHIFT, GOTO_WORKSPACE(slave="next-limit", notify=True))
-    m_right(CTRL|SHIFT, GOTO_WORKSPACE(slave="prev-limit", notify=True))
+    m_left (CTRL|SHIFT, GOTO_WORKSPACE(slave="prev-limit", notify=True))
+    m_right(CTRL|SHIFT, GOTO_WORKSPACE(slave="next-limit", notify=True))
 
     ################ WM Control  ################
     M(K_V, SPLIT_CONT("splitv"))
@@ -196,7 +196,6 @@ with ADD_MODIFICATOR(SUPER):
     M(K_D, CMD(ALTERNATIVES("rofi -show combi", "dmenu_run")))
     M(K_D(CTRL), CMD("xfce-appfinder"))
     M(K_D(SHIFT), CMD("dmenu_run"))
-    M(K_D(SHIFT|CTRL), TERMINAL("\"$(dmenu_path | dmenu)\""))
 
     # web
     M(K_C, CMD(ALTERNATIVES("chromium", "google-chrome", "firefox")))
@@ -216,7 +215,7 @@ with ADD_MODIFICATOR(SUPER):
 
     # Mail
     I3_DIRECT('for_window [title="MAIL"] move container to workspace MAIL')
-    app_workspace(K_M, "MAIL", TERMINAL("m-daemon"))
+    app_workspace(K_M, "MAIL", TERMINAL(CMD("m-daemon")))
 
     # Zoom
     I3_DIRECT("""

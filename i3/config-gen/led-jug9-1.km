@@ -1,4 +1,5 @@
-LOAD("led-cmddef.km", share_vars=True)
+LOAD_LIB("ssh-cmddef.km")
+LOAD_LIB("led-cmddef.km")
 
 with add_led_prefix("jug9/1"):
     m_base_keys("")
@@ -7,4 +8,12 @@ with add_led_prefix("jug9/1"):
 
     M(K("."), mqtt_pub("jug9", "motor/curtain/1/okno/goto", 0, retain=True))
     M(K("/"), mqtt_pub("jug9", "motor/curtain/1/okno/goto", 1, retain=True))
+
+    M(K_F6, ssh("jiri@rpi0", CMD("./.config/alarm/stop; osdc Alarm stopped")))
+
+    M(K_Insert, release_action=ssh("jiri@rpi0", MONITOR_POWER("on")))
+    M(K_Delete, release_action=ssh("jiri@rpi0", MONITOR_POWER("off")))
+
+    M(K_PgUp, release_action=ssh("jiri@rpi7", MONITOR_POWER("on")))
+    M(K_PgDown, release_action=ssh("jiri@rpi7", MONITOR_POWER("off")))
 
