@@ -42,6 +42,7 @@ exclude_mnt=true
 exclude_aux=true
 exclude_key=true
 exclude_fs=true
+exclude_cache=true
 exclude_downloads=true
 exclude_mountdir=true
 excludedir_homes="'/root' '/home/*'"
@@ -141,6 +142,7 @@ $exclude_aux &&  echo >> "$excludefile" "/aux"
 for h_it in $excludedir_homes
 do
 	h="${h_it:1:-1}"
+	$exclude_cache && echo >> "$excludefile" "$h/.cache"
 	$exclude_key && echo >> "$excludefile" "$h/.ssh"
 	$exclude_mountdir && echo >> "$excludefile" "$h/m"
 	$exclude_mountdir && echo >> "$excludefile" "$h/kam"
