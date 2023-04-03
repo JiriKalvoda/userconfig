@@ -29,8 +29,4 @@ case "$device" in
 		excludedir_homes="'/files/home'"
   		ms root@$device
     ;;
-  *)
-	err DEVICE $device NOT EXIST
-    exit 200
-    ;;
 esac
