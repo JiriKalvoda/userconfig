@@ -2,6 +2,8 @@
 
 snapdir="/mnt/snapshot"
 autosnapdir="/mnt/snapshot"
+snapdrive="/dev/mapper/snapshot"
+autosnapdrive="/dev/mapper/snapshot"
 
 case "$device" in
   test)
