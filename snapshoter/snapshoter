@@ -42,9 +42,13 @@ exclude_mnt=true
 exclude_aux=true
 exclude_key=true
 exclude_fs=true
+exclude_cache=true
 exclude_downloads=true
 exclude_mountdir=true
 excludedir_homes="'/root' '/home/*'"
+
+snapdir="/mnt/snapshot-manual"
+autosnapdir="/mnt/snapshot"
 
 ms()
 {
@@ -54,38 +58,88 @@ ms()
 	usingSSH=true
 }
 
+delete()
+{
+	for i in "$@"
+	do
+		echo REMOVE $i
+		/usr/bin/time rm -r $i
+	done
+}
+
+. ~/snapshoter.devices
+
+if [[ "$from" == "" ]] && [[ "$device" != clean ]]
+then
+	echo -e "\e[31m\e[1mNo device $device\e[0m"
+	exit 1
+fi
+
+[[ "$minus" == *"a"* ]] && snapdir="$autosnapdir"
+[[ "$minus" == *"a"* ]] && snapdrive="$autosnapdrive"
+
+tmpdir_template=$(basename $snapdir)-XXXXXXX
+
+mkdir -p /mnt/snapshoter-rundir
+tmpdir="$(mktemp -d -t $tmpdir_template -p /mnt/snapshoter-rundir)"
+chown 700 "$tmpdir"
+
+
+
+
+if [[ "$snapdrive" != "" ]]
+then
+	mkdir $tmpdir/fs
+	mount $snapdrive $tmpdir/fs || err 100 Mount faild
+	mount -o remount,rw $tmpdir/fs $tmpdir/fs || err 100 Remount faild
+	snapdir=$tmpdir/fs
+fi
+
 if [[ "$device" == "clean" ]]
 then
-	data="$(ls /mnt/snapshot/*/working/* -d 2>/dev/null)$(echo)$(ls /mnt/snapshot-manual/*/working/* -d 2>/dev/null)"
-  echo "$data"
-  [[ "$data" == "" ]] && exit 0
+	data="$(ls $snapdir/*/working/* -d 2>/dev/null)"
+	echo "$data"
+	[[ "$data" == "" ]] && exit 0
 	echo -e "\e[1mIF NO SNAPSHOTER RUNNING PRESS <Enter> for clean (some string to exit)\e[0m"
 	read r
 	if [[ "$r" != "" ]]
 	then
 		err 0 EXIT
 	fi
-	rm  $data -r
+	delete  $data
+	do_clean
 	exit 0
 fi
 
-tmpdir="$(mktemp -d -t snapshoter-XXXXXXX)"
-chown 700 "$tmpdir"
-snapdir="/mnt/snapshot-manual"
-autosnapdir="/mnt/snapshot"
-
-. ~/snapshoter.devices
-
-
-
-[[ "$minus" == *"a"* ]] && snapdir="$autosnapdir"
-[[ "$minus" == *"a"* ]] && snapdrive="$autosnapdrive"
-if [[ "$snapdrive" != "" ]]
+if [[ "$minus" == *"d"* ]]
 then
-	mkdir $tmpdir/fs
-	mount $snapdrive $tmpdir/fs || err 100 Mount faild
-	snapdir=$tmpdir/fs
+	data="$(ls $snapdir/$device/ok/*  -d 2>/dev/null| head -n-1 | awk 'NR % 2 == 0' )"
+	echo TO DELETE:
+	echo "$data"
+	echo
+	echo ALL FILES:
+	for i in $(ls $snapdir/$device/ok/* -d)
+	do
+		if [[ "$data" == *"$i"* ]]
+		then
+			echo -e "\e[31mDELETE" "$i"
+		else
+			echo -e "\e[32mKEEP  " "$i"
+		fi
+	done
+
+	[[ "$data" == "" ]] && exit 0
+	echo -e "\e[1mPRESS <Enter> for delete this snapshots (some string to exit)\e[0m"
+	read r
+	if [[ "$r" != "" ]]
+	then
+		err 0 EXIT
+	fi
+	delete $data
+	do_clean
+	exit 0
 fi
+
 devicedir="$snapdir/$device"
 okdir="$devicedir/ok"
 workingdir="$devicedir/working"
@@ -139,6 +193,7 @@ $exclude_aux &&  echo >> "$excludefile" "/aux"
 for h_it in $excludedir_homes
 do
 	h="${h_it:1:-1}"
+	$exclude_cache && echo >> "$excludefile" "$h/.cache"
 	$exclude_key && echo >> "$excludefile" "$h/.ssh"
 	$exclude_mountdir && echo >> "$excludefile" "$h/m"
 	$exclude_mountdir && echo >> "$excludefile" "$h/kam"

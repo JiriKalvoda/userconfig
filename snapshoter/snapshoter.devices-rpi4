@@ -1,19 +1,13 @@
 #!/bin/bash
-snapdrive=/dev/disk/by-uuid/319df3ef-4495-41b4-9635-968f2d374fcc
-autosnapdrive=/dev/disk/by-uuid/2285d44c-d0dd-4de7-afbd-e1bc001dacaf
+snapdrive=/dev/disk/by-uuid/264d302a-8d79-4941-8ad3-93159208eaf2
 case "$device" in
   test)
 		from=/tmp/testsnap
     ;;
-  rpi0 )
+  rpi4 )
 		from=/
-		exclude_aux=true
+		exclude_aux=false
 	;;
-  rpi[1-7])
-	    exclude_aux=false
-		fromdir=/
-  		ms root@$device
-	  ;;
   arch | external | arzen)
 		fromdir=/
   		ms root@$device
