@@ -146,6 +146,9 @@ se hlsearch
 " se textwidth=80
 " se nolinebreak
 
+
+au BufEnter,BufNew *.km se syntax=python expandtab
+
 let g:toExec = ""
 let g:VimRun = ""
 let g:useVimRun = 0
