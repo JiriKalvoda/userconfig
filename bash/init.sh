@@ -1,6 +1,6 @@
 #!/bin/bash
-cd "$(dirname "$0")"
+. ../userconfig-lib.sh
 confln bashrc ~/.bashrc
 confln bash_profile ~/.bash_profile
 confln wd ~/bin/
-mkdir -p ~/bin/bashrc
+r mkdir -p ~/bin/bashrc
