@@ -320,7 +320,7 @@ function! Compile(isVimRun)
 	else
 		let script = GetVar("CompileScript")
 		if script == "EMPTY"
-			execute "AddExec echo This sintax ".s." is not suported | lolcat"
+			execute "AddExec echo This syntax ".s." is not suported | lolcat"
 		elseif s=="script"
 			execute "AddExec ".script
 		else
@@ -371,7 +371,7 @@ function! Run(isVimRun,input)
 	else
 		let script = GetVar("RunScript")
 		if script == "EMPTY"
-			execute "AddExec echo This sintax ".s." is not suported | lolcat"
+			execute "AddExec echo This syntax ".s." is not suported | lolcat"
 		elseif s=="script"
 			w
 			execute "AddExec ".script
@@ -410,7 +410,7 @@ function! ClearBin(isVimRun)
 		execute "AddExec rm ".NameNoE().".out "
 	elseif s == "tex"
 	else
-		echo "This sintax \"".s."\" is not suported!"
+		echo "This syntax \"".s."\" is not suported!"
 	endif
 endfunction
 function! Debug(isVimRun)
@@ -425,7 +425,7 @@ function! Debug(isVimRun)
 		execute "AddExec gcc -g3 ".NameAll()." -o ".NameNoE().".out ".CompileArg()
 		execute "AddExec gdb ".NameNoE().".out ".RunArg()
 	else
-		echo "This sintax \"".s."\" is not suported!"
+		echo "This syntax \"".s."\" is not suported!"
 	endif
 endfunction
 function! CompileRun(isVimRun)
