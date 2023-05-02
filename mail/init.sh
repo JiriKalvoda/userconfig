@@ -1,5 +1,5 @@
 #!/bin/bash
-cd "$(dirname "$0")"
+. ../userconfig-lib.sh
 
 confln notmuch-config ~/.notmuch-config
 confln mailcap ~/.mailcap
@@ -14,6 +14,8 @@ confln m ~/bin/
 confln m-daemon ~/bin/
 confln m-daemon ~/bin/
 confln m-repeat-notification ~/bin/
+
+r -b 'ssh jirikalvoda@kam.mff.cuni.cz cat /etc/ssl/certs/ca-certificates.crt > ~/.config/certs/nikam-ssl.cert'
 
 
 if [[ ! -L ~/Maildir ]]
