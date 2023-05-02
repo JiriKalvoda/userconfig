@@ -648,11 +648,6 @@ do
 	  . $i
 done 2>/dev/null
 
-mv2md()
-{
-	tr -d "{}"  | pandoc -f mediawiki -t markdown
-}
-
 aux()
 {
 	if [[ "$(pwd)" == /aux/* ]]
