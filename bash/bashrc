@@ -682,3 +682,6 @@ x()
 {
 	h "$(which x)" "$@"
 }
+
+
+export MANPAGER='nvim +Man!'
