@@ -15,6 +15,7 @@ confln m-daemon ~/bin/
 confln m-daemon ~/bin/
 confln m-repeat-notification ~/bin/
 
+r mkdir -p ~/.config/certs
 r -b 'ssh jirikalvoda@kam.mff.cuni.cz cat /etc/ssl/certs/ca-certificates.crt > ~/.config/certs/nikam-ssl.cert'
 
 
