@@ -65,9 +65,39 @@ set mailcap_path = ~/.mailcap
 set hostname = "kam.mff.cuni.cz"
 
 
-unignore authentication-results
+unignore authentication-results tags
 set header_color_partial
 color header bold red default "(dkim|spf|dmarc)=fail"
 color header green default "(dkim|spf|dmarc)=pass"
 
 set pgp_sign_as=0x146A04044068269A
+
+tag-transforms "reu"   "R"   \
+                "unread"  "u"   \
+                "replied" "↻ "  \
+                "sent"    "➥ "  \
+                "todo"    "T"   \
+                "deleted" "DEL" \
+                "invites" "CAL"
+
+tag-formats "inbox"   "GI" \
+            "unread"  "GU" \
+            "replied" "GR" \
+            "sent"    "GS" \
+            "todo"    "Gt" \
+            "deleted" "GD" \
+            "reu" "Gr"
+
+set index_format='%3C %Z %{%y-%m-%d} %-15.15L (%?l?%4l&%4c?) %g|%s'
+#'%?Gr?%Gr&_? | %4C %S %[%y.%m.%d] %-18.18n %?GU?%GU& ? %?GR?%GR& ? %?GI?%GI& ? %s'
+
+bind pager \\ noop
+bind index,pager \` modify-labels
+macro index,pager \\r "<modify-labels>+reu\n" "Add the 'reu' tag"
+macro index,pager \\R "<modify-labels>-reu\n" "Remove the 'reu' tag"
+
+color index_tag red red "R"
+
+set hidden_tags = "unread,draft,flagged,passed,replied,attachment,signed,encrypted"
+
+
