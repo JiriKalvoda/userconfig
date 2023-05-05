@@ -5,3 +5,4 @@ confln tvim.sh ~/bin/tvim
 confln booklet.sh ~/bin/booklet
 confln lpbooklet.sh ~/bin/lpbooklet
 confln pub ~/bin/
+confln vzt.sh ~/bin/vzt
