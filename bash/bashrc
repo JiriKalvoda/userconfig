@@ -157,11 +157,11 @@ l(){
 ######################### vim
 if which nvim >/dev/null 2>/dev/null
 then
-	EDITOR=nvim
+	export EDITOR=nvim
+	export MANPAGER='nvim +Man!'
 else
-	EDITOR=vim
+	export EDITOR=vim
 fi
-export EDITOR
 e(){
 	$EDITOR "$@"
 }
@@ -684,4 +684,3 @@ x()
 }
 
 
-export MANPAGER='nvim +Man!'
