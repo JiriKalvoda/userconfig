@@ -138,7 +138,7 @@ def f(self):
     return CONFIRM_CMD("poweroff", "Do you really want to SHUTDOWN?")
 @action_implement("EXIT_SUSPEND")
 def f(self):
-    return CMD("suspender")
+    return CMD("suspender 2>&1 >~/.suspender_log")
 @action_implement("EXIT_RESTART")
 def f(self):
     return CONFIRM_CMD("reboot", "Do you really want to REBOOT?")
