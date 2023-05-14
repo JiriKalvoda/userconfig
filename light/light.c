@@ -28,10 +28,10 @@ int main(int argc,char ** argv)
 			{
 				FILE * f = fopen(adr[adri],"r");
 				if(!f) goto nextAdr;
-				fprintf(f,"%d",atoi(argv[2]));
+				//fprintf(f,"%d",atoi(argv[2]));
 				int realAct;
 				fscanf(f,"%d",&realAct);
-				if(realAct<light) realAct=lightMin;
+				//if(realAct<light) realAct=lightMin;
 				double act=log(realAct);
 				if(argv[1][0]=='+')
 					light = act+argv2;
