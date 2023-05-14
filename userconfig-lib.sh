@@ -72,7 +72,7 @@ r()
 	echo -n ">" 
 	if $do_eval
 	then
-		echo "$@"
+		echo "" "$@"
 	else
 		printf " %q" "$@"
 		echo
