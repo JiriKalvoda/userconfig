@@ -84,7 +84,8 @@ r()
 		while [[ "$in" != y ]]
 		do
 			echo -n -e " ╞ $Yellow Run?(Yes/Skip/Exit):$None "
-			read in
+			read -n 1 in
+			echo
 			[[ "$in" == "e" ]] && echo -e " └─  $Magenta Without run (exit) \e[0m" && exit 1
 			[[ "$in" == "s" ]] && echo -e " └─  $Magenta Without run (skip) \e[0m" && return 0
 		done
