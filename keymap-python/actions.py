@@ -10,7 +10,7 @@ def ROOT_MODE_AND(self, action):
     self.action = action
 @action_implement("ROOT_MODE_AND")
 def f(self):
-    return AND(GO_MODE(g["ROOT_MODE"]), self.action)
+    return AND(GO_MODE(g["ROOT_MODE"]), self.action, main=1)
 
 @action_init()
 def CMD(self, cmd):

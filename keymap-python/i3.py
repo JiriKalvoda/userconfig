@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 from main import *
 
+g["TARGET"] = "i3"
+
 def cmd_expand(cmd):
     s = cmd.replace('"', '\\\\"')
     return f'"{s}"'
