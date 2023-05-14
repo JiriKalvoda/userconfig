@@ -1,8 +1,0 @@
-#!/bin/bash
-(xtrlock ; killall suspender) &
-while true
-do
-systemctl suspend -i
-sleep 60
-done
-date
