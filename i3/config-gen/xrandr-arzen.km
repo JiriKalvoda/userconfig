@@ -1,29 +1,8 @@
+LOAD_LIB("xrandr-cmddef.km")
 map_touchscreen = "for i in {0..10}; do sleep 0.5; xinput | grep WingCoolTouch | while read l; do id=${l:50:2}; xinput map-to-output $id DP-1; done; done;"
 
-fhd = (1920, 1080)
-
-normal = "normal"
-left = "left"
-right = "right"
-inverted = "inverted"
-
 def xrandr_set(mode_name, eDP_1=(fhd, (0,0)), DP_1=None, HDMI_1=None, after="", primary="eDP_1"):
-    out = "xrandr "
-    for name in ["eDP_1", "DP_1", "HDMI_1"]:
-        def format_size(x):
-            return f"{x[0]}x{x[1]}"
-        val = locals()[name]
-        if val == None:
-            out += f" --output {name.replace('_','-')} --off"
-        else:
-            mode = val[0]
-            pos = val[1]
-            rotate = val[2] if len(val)>2 else normal
-            out += f" --output {name.replace('_','-')} --mode {format_size(mode)} --pos {format_size(pos)} --rotate {rotate}"
-            if primary == name:
-                out += " --primary"
-    after_xrandr = f"osdd-run & sleep 1;osdc --color=red 'xrandr {mode_name.replace('_', ' ')}';"
-    out += ";" + after_xrandr + after
+    out = xrandr(mode_name, {"eDP_1": eDP_1, "DP_1": DP_1, "HDMI_1": HDMI_1}, primary, after)
     globals()["r_" + mode_name] = out
     return out
 
@@ -44,15 +23,17 @@ xrandr_set("verbatim_right_table", eDP_1=(fhd, (0, 0)), DP_1=(fhd, (1920,0)), af
 if __name__ == "__main__":
     print(r_std)
 else:
-    M(K_N,           CMD(r_std))
-    M(K_N(SHIFT),    CMD(r_std_small))
+    M(K_N,           r_std)
+    M(K_N(SHIFT),    r_std_small)
 
-    M(K_J(),         CMD(r_verbatim_left_hand))
-    M(K_J(SHIFT),    CMD(r_verbatim_left_hand_only))
+    M(K_J(),         r_verbatim_left_hand)
+    M(K_J(SHIFT),    r_verbatim_left_hand_only)
 
-    M(K_K(),         CMD(r_verbatim_left_table))
-    M(K(";"),        CMD(r_verbatim_right_table))
+    M(K_K(),         r_verbatim_left_table)
+    M(K(";"),        r_verbatim_right_table)
 
-    M(K("'"),        CMD(r_verbatim_right_hand))
-    M(K("'", SHIFT), CMD(r_verbatim_right_hand_only))
+    M(K("'"),        r_verbatim_right_hand)
+    M(K("'", SHIFT), r_verbatim_right_hand_only)
+
+    M(K("/", SHIFT), CMD(map_touchscreen))
 
