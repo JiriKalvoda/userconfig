@@ -20,6 +20,14 @@ then
 	exit 1
 fi
 
+err()
+{
+	echo -en $Red
+	echo -n ERROR $@
+	echo -en $None
+	exit 1
+}
+
 confln()
 {
 	$USERCONFIG_ROOT/confln "$@"
@@ -130,4 +138,35 @@ r()
 		fi
 	fi
 	return $ret
+}
+
+install_begin(){
+	if [[ "$install_name" ==  "" ]]
+	then
+		install_name=$(pwd)/$(basename $0)
+		install_name=${install_name#$USERCONFIG_ROOT/}
+		[[ "$install_name" == *"/init.sh" ]] && install_name=${install_name%/init.sh}
+		install_name=${install_name//\//-}
+	fi
+	state_dir=$USERCONFIG_ROOT/state/$install_name
+	state_run_dir=$USERCONFIG_ROOT/state/$(date +%Y-%m-%d--%H-%M-%S)
+	mkdir -p $state_dir
+	if [[ -e $state_run_dir ]]
+	then
+		state_run_dir=""
+		err "State run dir exist, wait a second"
+		exit 1
+	fi
+	echo -e "${Blue}INSTALLING $install_name$None"
+	echo $state_dir $state_run_dir
+	echo installing > $state_dir/state
+	reln -sr $state_run_dir $state_dir/last
+	(
+		echo state=installing
+		echo date=$(date -Iseconds)
+		echo commit=$(git rev-parse --verify HEAD)
+	) > $state_dir/state
+}
+
+install_ok(){
 }
