@@ -10,6 +10,7 @@ def xrandr_set(mode_name, eDP_1=(fhd, (0,0)), DP_1=None, HDMI_1=None, after="", 
 xrandr_set("std")
 xrandr_set("std_small", eDP_1=((1280,720), (0,0)))
 
+
 xrandr_set("verbatim_left_hand", eDP_1=(fhd, (1080, 0)), DP_1=(fhd, (0,0), left), after=map_touchscreen, primary="DP_1")
 xrandr_set("verbatim_left_hand_only", eDP_1=None, DP_1=(fhd, (0,0), left), after=map_touchscreen, primary="DP_1")
 
@@ -18,6 +19,9 @@ xrandr_set("verbatim_right_hand_only", eDP_1=None, DP_1=(fhd, (0,0), right), aft
 
 xrandr_set("verbatim_left_table", eDP_1=(fhd, (1920, 0)), DP_1=(fhd, (0,0)), after=map_touchscreen, primary="DP_1")
 xrandr_set("verbatim_right_table", eDP_1=(fhd, (0, 0)), DP_1=(fhd, (1920,0)), after=map_touchscreen, primary="DP_1")
+
+
+xrandr_set("camomile", eDP_1=(fhd, (0, 1200)), HDMI_1=((1920, 1200), (0,0)), primary="HDMI_1")
 
 
 if __name__ == "__main__":
@@ -36,4 +40,6 @@ else:
     M(K("'", SHIFT), r_verbatim_right_hand_only)
 
     M(K("/", SHIFT), CMD(map_touchscreen))
+
+    M(K(",")       , r_camomile)
 
