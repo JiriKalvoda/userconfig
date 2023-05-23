@@ -250,6 +250,12 @@ mv(){
 mňau(){
 	cat "$@"
 }
+rs(){
+	rsync --recursive --info=progress2 --info=name1 --sparse  --stats  "$@"
+}
+rsa(){
+	rs -at "$@"
+}
 
 ######################### git
 gic(){
