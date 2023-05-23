@@ -36,7 +36,7 @@ def app_workspace(key, workspace, cmd):
 
 ################ On start run ################
 EXEC_ON_STARTUP(CMD("xrdb ~/.Xresources"))
-cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch")
+cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch -option grp:switch -option compose:rctrl")
 EXEC_ON_STARTUP(cmd_set_xkbmap)
 EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
 EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
