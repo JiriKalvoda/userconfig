@@ -100,4 +100,22 @@ color index_tag red red "R"
 
 set hidden_tags = "unread,draft,flagged,passed,replied,attachment,signed,encrypted"
 
-
+# Automatic select From in reply
+set reverse_name
+alternates ^jirikalvoda@kam\.mff\.cuni\.cz$ \
+           ^jirikalvoda\+.*@kam\.mff\.cuni\.cz$\
+           \
+           ^jirikalvoda@gimli\.ms\.mff\.cuni\.cz$ \
+           ^jirikalvoda\+.*@gimli\.ms\.mff\.cuni\.cz$\
+           \
+           ^jirikalvoda@ucw\.cz$ \
+           ^jirikalvoda\+.*@ucw\.cz$ \
+           ^jirikalvoda--.*@ucw\.cz$ \
+           \
+           ^jirikalvoda@matfyz\.cz$ \
+           ^jirikalvoda\+.*@matfyz\.cz$ \
+           \
+           ^.*@jk\.fnuk\.eu$ \
+           ^jk@fnuk\.eu$ \
+           ^jk\+.*@fnuk\.eu$ \
+           ^jk--.*@fnuk\.eu$
