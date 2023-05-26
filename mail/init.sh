@@ -14,6 +14,7 @@ confln m ~/bin/
 confln m-daemon ~/bin/
 confln m-daemon ~/bin/
 confln m-repeat-notification ~/bin/
+confln robot-send-mail ~/bin/
 
 
 if [[ ! -L ~/Maildir ]]
