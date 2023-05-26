@@ -158,7 +158,7 @@ install_config_load(){
 	then
 		echo -e "${Red}No install config, creating${None}"
 		(
-			echo "ic_vrsion=0"
+			echo "ic_version=0"
 			echo "ic_name=$USER@$(hostname)"
 			echo "ic_push='ssh jirikalvoda@ucw.cz'"
 			echo "ic_pull='movingssh -xd $USER@$(hostname)'"
