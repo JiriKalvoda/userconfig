@@ -6,13 +6,14 @@ confln second-tunel-kill.sh ~/bin/second-tunel-kill
 
 confln tunel.sh ~/bin/tunel
 
-gcc tunel-echo.c -o ~/.tunel/tunel-echo
-gcc tunel-echo.c -o ~/.tunel/second-tunel-echo
 
 mkdir ~/.tunel -p
 confln "`which ssh`" ~/.tunel/tunel-ssh
 confln "`which ssh`" ~/.tunel/second-tunel-ssh
 confln "`which ssh`" ~/.tunel/tunel-ssh-check
+
+gcc tunel-echo.c -o ~/.tunel/tunel-echo
+gcc tunel-echo.c -o ~/.tunel/second-tunel-echo
 
 confln config ~/.tunel/ c
 confln config-default ~/.tunel/
