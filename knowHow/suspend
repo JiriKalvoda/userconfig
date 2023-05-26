@@ -1,0 +1,62 @@
+Suspend wake up config:
+======================
+
+Daemon:
+jiri@arzen:~$ cat /lib/systemd/system/suspend-wakeup-config.service
+[Unit]
+Description=Suspend wakeup configuration
+Before=sleep.target
+
+[Service]
+Type=forking
+Environment=DISPLAY=:0
+ExecStart=/usr/lib/pm-utils/sleep.d/45fixusbwakeup suspend
+
+[Install]
+WantedBy=sleep.target
+
+
+Script:
+jiri@arzen:~$ cat /usr/lib/pm-utils/sleep.d/45fixusbwakeup
+#!/bin/bash
+case $1 in
+    hibernate)
+            echo "Going to suspend to disk!"
+            ;;
+    suspend)
+            echo "Fixing acpi settings."
+            for usb in `cat /proc/acpi/wakeup | tail +1 | cut -f1`;
+            do
+                    state=`cat /proc/acpi/wakeup | grep $usb | cut -f3 | cut -d' ' -f1 | tr -d '*'`
+                    echo "device = $usb, state = $state"
+                    if [ "$state" == "enabled" ]
+                    then
+                            echo $usb > /proc/acpi/wakeup
+                    fi
+            done
+            echo "Suspending to RAM."
+            ;;
+    thaw)
+            echo "Suspend to disk is now over!"
+            ;;
+    resume)
+            echo "We are now resuming."
+            ;;
+    *)
+            echo "Somebody is callin me totally wrong."
+            ;;
+esac
+
+
+Hibernate hook pasman:
+[Unit]
+Description=User suspend actions
+Before=hibernate.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/killall pasman pasman-daemon
+ExecStartPost=/usr/bin/sleep 0.01
+
+[Install]
+WantedBy=hibernate.target

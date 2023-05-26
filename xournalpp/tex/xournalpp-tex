@@ -285,6 +285,7 @@ then
 	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
 	\cdef $color
 	\setbox\b=\vbox{
+		\c
 		${input:3}
 	}
 	\bye
@@ -294,6 +295,7 @@ then
 	cat "$twd/template.tex" - > "$twd/tex.tex" <<EOF
 	\cdef $color
 	\setbox\b=\hbox{
+		\c
 		${input:3}
 	}
 	\bye

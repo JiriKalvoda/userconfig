@@ -1,0 +1,37 @@
+fhd = (1920, 1080)
+
+normal = "normal"
+left = "left"
+right = "right"
+inverted = "inverted"
+
+@ACTION_INIT()
+def xrandr(self, name, outputs, primary=None, after=""):
+    self.name = name
+    self.outputs = outputs
+    self.primary = primary
+    self.after = after
+
+@ACTION_IMPLEMENT(xrandr)
+def f(self):
+    out = "xrandr "
+    for name, val in self.outputs.items():
+        def format_size(x):
+            return f"{x[0]}x{x[1]}"
+        if val == None:
+            out += f" --output {name.replace('_','-')} --off"
+        else:
+            mode = val[0]
+            pos = val[1]
+            rotate = val[2] if len(val)>2 else normal
+            out += f" --output {name.replace('_','-')} --mode {format_size(mode)} --pos {format_size(pos)} --rotate {rotate}"
+            if self.primary == name:
+                out += " --primary"
+    osd_restart = f"osdd-run & sleep 1;osdc --color=red 'xrandr {self.name.replace('_', ' ')}';"
+    out += ";" + osd_restart + self.after
+    return CMD(out)
+
+if TARGET == "tex":
+    @ACTION_SERIALIZE(xrandr)
+    def f(self):
+        return TEX_p(1, 1, 0.8, f"XRANDR$nl {self.name.replace('_', ' ')}")

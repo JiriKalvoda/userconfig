@@ -1,0 +1,39 @@
+\def\CppOutputMode{razer}
+\input keymap-cpp.tex
+
+
+\def\rgb#1#2#3{\addoutput{k::rgb(#1,#2,#3)}}
+%%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% workspaces
+\def\GoWorkspace#1{\rgb{0}{1}{1}}
+\def\ContWorkspace#1{\rgb{0}{1}{1}}
+\def\ContGoWorkspace#1{\rgb{0}{1}{1}}
+\def\MoveWorkspace#1{\rgb{0}{1}{0}}
+% Container
+\def\FocusWind#1{\rgb{0}{1}{0}}
+\def\MoveCont#1{\rgb{0}{1}{0}}
+\def\SplitContV{\rgb{0.85}{1}{0}}
+\def\SplitContH{\rgb{0.85}{1}{0}}
+\def\SplitContT{\rgb{0.85}{1}{0}}
+\def\FullscreenContToggle{\rgb{0.85}{1}{0}}
+\def\LayoutCont#1{\rgb{0.85}{1}{0}}
+\def\ResizeCont#1#2#3{\rgb{0.85}{1}{0}}
+\def\FloatingToggleCont{\rgb{0.85}{1}{0}}
+% Restart i3
+\def\RestartProg{\rgb{1}{0}{0}}
+
+%%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\ExitProg{\rgb{1}{0}{0}}
+\def\ExitShutdown{\rgb{1}{0}{0}}
+\def\ExitSuspend{\rgb{1}{0}{0}}
+\def\ExitRestart{\rgb{1}{0}{0}}
+
+\openOutputFile{./razer.cpp}
+\beginIn
+
+\Mode{default}{
+\input ./master.tex
+}
+
+\endIn
+\bye

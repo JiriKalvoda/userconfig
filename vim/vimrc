@@ -9,21 +9,108 @@
 "	 for MS-Windows:  $VIM\_vimrc
 "	    for OpenVMS:  sys$login:.vimrc
 
-" When started as "evim", evim.vim will already have done these settings, bail
-" out.
-if v:progname =~? "evim"
-  finish
-endif
-
 " Get the defaults that most users want.
-source $VIMRUNTIME/defaults.vim
+	if v:progname =~? "evim"
+	  finish
+	endif
+
+	" Bail out if something that ran earlier, e.g. a system wide vimrc, does not
+	" want Vim to use these default values.
+	if exists('skip_defaults_vim')
+	  finish
+	endif
+
+	" Use Vim settings, rather than Vi settings (much better!).
+	" This must be first, because it changes other options as a side effect.
+	" Avoid side effects when it was already reset.
+	if &compatible
+	  set nocompatible
+	endif
+
+	" When the +eval feature is missing, the set command above will be skipped.
+	" Use a trick to reset compatible only when the +eval feature is missing.
+	silent! while 0
+	  set nocompatible
+	silent! endwhile
+
+	" Allow backspacing over everything in insert mode.
+	set backspace=indent,eol,start
+
+	set history=200		" keep 200 lines of command line history
+	set ruler		" show the cursor position all the time
+	set showcmd		" display incomplete commands
+	set wildmenu		" display completion matches in a status line
+
+	set ttimeout		" time out for key codes
+	set ttimeoutlen=100	" wait up to 100ms after Esc for special key
+
+	set display=truncate
+	set scrolloff=5
+	if has('reltime')
+	  set incsearch
+	endif
+	set nrformats-=octal
+	if has('win32')
+	  set guioptions-=t
+	endif
+	map Q gq
+	sunmap Q
+	inoremap <C-U> <C-G>u<C-U>
+
+	if has('mouse')
+	  if &term =~ 'xterm'
+		set mouse=a
+	  else
+		set mouse=nvi
+	  endif
+	endif
+
+	" Only do this part when Vim was compiled with the +eval feature.
+	if 1
+	  filetype plugin indent on
+
+	  " Put these in an autocmd group, so that you can revert them with:
+	  " ":augroup vimStartup | exe 'au!' | augroup END"
+	  augroup vimStartup
+		au!
+
+		autocmd BufReadPost *
+		  \ if line("'\"") >= 1 && line("'\"") <= line("$") && &ft !~# 'commit'
+		  \ |   exe "normal! g`\""
+		  \ | endif
+
+	  augroup END
+	  augroup vimHints
+		au!
+		autocmd CmdwinEnter *
+		  \ echohl Todo | 
+		  \ echo 'You discovered the command-line window! You can close it with ":q".' |
+		  \ echohl None
+	  augroup END
+
+	endif
+	if &t_Co > 2 || has("gui_running")
+	  syntax on
+	  let c_comment_strings=1
+	endif
+
+	if !exists(":DiffOrig")
+	  command DiffOrig vert new | set bt=nofile | r ++edit # | 0d_ | diffthis
+			  \ | wincmd p | diffthis
+	endif
+
+	if has('langmap') && exists('+langremap')
+	  set nolangremap
+	endif
+" END: Get the defaults that most users want.
+
 
 if has("vms")
   set nobackup		" do not keep a backup file, use versions instead
 else
-"  set backup		" keep a backup file (restore to previous version)
+  "set backup		" keep a backup file (restore to previous version)
   if has('persistent_undo')
-"    set undofile	" keep an undo file (undo changes after closing)
+    set undofile	" keep an undo file (undo changes after closing)
   endif
 endif
 
@@ -59,6 +146,9 @@ se hlsearch
 " se textwidth=80
 " se nolinebreak
 
+
+au BufEnter,BufNew *.km se syntax=python expandtab
+
 let g:toExec = ""
 let g:VimRun = ""
 let g:useVimRun = 0
@@ -68,7 +158,7 @@ let g:useVimRun = 0
 command! -nargs=+ AddExecF  let g:toExec = g:toExec . <q-args>
 command! -nargs=+ AddExec  AddExecF promt; echo <q-args>; <args>;
 command! -nargs=+ AddBashF  let g:toExec = <q-args>
-command! -nargs=* AddBashG  AddBashF bash-rc -i -c <q-args>;
+command! -nargs=* AddBashG  AddBashF bash-rc -i -c <q-args>
 command!  AddBash  execute "AddBashG ".g:toExec
 command! -nargs=+ AddLessF  let g:toExec = <q-args>
 command! -nargs=* AddLessG  AddLessF bash-rc -i -c <q-args>;
@@ -91,7 +181,8 @@ command! -nargs=* BR call BR(<q-args>)
 
 function! ExecHere()
 	AddBash
-	execute "!".g:toExec
+	execute "! ".g:toExec."echo"
+	normal i
 	let g:toExec = ""
 endfunction
 
@@ -211,7 +302,7 @@ function! Compile(isVimRun)
 		execute "AddExec cmake  ".NameDir()." ".CompileArg()
 		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
 	elseif s == "arduino"
-		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".RunArg()
+		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".CompileArg()
 	elseif s == "tex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	elseif s == "ptex"
@@ -225,11 +316,11 @@ function! Compile(isVimRun)
 	elseif s == "asy"
 		execute "AddExec asy ".NameAll()." ".CompileArg()
 	elseif s == "make"
-		execute "AddExec make"
+		execute "AddExec make ".CompileArg()
 	else
 		let script = GetVar("CompileScript")
 		if script == "EMPTY"
-			execute "AddExec echo This sintax ".s." is not suported | lolcat"
+			execute "AddExec echo This syntax ".s." is not suported | lolcat"
 		elseif s=="script"
 			execute "AddExec ".script
 		else
@@ -241,6 +332,8 @@ function! Run(isVimRun,input)
 	let s = Syntax()
 	if s == "cpp"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
+	elseif s == "run"
+		execute "AddExec ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "c"
 		execute "AddExec ".NameNoE().".out ".RunArg()." ".a:input
 	elseif s == "sh"
@@ -272,10 +365,13 @@ function! Run(isVimRun,input)
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ltex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
+	elseif s == "cs"
+		w
+		execute "AddExec dotnet run ".RunArg()" ".a:input
 	else
 		let script = GetVar("RunScript")
 		if script == "EMPTY"
-			execute "AddExec echo This sintax ".s." is not suported | lolcat"
+			execute "AddExec echo This syntax ".s." is not suported | lolcat"
 		elseif s=="script"
 			w
 			execute "AddExec ".script
@@ -297,7 +393,7 @@ endfunction
 "##%endfunction
 function! XournalLaunch()
 		"execute "AddExec ( xournalpp ".expand('<cfile>:p:r').".xopp; xournalpp ".expand('<cfile>:p:r').".xopp --create-pdf ".expand('<cfile>:p:r').".pdf ) 2>/dev/null >/dev/null & echo" 
-		execute "AddExec ~/bin/vim_launcher xournalppp ".expand('<cfile>')
+		execute "! ~/bin/vim_launcher xournalppp ".expand('<cfile>')
 endfunction
 
 function! RunTests(isVimRun)
@@ -314,7 +410,7 @@ function! ClearBin(isVimRun)
 		execute "AddExec rm ".NameNoE().".out "
 	elseif s == "tex"
 	else
-		echo "This sintax \"".s."\" is not suported!"
+		echo "This syntax \"".s."\" is not suported!"
 	endif
 endfunction
 function! Debug(isVimRun)
@@ -329,7 +425,7 @@ function! Debug(isVimRun)
 		execute "AddExec gcc -g3 ".NameAll()." -o ".NameNoE().".out ".CompileArg()
 		execute "AddExec gdb ".NameNoE().".out ".RunArg()
 	else
-		echo "This sintax \"".s."\" is not suported!"
+		echo "This syntax \"".s."\" is not suported!"
 	endif
 endfunction
 function! CompileRun(isVimRun)
@@ -433,7 +529,7 @@ map <silent> <C-x> "+d
 vmap <silent> <C-x> "+d
 imap <silent> <C-v> <C-r>+
 
-set timeoutlen=100000000000000000
+set timeoutlen=10000000
 
 map ,, A <ESC>I <Esc>lvEdi<BS><Del>\begin{}<Esc>Po\end{}<Esc>PO
 map <silent> ,o o\item 
@@ -450,7 +546,44 @@ map <silent> ,N O$$<ESC>o$$<ESC>O
 map <silent> ,x "xyaB:call XournalLaunch()<CR>:call Exec()<CR>
 "map ,, yyI\begin{<Esc>A}<Esc>pI\end{<Esc>A}<Esc>O
 
+function StyleDefault()
+	se shiftwidth=4
+	se tabstop=4
+	se cinoptions=
+endfunc
+
+function StyleGNU()
+	se shiftwidth=8
+	se tabstop=8
+	se cinoptions=>4,n-2,^-2,{2,:2,=2,t0,(2
+endfunc
+
+call StyleDefault()
+map \h :call StyleDefault()<CR>
+map \g :call StyleGNU()<CR>
 
 
-se shiftwidth=4
-se tabstop=4
+function ListCharsAll()
+	se list
+	se listchars=tab:>-,eol:$,space:_,nbsp:~,extends:\|
+	syntax off
+endfunction
+
+function ListCharsDefault()
+	se list
+   set listchars=tab:>-
+	syntax on
+endfunction
+
+function ListCharsNone()
+	se nolist
+	syntax on
+endfunction
+
+call ListCharsDefault()
+map \m :call ListCharsAll()<CR>
+map \M :call ListCharsDefault()<CR>
+map \<C-m> :call ListCharsNone()<CR>
+
+set list
+se ls=0

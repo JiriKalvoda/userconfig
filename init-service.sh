@@ -4,13 +4,26 @@ user="$2"
 exe="$3"
 par="$4"
 opt="$5"
+installToUser=False
 
 if [ -z "$name" ] || [ -z "$user" ] || [ -z "$exe" ]
 then 
 	echo "Script for creating systemd deamon"
 	echo "Usage:"
-	echo "	$0 name user exec [cmd parametrs] [daemon options]"
+	echo "	$0 name [user/'--user'] exec [cmd parametrs] [daemon options]"
 	exit 100
+fi
+
+if [[ "$user" == "--user" ]]
+then
+	user="$USER"
+	installToUser=true
+	# loginctl enable-linger USERNAME
+fi
+
+if $installToUser
+then
+	systemctlUserArg="--user"
 fi
 
 if id "$user" &>/dev/null; then  true ; else
@@ -31,34 +44,54 @@ fi
 
 tmp=$(mktemp)
 
+if $installToUser
+then
+lineUser=""
+else
+lineUser="User=$user"
+fi
+
+if $installToUser
+then
+lineWantedBy="WantedBy=default.target"
+else
+lineWantedBy="WantedBy=multi-user.target"
+fi
+
 cat > $tmp <<EOF
 [Unit]
 Description=$name
 After=network.target
 
 [Service]
-User=$user
+$lineUser
 Environment=HOME=$home
 Environment=PATH=$path
 ExecStart=$exePath $par
-Restart=on-failure
+Restart=always
+RestartSec=10
 $opt
 
 [Install]
-WantedBy=multi-user.target
+$lineWantedBy
 EOF
 
 
-systemctl disable $name
+systemctl $systemctlUserArg disable $name
 
 
-confln $tmp /lib/systemd/system/$name.service cr
-systemctl daemon-reload
+if $installToUser
+then
+	confln $tmp ~/.config/systemd/user/$name.service cr
+else
+	confln $tmp /lib/systemd/system/$name.service cr
+fi
+systemctl $systemctlUserArg daemon-reload
 
 if [[ "$opt" != *d* ]]
 then
-	systemctl enable $name
-	systemctl restart $name
+	systemctl $systemctlUserArg enable $name
+	systemctl $systemctlUserArg restart $name
 fi
 
 rm $tmp

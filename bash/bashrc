@@ -6,7 +6,7 @@
 case $- in
     *i*) ;;
       *) 
-	      [[ "$use_bashrc" = "" ]] && exit;;
+	      [[ "$use_bashrc" = "" ]] && return;;
 esac
 
 ######################### spawn-alacritty-cwd
@@ -23,6 +23,7 @@ fi
 
 ######################### Local bin
 export PATH=$PATH:~/bin
+#unalias -a
 
 ######################### history files
 # don't put duplicate lines or lines starting with space in the history.
@@ -46,7 +47,7 @@ shopt -s checkwinsize
 #shopt -s globstar
 
 # make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+# [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
@@ -140,6 +141,9 @@ egrep(){
 }
 
 ######################### ls
+unalias ll 2>/dev/null
+unalias la 2>/dev/null
+unalias l 2>/dev/null
 ll(){
 	ls -alF "$@"
 }
@@ -151,14 +155,21 @@ l(){
 }
 
 ######################### vim
+if which nvim >/dev/null 2>/dev/null
+then
+	export EDITOR=nvim
+	export MANPAGER='nvim +Man!'
+else
+	export EDITOR=vim
+fi
 e(){
-	vim "$@"
+	$EDITOR "$@"
 }
 vi(){
-	vim "$@"
+	e "$@"
 }
 view(){
-	vim -R "$@"
+	e -R "$@"
 }
 
 ######################### ping, traceroute
@@ -195,17 +206,19 @@ run(){
 	$@;
 }
 zath(){
-	for i in $@
+	for i in "$@"
 	do
-		zathura $i & sleep 0.2
+		zathura "$i" & sleep 0.2
+	done
+}
+zath1(){
+	for i in "$@"
+	do
+		zathura "$i" --page=1 & sleep 0.2
 	done
 }
 
 ######################### Separators
-h(){
-	 echo ---------- "$@": | lolcat
-	"$@"
-}
 promt(){
 	echo -n "${PS1@P}" | tr -d `char 1``char 2`
 }
@@ -219,7 +232,7 @@ sepLine(){
 }
 
 ######################### remove, coppy, move
-real_rm="(which rm)"
+real_rm="$(which rm)"
 rmHARD(){
 	$real_rm "$@"
 }
@@ -233,6 +246,15 @@ cp(){
 real_mv="$(which mv)"
 mv(){
 	$real_mv -i "$@"
+}
+mňau(){
+	cat "$@"
+}
+rs(){
+	rsync --recursive --info=progress2 --info=name1 --sparse  --stats  "$@"
+}
+rsa(){
+	rs -at "$@"
 }
 
 ######################### git
@@ -251,11 +273,8 @@ gig(){
 gil(){
 	git log --max-count=1 "$@"
 }
-gi(){
-	git add "$@"
-}
 gia(){
-	git add . "$@"
+	git add "$@"
 }
 giac(){
 	git add $@;git commit;
@@ -284,6 +303,15 @@ gipa() {
 	git remote | while read r ; do echo -e "\e[91;1m PULL $r $b\e[0m"; git pull $r $b ; done
 	git remote | while read r ; do echo -e "\e[91;1m PUSH $r $b\e[0m"; git push $r $b ; done
 }
+gir(){
+	git rebase $@
+}
+giri(){
+	git rebase -i $@
+}
+girc(){
+	git rebase --continue $@
+}
  
 ######################### systemctl
 sys(){
@@ -308,7 +336,7 @@ youtube() {
 ms(){
 	movingssh "$@"
 }
-complete -F _movingssh m "$@"
+complete -F _movingssh ms
 
 ######################### gpg
 bye(){
@@ -334,7 +362,7 @@ p3(){
 }
 pe(){
 	p="$PS1"
-	. ./venv/bin/activate
+	. "${1:-.}"/venv/bin/activate
 	PS1="$p"
 }
 pde(){
@@ -348,6 +376,17 @@ makej(){
 
 
 
+d(){
+	BG ~/.config/alacritty/spawn-alacritty-cwd
+}
+
+cwd(){
+	cd $(wd $@)
+}
+
+mcwd(){
+	mcd $(wd $@)
+}
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -365,9 +404,24 @@ alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo
 promt_NoGit=0
 promt_parse_git_branch() {
 	if [ $promt_NoGit -eq 0 ]; then 
-		git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+		promt_git_branch="$(git branch 2>&1)"
+		if ! [[ "$promt_git_branch" == *"fatal: not a git repository"* ]]
+		then
+			if [[ "$promt_git_branch" == *"fatal: unsafe repository"* ]]
+			then
+				echo "[S]"
+			else
+				promt_git_branch=$(echo "$promt_git_branch" |sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/')
+				if [[ "$promt_git_branch" == '('*')' ]]
+				then
+					echo "$promt_git_branch"
+				else
+					echo "[E]"
+				fi
+			fi
+		fi
 	else
-		echo "?"
+		echo "[?]"
 	fi
 }
 
@@ -439,6 +493,24 @@ pG()
 	fi
 }
 
+nm()
+{
+	neomutt -f"notmuch://?query=$1" ; offlineimap-run all
+}
+nmt()
+{
+	neomutt -f"notmuch://?query=thread:{$1}" ; offlineimap-run all
+}
+nmi()
+{
+	nm "tag:unread or tag:flagged"
+}
+nmat()
+{
+	notmuch search --output=tags '*'
+}
+
+
 
 ######################### default colors
 promt_color_rvalue=91
@@ -478,13 +550,13 @@ fi
 ######################### configuration by connection types
 if [ "$SSH_CONNECTION" != "" ];
 then 
-	if [ "$LD_SSHTYPE" = "localhost" ];
+	if [ "$LD_SSHTYPE" = "localhost" ] || [ "$LC_SSHTYPE" = "localhost" ]
 	then
 		true
-	elif [ "$LD_SSHTYPE" = "second" ];
+	elif [ "$LD_SSHTYPE" = "second" ] || [ "$LC_SSHTYPE" = "second" ]
 	then 
 		promt_color_user=33
-	elif [ "$LD_SSHTYPE" = "local" ];
+	elif [ "$LD_SSHTYPE" = "local" ] || [ "$LC_SSHTYPE" = "local" ]
 	then 
 		promt_color_user=96
 	else
@@ -532,13 +604,15 @@ promt_pwd(){
 	fi
 }
 
-promt_NoRight=0
+promt_NoRight=1
 promt_right()
 {
+	lastcmd=$?;
 	if [ "$promt_NoRight" -eq 0 ]
 	then 
 		printf "%*s" $(( $(tput cols) + 6 ))  "$(echo -e "\e[${promt_color_right}m[$(date +%H:%M:%S)]\015")"
 	fi
+	exit $lastcmd
 }
 
 ######################### PS1
@@ -579,3 +653,40 @@ for i in ~/bin/bashrc/*
 do
 	  . $i
 done 2>/dev/null
+
+aux()
+{
+	if [[ "$(pwd)" == /aux/* ]]
+	then
+		cwd 0 home
+	else
+		cwd 0 aux
+	fi
+}
+
+unset MAILCHECK
+
+lpl()
+{
+	lp -o Duplex=DuplexTumble -o XRFold=BiFoldStaple -o XROutputMode=HighResolution "$@"
+}
+lp1l()
+{
+	lp -o Duplex=DuplexTumble -o XROutputMode=HighResolution "$@"
+}
+
+
+h(){
+	xdo hide "$WINDOWID";
+	"$@"
+	r=$?
+	xdo show "$WINDOWID"
+	return $r
+}
+
+x()
+{
+	h "$(which x)" "$@"
+}
+
+

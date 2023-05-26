@@ -1,0 +1,84 @@
+\input ucwmac2.tex
+
+\def\makeatletter{\catcode`@=11 }
+\def\makeatother{\catcode`@=12 }
+\makeatletter
+
+
+\def\pair#1#2{$\left<#1,#2\right>$}
+\def\E{{\bf E}}
+\def\O{{\cal O}}
+\def\frac#1#2{{{#1}\over{#2}}}
+\let\f\frac
+\mathchardef\comma="013B
+% FIXME: This is ugly, no need to switch modes.
+\def\eq{\ifmmode$\nobreak\ \discretionary{=}{=}{=}\nobreak\ $\else$\eq$\errmessage{You shall use \eq in the math mode.}\fi}
+\def\cdotop{\mathop\cdot}
+\def\degree{^{\circ}}
+\def\nsd{\mathop{\rm nsd}\nolimits}
+\def\nsn{\mathop{\rm nsn}\nolimits}
+
+% Function typeset in italic, e.g., $\f{size}(v)$
+\def\f#1{\mathop{\<#1>}\mkern 1mu\relax}
+
+\font\mft=msbm10
+\def\N{\hbox{\mft N}}
+\def\Z{\hbox{\mft Z}}
+\def\Q{\hbox{\mft Q}}
+\def\R{\hbox{\mft R}}
+\def\C{\hbox{\mft C}}
+
+% \vect is longer than \vec, but with smaller arrow than \overrightarrow (same arrow as in \vec)
+\def\vect#1{%
+  \vbox{\m@th \ialign {##\crcr
+  \vectfill\crcr\noalign{\kern-\p@\vskip-2pt \nointerlineskip}
+  $\hfil\displaystyle{#1}\hfil$\crcr}}}
+\def\vectfill{%
+  $\m@th\smash-\mkern-7mu%
+  \cleaders\hbox{$\mkern-2mu\smash-\mkern-2mu$}\hfill\hskip-2.8pt
+  \mkern-7mu\raise-3.7pt\hbox{$\mathord\mathchar"017E$}$}
+
+% \<...> is already defined in ucwmac, but it does not scale the fonts in (super|sub)scripts
+\def\<#1>{\ifmmode
+\mathchoice{\hbox{\I #1}}{\hbox{\I #1}}{\hbox{\it\setfonts[/7]#1\/}}{\hbox{\it\setfonts[/5]#1\/}}
+\else\leavevmode\hbox{\I #1}\fi}
+
+ \def\sc{%
+      \expandafter\ifx\the\scriptfont\fam\nullfont
+        \font\temp = cmr7 \temp
+      \else
+        \the\scriptfont\fam
+      \fi
+      \def\uppercasesc{\char\uccode`}%
+    }%
+\def\LaTeX{{L\kern-\pnt36em\setbox0\hbox{T}\vbox to \ht0{\hbox{\settextsize{7}A}\vss}\kern-\pnt15em}\TeX}
+\protected\def\Cpp{C{\tt ++}}
+\protected\def\Cis{C{\tt\#}}
+
+
+\def\({\left(}
+\def\){\right)}
+\def\<{\left<}
+\def\>{\right>}
+\def\Ra{\Rightarrow}
+\def\sRa{\ \Rightarrow\ }
+\def\sLRa{\ \Leftrightarrow\ }
+\def\ra{\rightarrow}
+\def\sra{\ \rightarrow\ }
+\def\f{\frac}
+\def\ceil#1{\lceil#1\rceil}
+\def\floor#1{\lfloor#1\rfloor}
+
+\def\nl{\hfil\penalty -1000000}
+
+\def\loadpic#1#2{% pic width, pic file. Could be more universal...
+  \def\@mpty{width }\edef\wdt@{width #1}\ifx\@mpty\wdt@\def\wdt@{}\fi
+  \pdfximage\wdt@{#2}
+}
+\def\putpic{\pdfrefximage\pdflastximage}
+\def\centerpic#1#2{%pic width, pic file
+\loadpic{#1}{#2}
+\cline{\putpic}}%
+
+
+\makeatother

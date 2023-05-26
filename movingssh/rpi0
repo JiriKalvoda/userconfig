@@ -1,4 +1,6 @@
 #!/bin/bash
 echo localhost:57083 > ~/.secret/mqtt/rpi0-all.tunel
-movingssh -dx rpi0 -L3001:localhost:3001 -L3002:localhost:22 -L3000:localhost:3000 -L57083:localhost:1883
+echo localhost:57084 > ~/.secret/mqtt/jug9-all.tunel
+movingssh -dx rpi0 -L3001:localhost:3001 -L3002:localhost:22 -L3000:localhost:3000 -L57083:localhost:1883 -L57084:10.19.32.1:1883
 rm ~/.secret/mqtt/rpi0-all.tunel
+rm ~/.secret/mqtt/jug9-all.tunel

@@ -19,9 +19,10 @@ whileok()
 	while true
 	do
 		sleep $checktime
-		./$cmdprefix-ssh-check $server -p $port -oServerAliveInterval=300 -o HostKeyAlias=localhost "echo OK > $okfile" &
+		ssh $server -p $port -oServerAliveInterval=300 -o HostKeyAlias=localhost "echo OK > $okfile" &
+		pid_check=$!
 		sleep $timeout
-		killall $cmdprefix-ssh-check -q
+		kill $pid_check
 		if [[ -f $okfile ]]
 		then
 			rm $okfile 
@@ -34,11 +35,17 @@ whileok()
 
 while true
 do
-	killall $cmdprefix-echo -q
-	killall $cmdprefix-ssh -q
-	killall $cmdprefix-check -q
 	echo START
-	./$cmdprefix-echo |  ./$cmdprefix-ssh $tunel $user@$server -oServerAliveInterval=300 "./bin/tunel-server -- $name port $port from \$SSH_CLIENT local $(myip) start at \$(date \"+%y-%m-%d %H:%M:%S\")"  &
+	(
+		while true
+		do
+			sleep 10
+			echo DOING ECHO >&2
+			echo -n a || exit 0
+		done
+	) |  ssh $tunel $user@$server -oServerAliveInterval=300 "./bin/tunel-server -- $name port $port from \$SSH_CLIENT local $(myip) start at \$(date \"+%y-%m-%d %H:%M:%S\")"  &
+	pid_ssh=$!
 	whileok
+	kill $pid_ssh
 done
 

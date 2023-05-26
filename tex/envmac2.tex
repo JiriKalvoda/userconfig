@@ -1,0 +1,129 @@
+% Macros for printing of envelopes (used by db/post-envelopes)
+
+\input ucwmac2.tex
+\ucwmodule{paper}
+
+\nopagenumbers
+\parindent=0pt
+\parskip=0pt
+\lineskiplimit=-2pt
+
+\newdimen\addrhpos         \addrhpos=150mm
+\newdimen\addrvpos         \addrvpos=110mm
+\newdimen\returnaddrhpos   \returnaddrhpos=12mm
+\newdimen\returnaddrvpos   \returnaddrvpos=15mm
+\newdimen\hippohpos        \hippohpos=100mm
+\newdimen\hippovpos        \hippovpos=98mm
+\newdimen\hipposize        \hipposize=30mm
+\newdimen\addrbaselineskip \addrbaselineskip=14pt
+
+\newif\ifstickers
+\stickersfalse
+
+\def\envformat#1{\sget\fmt{format:#1}\fmt}
+
+\sdef{format:C4}{
+	\envdefaults{c4}
+	\addrhpos=200mm \addrvpos=150mm
+	\hippohpos=150mm \hippovpos=160mm
+}
+
+\sdef{format:C5}{
+	\envdefaults{c5}
+}
+
+\sdef{format:C6}{
+	\envdefaults{c6}
+	\returnaddrhpos=5mm \returnaddrvpos=5mm
+	\addrhpos=90mm \addrvpos=85mm
+	\hippohpos=50mm  \hippovpos=85 mm
+	\hipposize=20mm
+}
+
+\sdef{format:B5}{
+	\envdefaults{b5}
+	\addrhpos=170mm \addrvpos=120mm
+	\hippohpos=120mm \hippovpos=130mm
+}
+
+\sdef{format:stickers}{
+	\ucwmodule{labels}
+	\setpaper{a4}
+	\raggedbottom
+	\setuplabels{3}{8}
+	% \labelrulestrue
+	\stickerstrue
+	\addrhpos=0mm \addrvpos=26mm
+	\font\envfnt=csr12 at 13pt
+	\addrbaselineskip=13pt
+}
+
+\def\envdefaults#1{
+	\setpaper{#1}
+	\landscape
+	\setmargins{0mm}
+	\setuppage
+	\font\envfnt=csr12 at 13pt
+	\font\papersfnt=csr7
+}
+
+\long\def\letter#1{
+	\ifstickers
+		\label{#1\vfil}\ignorespaces
+	\else
+		\nointerlineskip
+		\placeat{\returnaddrhpos}{\returnaddrvpos}{\returnaddr}
+		\nointerlineskip
+		\placeat{\hippohpos}{\hippovpos}{\hippo}
+		#1
+		\vfill
+		\eject
+	\fi
+}
+
+\def\addr#1{
+	\nointerlineskip
+	\placeat{\addrhpos}{\addrvpos}{
+		\envfnt
+		\advance\baselineskip 2pt
+		\vbox{#1}
+	}
+}
+
+\def\arow#1{
+	\leftline{#1}
+}
+
+\def\returnaddr{
+	\vhanglines{
+		\advance\baselineskip by -1pt
+		\halign{\hbox to 20em{\hfil##\hfil}\cr
+			\bf Jiří Kalvoda\cr
+			\rm email: jirikalvoda@kam.mff.cuni.cz\cr
+		}
+	}
+}
+
+\newbox\hippobox
+
+\def\hippo{}
+
+\def\img#1{
+	\def\hippo{
+		\ifvoid\hippobox
+			\global\setbox\hippobox=\putimage{width \hipposize}{#1}%
+		\fi
+		\copy\hippobox
+	}
+}
+
+\def\papers#1{
+	\ifstickers
+		% No room for a list of papers
+	\else
+		\nointerlineskip
+		\placeat{10mm}{\dimexpr\vsize-10mm\relax}{\papersfnt #1}
+	\fi
+}
+
+\def\blank{\label{\vfil}}

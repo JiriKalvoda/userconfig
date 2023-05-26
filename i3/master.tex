@@ -15,6 +15,19 @@
 	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContWorkspace{#3}}
 	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoWorkspace{#3}}
 }
+\def\WorkspaceMasterAll#1#2#3{
+	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoMasterWorkspace{#3}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContMasterWorkspace{#3}}
+	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoMasterWorkspace{#3}}
+	\BindKey{\Key{\Alt\Super  }{#1}{#2}}{\Cmd{i3-woman swap-with-workspace -m #3 -s alloc -n}}
+	\BindKey{\Key{\Alt\Shift\Super}{#1}{#2}}{\Cmd{i3-woman swap-master-with-workspace -m #3 -s alloc -n}}
+}
+\def\WorkspaceSlaveAll#1#2#3{
+	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoSlaveWorkspace{#3}}
+	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContSlaveWorkspace{#3}}
+	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoSlaveWorkspace{#3}}
+	\BindKey{\Key{\Alt\Super  }{#1}{#2}}{\Cmd{i3-woman swap-with-workspace -s #3 -n}}
+}
 
 \def\BindArrUp#1#2{
 	\BindKey{\Key{#1}{3}{8}}{#2}
@@ -74,7 +87,8 @@
 
 \IiiiLine{%
 bar \{%
-        status_command "~/.config/i3/status.out 2>~/.status.log"%
+        % status_command "~/.config/i3/status.out 2>~/.status.log"%
+        status_command "~/bin/i3csstatus i3 -c .config/i3/i3csstatus.conf -i 2>~/.i3csstatus.log"%
 \}%
 }
 
@@ -83,19 +97,40 @@ bar \{%
 \IiiiLine{floating_modifier $mod} %$
 
 %%%%%%%%%%%%%% Standard workspaces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\IiiiLine{exec_always "i3-woman exit; i3-woman-daemon --gui"}
+\IiiiLine{for_window [title="^i3-woman$"] move to workspace 0}
+\IiiiLine{for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp}
+
 \for{I}{0}{13}{\countJ\countI
-\WorkspaceAll{1}{\the\countI}{\the\countJ}
+\WorkspaceSlaveAll{1}{\the\countI}{\the\countJ}
 }
-\for{I}{1}{13}{\countJ\countI \advance\countJ 20\relax
-\WorkspaceAll{0}{\the\countI}{\the\countJ}
+\for{I}{1}{13}{\countJ\countI\relax
+\WorkspaceMasterAll{0}{\the\countI}{\the\countJ}
 }
 
 %%%%%%%%%%%%%% WM Control %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \for{Iter}\in{{Left}{Right}{Up}{Down}}{
 \csname BindArr\Iter\endcsname{\Super}{\FocusWind{\Iter}}
 \csname BindArr\Iter\endcsname{\Shift\Super}{\MoveCont{\Iter}}
-\csname BindArr\Iter\endcsname{\Ctrl\Super}{\MoveWorkspace{\Iter}}
 }
+\BindKey{\Key{\Super}{4}{10}}{\MoveWorkspace{next}}
+
+\BindKey{\Key{\Super}{4}{9}}{\Cmd{i3-woman goto-workspace -s alloc -n}}
+\BindKey{\Key{\Shift\Super}{4}{9}}{\Cmd{i3-woman goto-workspace -m alloc -n}}
+\BindKey{\Key{\Ctrl\Super}{4}{9}}{\Cmd{i3-woman goto-with-container-to -s alloc -n}}
+\BindKey{\Key{\Ctrl\Shift\Super}{4}{9}}{\Cmd{i3-woman goto-with-container-to -m alloc -n}}
+
+\BindKey{\Key{\Super}{4}{11}}{\Cmd{i3-woman gui}}
+% \IiiiLine{for_window [title="i3-workspace-daemon"] move container to workspace 0}
+
+\BindArrDown{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -m next-skip -n}}
+\BindArrUp{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -m prev-skip -n}}
+\BindArrLeft{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -s prev-skip -n}}
+\BindArrRight{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -s next-skip -n}}
+\BindArrDown{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -m next -n}}
+\BindArrUp{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -m prev -n}}
+\BindArrLeft{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -s prev-limit -n}}
+\BindArrRight{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -s next-limit -n}}
 
 \BindKey{\Key{\Super}{4}{5}}{\SplitContV}
 \BindKey{\Key{\Super}{3}{5}}{\SplitContH}
@@ -108,6 +143,7 @@ bar \{%
 \BindKey{\Key{\Super}{2}{3}}{\LayoutCont{toggle split}}
 
 \BindKey{\Key{\Shift\Super}{5}{3}}{\FloatingToggleCont}
+\BindKey{\Key{\Ctrl\Super}{5}{3}}{\StickyToggleCont}
 \BindKey{\Key{\Super}{5}{3}}{\FocusWind{mode_toggle}}
 
 \BindKey{\Key{\Super}{3}{1}}{\FocusWind{parent}}
@@ -172,15 +208,19 @@ bar \{%
 
 \BindKey{\Key{\Ctrl\Shift\Super}{4}{2}}{\Cmd{zathura}}
 
-\AppWorkspace{4}{9}{WUI}{~/dev/runWUI/run.sh}
+% \BindKey{\Key{\Super}{4}{9}}{\GoWorkspace{1}}
+
 \IiiiLine{for_window [title="WebUpdatingIndicator compare"] floating enable}
 \IiiiLine{for_window [title="Tea Timer"] floating enable}
+\IiiiLine{for_window [title="Tea Timer"] sticky enable}
 
-\AppWorkspace{4}{8}{MAIL}{start-mail}
+\AppWorkspace{4}{8}{MAIL}{terminal -e m-daemon}
 \IiiiLine{for_window [title="MAIL"] move container to workspace MAIL}
 
 \AppWorkspace{4}{2}{ZOOM}{zoom}
 \IiiiLine{for_window [class="zoom"] move container to workspace ZOOM}
+\IiiiLine{for_window [title="^zoom$" class="zoom"] floating enable}
+\IiiiLine{for_window [title="Zoom - Free Account" class="zoom"] floating disable}
 
 \IiiiLine{for_window [title="AlwaysOnTop"] floating enable}
 
@@ -197,10 +237,10 @@ bar \{%
 
 
 % TV
-\BindKey{\Key{\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/playlist/channels}}
-\BindKey{\Key{\Shift\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
-\BindKey{\Key{\Ctrl\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/playlist/channels}}
-\BindKey{\Key{\Ctrl\Shift\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://localhost:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://localhost:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
+% \BindKey{\Key{\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/playlist/channels}}
+% \BindKey{\Key{\Shift\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
+% \BindKey{\Key{\Ctrl\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/playlist/channels}}
+% \BindKey{\Key{\Ctrl\Shift\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://localhost:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://localhost:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
 
 
 
@@ -250,7 +290,7 @@ bar \{%
 	\BindKey{\Key{}{3}{4}}{\Volume{+}{2}}
 	\BindKey{\Key{}{3}{5}}{\Volume{+}{10}}
 
-	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output DP-1 --off --output HDMI-1 --off --output eDP-1 --pos 0x0; wacom-config output 0}}
+	\BindKey{\Key{}{4}{7}}{\Cmd{xrand--auto; xrandr --output DP-1 --off --output HDMI-1 --off --output eDP-1 --pos 0x0 --mode 1920x1080; wacom-config output 0}}
 	\BindKey{\Key{}{4}{8}}{\Cmd{xrandr --auto; xrandr --output DP-1 --pos 0x0 --output HDMI-1 --pos 0x0 --output eDP-1 --pos 2560x500; xsetwacom --set 10 MapToOutput  2560x1440+0+0; wacom-config output 0}}
 	\BindKey{\Key{}{4}{9}}{\Cmd{xrandr --auto ; wacom-config output 0}}
 
@@ -290,6 +330,8 @@ bar \{%
 	\BindKey{\Key{\Shift}{4}{4}}{\OsdDisable{display0}}
 	\BindKey{\Key{}{4}{5}}{\OsdEnable{display1}}
 	\BindKey{\Key{\Shift}{4}{5}}{\OsdDisable{display1}}
+	\BindKey{\KeyH{}}{\AndII{\GoMode{default}}{\Cmd{blueman-manager}}}
+	\BindKey{\KeyH{\Shift}}{\AndII{\GoMode{default}}{\Cmd{bueman-applet}}}
 }
 %\BindKey{\KeyI{\Super}}{\Cmd{terminal}}
 %\BindKey{\Key{}{2}{6}}{\Cmd{terminal}}
@@ -318,7 +360,7 @@ bar \{%
 
 \def\OutputModeIiii{i3}
 \ifx\OutputMode\OutputModeIiii
-\IiiiInline{bindcode 171 }\LedOpSwap{pokojik}{_}{second}\IiiiLine{}
+\IiiiInline{bindcode 171 }\LedOpSwap{jug9/1}{_}{second}\IiiiLine{}
 \IiiiInline{bindcode 173 }\Volume{}{0}\IiiiLine{}
 \IiiiLine{bindcode 172 exec playerctl play-pause}
 \IiiiLine{bindcode 208 exec playerctl play-pause}
@@ -347,4 +389,3 @@ bar \{%
 \PrintKeyboard{{\relax\Super}{\Super\Shift}{\Super\Ctrl}{\Super\Ctrl\Shift}}
 \PrintKeyboard{{\relax}{\Shift}{\Ctrl}{\Ctrl\Shift}}
 \fi
-

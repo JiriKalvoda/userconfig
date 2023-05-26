@@ -1,11 +1,13 @@
 #!/bin/bash
+snapdrive=/dev/disk/by-uuid/319df3ef-4495-41b4-9635-968f2d374fcc
+autosnapdrive=/dev/disk/by-uuid/2285d44c-d0dd-4de7-afbd-e1bc001dacaf
 case "$device" in
   test)
 		from=/tmp/testsnap
     ;;
   rpi0 )
 		from=/
-		exclude_aux=false
+		exclude_aux=true
 	;;
   rpi[1-7])
 	    exclude_aux=false
@@ -24,9 +26,5 @@ case "$device" in
 		exclude_mountdir=false
 		excludedir_homes="'/files/home'"
   		ms root@$device
-    ;;
-  *)
-	err DEVICE $device NOT EXIST
-    exit 200
     ;;
 esac

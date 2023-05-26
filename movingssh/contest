@@ -1,0 +1,5 @@
+#!/bin/bash
+movingssh -r contest\
+ -L8889:localhost:8889\
+ -L8890:localhost:8890\
+ -L8888:localhost:8888

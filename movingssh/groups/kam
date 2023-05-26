@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [[ "$name" == *"kam"* ]] || [[ "$name" == *"cam" ]] || [[ "$minus" == *"k"* ]]
+if [[ "$name" == *"kam"* ]] || [[ "$name" == *"cam"* ]] || [[ "$minus" == *"k"* ]]
 then
 	if [[ "$minus" != *"K"* ]]
 	then

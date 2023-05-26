@@ -1,0 +1,231 @@
+\def\OutputMode{doc}
+%%%%%%%%%%%%%% Include %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\input keymap-utils.tex
+\input keymap-abstract.tex
+
+\let\isPrintNumpad\YES
+
+%%% Colors %%% (from ucwmac (c) MJ)
+\chardef\colorstk=\pdfcolorstackinit page direct{0 g 0 G}
+\def\colorset#1{\pdfcolorstack\colorstk set #1}
+\def\colorpush#1{\pdfcolorstack\colorstk push #1}
+\def\colorpop{\pdfcolorstack\colorstk pop}
+\def\colorlocal{\aftergroup\colorpop\colorpush}
+\def\rgb#1{{#1 rg #1 RG}}
+\def\gray#1{{#1 g #1 G}}
+\def\cmyk#1{{#1 k #1 K}}
+\def\cwhite{\rgb{1 1 1}}
+
+%%%%%%%%%%%%%% Output %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newinsert\marg
+\newcount\margCount
+\def\pagebody{\vbox{\boxmaxdepth\maxdepth \pagecontents}}
+
+\parindent=0pt
+\hsize=86cm
+\pdfpagewidth=87cm
+\vsize=123cm
+\pdfpageheight=0cm
+\font\hhdfont csbx32
+\font\smallfont cmr8
+\font\basicfont cmr10\basicfont
+\def\basebaselineskip{12pt} \baselineskip\basebaselineskip
+\font\smallsmallfont cmr5 at 5pt
+\newbox\autofontBox
+\def\autofont#1{%
+\setbox\autofontBox=\hbox{#1}%
+\ifdim\wd\autofontBox<120pt\relax\basicfont\else%
+\ifdim\wd\autofontBox<330pt\relax\baselineskip 1pt\smallfont\else%
+\baselineskip 1pt\smallsmallfont\fi\fi%
+#1\basicfont%
+}%
+
+%%%%%%%%%%%%%% Kernel %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newdimen\keyw
+\newdimen\keyh
+\newdimen\skipBefore
+
+\def\nullkey{\printkey{\cwhite}{}}
+
+\input keymap-map.tex
+\input keymap-doc-keyboard.tex
+
+
+
+
+
+\def\printkey#1#2{%
+\hrule \hbox{%
+\vrule\relax%
+\hbox to 0pt{\colorlocal{#1}\vrule width \keyw height \keyh\hskip -\keyw}%
+\vbox to \keyh{%
+\hsize\keyw%
+\leftskip 0pt plus 1fill%
+\rightskip 0pt plus 1fill%
+\vskip 0pt plus 1fil\relax%
+\keyname%
+#2%
+\hskip 0pt\hbox{}\vskip 0pt plus 1fil\relax\hrule height 0pt
+}\vrule%
+}\hrule%
+}
+
+\def\printActKey{%
+\skipBefore \csname skipBeforeK\keyBase\endcsname%
+\kern \skipBefore\vbox{%
+\keyw \csname keywK\keyBase\endcsname%
+\keyh \csname keyhK\keyBase\endcsname%
+\advance\keyw -0.4pt%
+\advance\keyh -0.4pt%
+\def\keyname{\csname keyNameK\keyBase\endcsname\nl}%
+\def\printActKeyIsFirst{1}
+\for{iter}\in\localAllMod{%
+\setKeyMod{\iter}
+\letcs{tmp}{activeModM\keyMod}
+\if\tmp1%
+\csname keymapK\key\endcsname%
+\vskip-0.4pt%
+\if \printActKeyIsFirst1\relax%
+\advance\keyh -10pt%
+\def\keyname{}%
+\def\printActKeyIsFirst{0}%
+\fi%
+\fi%
+}%
+}%
+\hskip -0.4pt
+}
+
+\def\printModList{%
+\kern \skipBefore\vbox{%
+\keyw 0.4\standkeyw%
+\keyh \standkeyh%
+\advance\keyw -0.4pt%
+\advance\keyh -0.4pt%
+\def\keyname{}%
+\def\printActKeyIsFirst{1}
+\for{iter}\in\localAllMod{%
+\setKeyMod{\iter}
+\letcs{tmp}{activeModM\keyMod}
+\if\tmp1%
+\printkey{\rgb{1 1 1}}{\csname modNameM\keyMod\endcsname}%
+\vskip-0.4pt%
+\if \printActKeyIsFirst1\relax%
+\advance\keyh -10pt%
+\def\printActKeyIsFirst{0}%
+\fi%
+\fi%
+}%
+}%
+\hskip -0.4pt
+\hskip 20pt
+}
+
+
+\def\printLine#1#2{%
+\hbox{#2%
+\for j 0 {\csname keyLineLen\the\counti\endcsname}%
+{\setKeyBase{#1}{\the\countj}\printActKey}%
+}%
+\vskip 10pt%
+}
+
+\newbox\outbox
+
+\def\PrintKeyboard#1{
+\ex\def\ex\localAllMod\ex{#1}
+\if\isFirstPrintKeyboard 1
+\def\isFirstPrintKeyboard{0}
+\for{iter}\in\allmod{\setKeyMod{\iter}\defcs{activeModM\keyMod}{0}}%
+\getUsedMod
+{\hhdfont \ModeName }%
+\vskip 15pt\relax
+\else
+\vskip 50pt\relax
+\fi
+\hbox{
+\vbox{
+\for i 0 1{\printLine{\the\counti}{\printModList}}
+\vskip\afterEscSkip\relax
+\for i 1 6{\printLine{\the\counti}{\printModList}}
+}\hskip \afterAlphaSkip
+\vbox{
+\for i 6 7{\printLine{\the\counti}{}}
+\vskip\afterEscSkip\relax
+\for i 7 9{\printLine{\the\counti}{}}
+{ \setbox5=\vbox{\Key{}{0}{0}\printActKey}\vskip\ht5}
+\for i 9 {11}{\printLine{\the\counti}{}}
+}
+\ifx\isPrintNumpad\YES
+\hskip \afterAlphaSkip
+\vbox{
+\for i {11} {16}{\printLine{\the\counti}{}}
+}
+\else
+\fi
+}
+}
+
+\def\onModeEnd{\vfil \break}
+
+
+%%%%%%%%%%%%%% Chars and catcodes %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\catcode`&=11
+\catcode`"=11
+\catcode`'=11
+\catcode`_=11
+\catcode`~=11
+\catcode`$=11 %$
+\def\\{$\scriptscriptstyle \backslash$}
+\def\nl{\par}
+
+
+%%%%%%%%%%%%%% general commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\GoMode#1{\printkey{\rgb{0.8 0.8 1}}{MODE\nl\smallfont#1}}
+\def\Cmd#1{\printkey{\rgb{1 0.8 1}}{\autofont{#1}}}
+\def\UndefKey{\printkey{\rgb{1 0.8 0.8}}{UNDEF}}
+
+%%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% workspaces
+\def\GoWorkspace#1{\printkey{\rgb{0 1 1}}{Workspace\nl#1}}
+\def\ContWorkspace#1{\printkey{\rgb{0 1 1}}{Move to workspace\nl#1}}
+\def\ContGoWorkspace#1{\printkey{\rgb{0 1 1}}{Move and go to wsp.\nl#1}}
+
+\def\GoMasterWorkspace#1{\printkey{\rgb{0 1 1}}{Workspace\nl M: #1}}
+\def\ContMasterWorkspace#1{\printkey{\rgb{0 1 1}}{Move to workspace\nl M: #1}}
+\def\ContGoMasterWorkspace#1{\printkey{\rgb{0 1 1}}{Move and go to wsp.\nl M: #1}}
+
+\def\GoSlaveWorkspace#1{\printkey{\rgb{0 1 1}}{Workspace\nl S: #1}}
+\def\ContSlaveWorkspace#1{\printkey{\rgb{0 1 1}}{Move to workspace\nl S: #1}}
+\def\ContGoSlaveWorkspace#1{\printkey{\rgb{0 1 1}}{Move and go to wsp.\nl S: #1}}
+
+\def\MoveWorkspace#1{\printkey{\rgb{0 1 0}}{Move worksp. #1}}
+% Container
+\def\FocusWind#1{\printkey{\rgb{0 1 0}}{Focus #1}}
+\def\MoveCont#1{\printkey{\rgb{0 1 0}}{Move #1}}
+\def\SplitContV{\printkey{\rgb{0.85 1 0}}{Split vertical}}
+\def\SplitContH{\printkey{\rgb{0.85 1 0}}{Split horizontal}}
+\def\SplitContT{\printkey{\rgb{0.85 1 0}}{Split tabbed}}
+\def\FullscreenContToggle{\printkey{\rgb{0.85 1 0}}{Fullscreen}}
+\def\LayoutCont#1{\printkey{\rgb{0.85 1 0}}{Layout #1}}
+\def\ResizeCont#1#2#3{\printkey{\rgb{0.85 1 0}}{Resize #1 #2 #3}}
+\def\FloatingToggleCont{\printkey{\rgb{0.85 1 0}}{Floating toggle}}
+\def\StickyToggleCont{\printkey{\rgb{0.85 1 0}}{Sticky toggle}}
+% Restart i3
+\def\RestartProg{\printkey{\rgb{1 0 0}}{Restart WM}}
+
+%%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\ExitProg{\printkey{\rgb{1 0 0}}{Exit}}
+\def\ExitShutdown{\printkey{\rgb{1 0 0}}{Shutdown}}
+\def\ExitSuspend{\printkey{\rgb{1 0 0}}{Suspend}}
+\def\ExitRestart{\printkey{\rgb{1 0 0}}{Restart}}
+
+
+%%%%%%%%%%%%%% Input %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\Mode{default}{
+\input master.tex
+}
+
+
+\bye
+

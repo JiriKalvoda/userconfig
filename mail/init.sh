@@ -1,7 +1,9 @@
 #!/bin/bash
-cd "$(dirname "$0")"
+. ../userconfig-lib.sh
 
+confln notmuch-config ~/.notmuch-config
 confln mailcap ~/.mailcap
+confln mailcap ~/.mime.types
 
 confln offlineimap-run ~/bin/
 g++ offlineimap-deamon.cpp -o ~/bin/offlineimap-deamon -pthread
@@ -12,6 +14,10 @@ confln m ~/bin/
 confln m-daemon ~/bin/
 confln m-daemon ~/bin/
 confln m-repeat-notification ~/bin/
+confln robot-send-mail ~/bin/
+
+r mkdir -p ~/.config/certs
+r -bc 'ssh jirikalvoda@kam.mff.cuni.cz cat /etc/ssl/certs/ca-certificates.crt > ~/.config/certs/nikam-ssl.cert'
 
 confln robot-send-mail ~/bin/
 
@@ -25,11 +31,8 @@ fi
 	cd ~/Maildir-no-dot || exit 1
 	for i in *;
 	do
-		if [[ "$i" != "INBOX" ]]
+		if [[ "$i" != "INBOX" ]] && [[ "$i" != "notmuch" ]]
 		then 
-			# unlink $i/$i 
-			# unlink INBOX/$i 
-
 			if [[ ! -L INBOX/.$i ]]
 			then
 				confln $i INBOX/.$i

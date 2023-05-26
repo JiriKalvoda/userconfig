@@ -1,8 +1,11 @@
 #!/bin/bash
 cd "$(dirname "$0")"
+. ../userconfig-lib.sh
+install_begin
 
-chmod +x movingssh
 confln movingssh ~/bin/
+confln cssh ~/bin/
+confln movingssh_complete ~/bin/bashrc/
 
 confln rpi0 ~/bin/
 confln rpi2 ~/bin/
@@ -11,6 +14,7 @@ confln poppi ~/bin/
 confln gimli ~/bin/
 confln nikam ~/bin/
 confln kamtop ~/bin/
+confln contest ~/bin/
 
 mkdir -p ~/.movingssh/address
 mkdir -p ~/.movingssh/tunel
@@ -33,3 +37,5 @@ for i in configDevice/*
 do
 	confln $i ~/.movingssh/configDevice/ cr
 done
+
+install_ok

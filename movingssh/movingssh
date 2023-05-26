@@ -1,12 +1,25 @@
 #!/bin/bash
 
-toMsgOutput=">&2"
+debug()
+{
+	if [[ "$minus" == *"b"* ]]
+	then
+		echo -e DEBUG: "$@"  >&2
+	fi
+}
 
 usernameDefault="$USER"
 keyFile=""
 usernameSpec=""
+
+declare -g -A config
+
+####################### MKDIRs #######################################
 mkdir -p ~/m
 mkdir -p ~/.movingssh
+mkdir -p ~/.movingssh/address/
+mkdir -p ~/.movingssh/tunel/
+mkdir -p ~/.movingssh/configDevice/
 
 ####################### PARSE ARG #######################################
 for var in "$@"
@@ -30,10 +43,6 @@ do
 	name="${name:1}"
 done
 
-if [[ -f ~/.movingssh/config ]]
-then
-	. ~/.movingssh/config
-fi
 ####################### HELP #######################################
 if [[ "$minus" == *"h"* ]]
 then
@@ -52,6 +61,7 @@ Parametrs:
 	-l	force use local conection
 	-r	force use remote conection
 	-m	sshfs mount
+	-M	sshfs mount without links eval
 	-u	umount
 	-U	force umount
 	-t	Make tunel
@@ -64,6 +74,9 @@ Parametrs:
 	-g 	Only print addres for use
 	-s	use moSh
 	-2	use second tunel (port number plus one)
+	-A	do not use key agent
+	-a	use key agent
+	-e	tunel ssh agEnt
 EOF
 	exit 0
 fi
@@ -89,13 +102,9 @@ fi
 timeout=2
 sleepTime=10
 
-####################### PARSE ARG #######################################
 addressFile=~/.movingssh/address/$name
 tunelFile=~/.movingssh/tunel/$name
 configFile=~/.movingssh/configDevice/$name
-mkdir -p ~/.movingssh/address/
-mkdir -p ~/.movingssh/tunel/
-mkdir -p ~/.movingssh/configDevice/
 mountpoint=~/m/$name
 servermountpoint=/
 [[ "$MS_MOUNTPOINT" != "" ]] && mountpoint="$MS_MOUNTPOINT"
@@ -107,19 +116,66 @@ exec 3<>$pipeFile
 rm $pipeFile
 
 timeoutCMD="-o ConnectTimeout=$timeout"
-envCMD="-o SendEnv=LD_SSHTYPE"
+envCMD="-o SendEnv=LD_SSHTYPE -o SendEnv=LC_SSHTYPE"
 keyCMD="-o HostKeyAlias=$name"
+useAgent=false
 
 [[ "$downloadServer" == "" ]] && downloadServer="jirikalvoda@kam.mff.cuni.cz"
 
+####################### IMPUT CONFIGs #######################################
+[[ -f ~/.movingssh/config ]] && 	. ~/.movingssh/config
+[ -f "$configFile" ] && . $configFile
 
-debug()
-{
-	if [[ "$minus" == *"b"* ]]
+	if [ -d ~/.movingssh/groups ]
 	then
-		echo -e DEBUG: "$@"  >&2
+		for i in  ~/.movingssh/groups/*
+		do
+			. $i
+		done
 	fi
-}
+
+####################### PROCES ARGS #######################################
+
+if [[ $usernameSpec == "" ]]
+then
+	username="$usernameDefault"
+else
+	username="$usernameSpec"
+fi
+keyFileCMD=""
+[[ "$keyFile" != "" ]] && keyFileCMD="-o IdentityFile=$keyFile"
+
+
+####################### AGENT #######################################
+
+
+
+[[ "$minus" == *"a"* ]] && useAgent=true
+[[ "$minus" == *"A"* ]] && useAgent=false
+
+[[ "$minus" == *"e"* ]] && useAgent=false
+if $useAgent
+then
+	eval $(ssh-agent -s -t 30 | head -n2)
+	if [[ "$keyFile" != "" ]]
+	then
+		ssh-add "$keyFile"
+	fi
+fi
+
+if [[ "$minus" == *"e"* ]]
+then
+	eval $(ssh-agent -s)
+	agentTumelCMD="-A"
+	ssh-add ~/.ssh/id_ed25519
+	ssh-add ~/.ssh/id_rsa
+	if [[ "$keyFile" != "" ]]
+	then
+		ssh-add "$keyFile"
+	fi
+fi
+
+####################### FUNCTIONS #######################################
 
 kilrek()
 {
@@ -130,6 +186,7 @@ kilrek()
 		kill $p;
 	done
 }
+
 killallmy()
 {
 	pgrep -P $$ |  while read p;
@@ -143,12 +200,10 @@ killallmy()
 	done
 }
 
-
-parseConfig()
+parseAddresFile()
 {
 	debug PARSE CONFIG
 	#shopt -s extglob
-	declare -g -A config
 	if [ -f "$addressFile" ]
 	then
 		while IFS='= ' read -r lhs rhs
@@ -161,14 +216,6 @@ parseConfig()
 			config[$lhs]="$rhs"
 		    fi
 		done < $addressFile
-	else
-		if [ -d ~/.movingssh/groups ]
-		then
-			for i in  ~/.movingssh/groups/*
-			do
-				. $i
-			done
-		fi
 	fi
 	if [[ "$1" != "notunel" ]] && [ -f $tunelFile ] 
 	then
@@ -183,16 +230,8 @@ parseConfig()
 			fi
 		done < $tunelFile
 	fi
-	[ -f "$configFile" ] && . $configFile
-	if [[ $usernameSpec == "" ]]
-	then
-		username="$usernameDefault"
-	else
-		username="$usernameSpec"
-	fi
-	keyFileCMD=""
-	[[ "$keyFile" != "" ]] && keyFileCMD="-o IdentityFile=$keyFile"
 }
+
 printAddres()
 {
 	if [[ "$minus" == *"p"* ]]
@@ -203,6 +242,7 @@ printAddres()
 		) | column -t -N \ ,ip,port
 	fi
 }
+
 download()
 {
 	[[ "$noDownload" != "" ]] && return
@@ -227,7 +267,7 @@ download()
 		then
 			debug DIFF CONFIG
 			cat $newConfigFile > $addressFile
-			parseConfig
+			parseAddresFile
 			printAddres
 			rm $newConfigFile
 			return 1
@@ -240,6 +280,7 @@ download()
 		return 0
 	fi
 }
+
 tryLocal()
 {
 	debug TRY LOCAL
@@ -254,17 +295,18 @@ tryLocal()
 		ret=
 		debug LOCAL NO IPA
 	else
-		ret=$(LD_SSHTYPE=local ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyFileCMD $keyCMD $timeoutCMD echo OK 2>/dev/null)
+		ret=$(LD_SSHTYPE=try LC_SSHTYPE=try ssh $envCMD $username@${config[ipA]} -p${config[portA]} $keyFileCMD $keyCMD $timeoutCMD echo OK 2>/dev/null)
 	fi
 	#echo -en "\e[92mTRY DONE\e[0m\015" 1>&2
 	if [ "$ret" = "OK" ]
 	then
 		debug LOCAL OK
+		killallmy ssh
 		echo YES >&3
-		killallmy sleep ssh
 		return 1
 	fi
 	debug LOCAL NO
+	echo NO >&3
 	return 0
 }
 tryLocalDownload()
@@ -281,11 +323,9 @@ tryLocalDownload()
 	download
 	if [[ $? == 0 ]]
 	then
-		killallmy sleep
 		return
 	fi
 	tryLocal
-	killallmy sleep
 }
 
 x11vnc()
@@ -354,6 +394,8 @@ printGetAddres()
 
 conect()
 {
+	LC_SSHTYPE=$LD_SSHTYPE
+	export LC_SSHTYPE
 	if [[ "$minus" == *"g"* ]]
 	then
 		printGetAddres "$@"
@@ -371,7 +413,7 @@ conect()
 	then
 		mosh  $username@$1 --ssh="ssh $envCMD -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs"
 		return $?
-	elif [[ "$minus" == *"m"* ]]
+	elif [[ "$minus" == *"m"* ]] || [[ "$minus" == *"M"* ]]
 	then
 		if [[ -d "$mountpoint" || -f "$mountpoint" ]]
 		then
@@ -384,10 +426,11 @@ conect()
 			exit 100
 		fi
 		mkdir $mountpoint
-		sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
+		[[ "$minus" == *"m"* ]] && sshfs -o follow_symlinks -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
+		[[ "$minus" == *"M"* ]] && sshfs -C $username@$1:$servermountpoint -p $2 $keyFileCMD $keyCMD $mountpoint
 	else
-		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyFileCMD $keyCMD $parametrs
-		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs
+		debug RUN: ssh $envCMD $username@$1 -p$2 $xtunelCMD $keyFileCMD $keyCMD $parametrs $agentTumelCMD
+		ssh $envCMD $username@$1 -p$2 $xtunelCMD  $keyFileCMD $keyCMD $parametrs $agentTumelCMD
 		return $?
 	fi
 }
@@ -435,7 +478,7 @@ then
 	rm $tunelFile
 fi
 
-parseConfig
+parseAddresFile
 printAddres
 if [[ "$minus" == *"u"* || "$minus" == *"U"* ]]
 then
@@ -466,9 +509,9 @@ then
 fi
 if [[ "$minus" == *"t"* ]]
 then
-	parseConfig notunel
+	parseAddresFile notunel
 	tunelPort=$(( 40000 + $RANDOM % 10000 ))
-	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile >&2
+	echo -e "ipB=localhost\nportB=$tunelPort" > $tunelFile
 	echo -e "\e[4;1;31mSSH TUNEL TO $name ON PORT $tunelPort \e[0m" >&2
 	ssh -p 443 jirikalvoda@sneaky.kam.mff.cuni.cz -L $tunelPort:${config[ipB]}:${config[portB]} "read"
 	echo END >&2
@@ -481,7 +524,7 @@ then
 elif [[ "$minus" == *"r"* ]]
 then
 	remote
-elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]] || [[ "$minus" == *"m"* ]]
+elif [[ "$minus" == *"x"* ]] || [[ "$minus" == *"v"* ]] || [[ "$minus" == *"V"* ]] || [[ "$minus" == *"c"* ]] || [[ "$minus" == *"m"* ]] || [[ "$minus" == *"M"* ]]
 then
 	tryLocalDownload
 	echo NO >&3
@@ -496,15 +539,19 @@ then
 else
 	tryLocalDownload &
 	remote
-	if [ $? = 255 ]
+	r=$?
+	debug return $r
+	if [ $r = 255 ] || [ $r = 143 ]
 	then
-		sleep $sleepTime
-	fi
-	echo NO >&3
-	if [ "$(head -n1 <&3)" == "YES" ]
-	then
-		parseConfig
-		local
+		debug START READ PIPE
+		from_pipe="$(head -n1 <&3)"
+		debug FROM PIPE "$from_pipe"
+		if [ "$from_pipe" == "YES" ]
+		then
+			debug END HEAD
+			parseAddresFile
+			local
+		fi
 	fi
 fi
 
