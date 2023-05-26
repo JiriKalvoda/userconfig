@@ -30,4 +30,10 @@ r cp ~/.ssh/*.pub  $state_run_dir/files/
 
 r rm -r $new_dir
 
+echo
+echo
+cat  ~/.ssh/*pub
+echo
+echo
+
 install_ok
