@@ -153,6 +153,7 @@ install_try_push(){
 
 install_config_load(){
 	install_config_path=$USERCONFIG_ROOT/state/install_config
+	mkdir -p $USERCONFIG_ROOT/state
 	if [[ ! -f $install_config_path ]]
 	then
 		echo -e "${Red}No install config, creating${None}"
@@ -161,7 +162,7 @@ install_config_load(){
 			echo "ic_name=$USER@$(hostname)"
 			echo "ic_push='ssh jirikalvoda@ucw.cz'"
 			echo "ic_pull='movingssh -xd $USER@$(hostname)'"
-			echo "ic_userconfig_path='$(cd USERCONFIG_ROOT ; pwd)'"
+			echo "ic_userconfig_path='$(cd $USERCONFIG_ROOT ; pwd)'"
 		) > $install_config_path
 		vim $install_config_path || exit 1
 	fi
