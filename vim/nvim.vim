@@ -1,6 +1,5 @@
 so ~/.vimrc
 set guicursor=
-se ls=0
 "vmap <LeftRelease> "*ygv
 "vmap p "0p
 

@@ -494,3 +494,4 @@ map \M :call ListCharsDefault()<CR>
 map \<C-m> :call ListCharsNone()<CR>
 
 set list
+se ls=0
