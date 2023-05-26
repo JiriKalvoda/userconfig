@@ -5,6 +5,8 @@ Blue="\e[34m"
 Magenta="\e[35m"
 None="\e[0m"
 
+export CONFLN_DATE=${CONFLN_DATE:-$(date +%Y-%m-%d--%H-%M-%S)}
+
 USERCONFIG_ROOT="$1"
 if [[ "$USERCONFIG_ROOT" == "" ]]
 then

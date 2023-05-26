@@ -7,6 +7,8 @@ Blue="\e[34m"
 Magenta="\e[35m"
 None="\e[0m"
 
+date=${CONFLN_DATE:-$(date +%Y-%m-%d--%H-%M-%S)}
+
 
 from="$1"
 to="$2"
@@ -101,9 +103,9 @@ then
 		rm "$to" || err rm
 		echo -n "Old file deleted"
 	else
-		old="$to.old.$(date +%Y-%m-%d--%H-%M-%S)"
+		old="$to.old.$date"
 		echo -n " Old file is: $old"
-		mv "$to" "$old" || err mv 
+		mv -n "$to" "$old" || err mv old file 
 	fi
 fi
 
