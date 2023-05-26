@@ -9,5 +9,5 @@ then
 	exit 1
 else
 	cd $USERCONFIG_ROOT/state || err cd faild
-	r -b "tar --create --to-stdout * | $ic_push  bin/userconfig_state_server $ic_name"
+	r -b "tar --create --to-stdout . | $ic_push  bin/userconfig_state_server $ic_name"
 fi
