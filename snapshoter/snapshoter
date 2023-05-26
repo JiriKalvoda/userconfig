@@ -9,9 +9,21 @@ then
 	exit $?
 fi
 
+do_clean()
+{
+	if [[ "$snapdrive" != "" ]]
+	then
+		umount $tmpdir/fs
+		rmdir $tmpdir/fs
+	fi
+	rmdir $tmpdir
+}
+
 err()
 {
-	echo -e "\e[31m\e[1m$@\e[0m"
+	echo -e "\e[31m\e[1m${@:2}\e[0m"
+	do_clean
+	exit $1
 }
 
 minus=""
@@ -30,9 +42,13 @@ exclude_mnt=true
 exclude_aux=true
 exclude_key=true
 exclude_fs=true
+exclude_cache=true
 exclude_downloads=true
 exclude_mountdir=true
 excludedir_homes="'/root' '/home/*'"
+
+snapdir="/mnt/snapshot-manual"
+autosnapdir="/mnt/snapshot"
 
 ms()
 {
@@ -42,28 +58,88 @@ ms()
 	usingSSH=true
 }
 
+delete()
+{
+	for i in "$@"
+	do
+		echo REMOVE $i
+		/usr/bin/time rm -r $i
+	done
+}
+
+. ~/snapshoter.devices
+
+if [[ "$from" == "" ]] && [[ "$device" != clean ]]
+then
+	echo -e "\e[31m\e[1mNo device $device\e[0m"
+	exit 1
+fi
+
+[[ "$minus" == *"a"* ]] && snapdir="$autosnapdir"
+[[ "$minus" == *"a"* ]] && snapdrive="$autosnapdrive"
+
+tmpdir_template=$(basename $snapdir)-XXXXXXX
+
+mkdir -p /mnt/snapshoter-rundir
+tmpdir="$(mktemp -d -t $tmpdir_template -p /mnt/snapshoter-rundir)"
+chown 700 "$tmpdir"
+
+
+
+
+if [[ "$snapdrive" != "" ]]
+then
+	mkdir $tmpdir/fs
+	mount $snapdrive $tmpdir/fs || err 100 Mount faild
+	mount -o remount,rw $tmpdir/fs $tmpdir/fs || err 100 Remount faild
+	snapdir=$tmpdir/fs
+fi
+
 if [[ "$device" == "clean" ]]
 then
-	data="$(ls /mnt/snapshot/*/working/* -d 2>/dev/null)$(echo)$(ls /mnt/snapshot-manual/*/working/* -d 2>/dev/null)"
-  echo "$data"
-  [[ "$data" == "" ]] && exit 0
+	data="$(ls $snapdir/*/working/* -d 2>/dev/null)"
+	echo "$data"
+	[[ "$data" == "" ]] && exit 0
 	echo -e "\e[1mIF NO SNAPSHOTER RUNNING PRESS <Enter> for clean (some string to exit)\e[0m"
 	read r
 	if [[ "$r" != "" ]]
 	then
-		err EXIT
-		exit 0
+		err 0 EXIT
 	fi
-	rm  $data -r
+	delete  $data
+	do_clean
 	exit 0
 fi
 
-snapdir="/mnt/snapshot-manual"
-autosnapdir="/mnt/snapshot"
+if [[ "$minus" == *"d"* ]]
+then
+	data="$(ls $snapdir/$device/ok/*  -d 2>/dev/null| head -n-1 | awk 'NR % 2 == 0' )"
+	echo TO DELETE:
+	echo "$data"
+	echo
+	echo ALL FILES:
+	for i in $(ls $snapdir/$device/ok/* -d)
+	do
+		if [[ "$data" == *"$i"* ]]
+		then
+			echo -e "\e[31mDELETE" "$i"
+		else
+			echo -e "\e[32mKEEP  " "$i"
+		fi
+	done
 
-. ~/snapshoter.devices
+	[[ "$data" == "" ]] && exit 0
+	echo -e "\e[1mPRESS <Enter> for delete this snapshots (some string to exit)\e[0m"
+	read r
+	if [[ "$r" != "" ]]
+	then
+		err 0 EXIT
+	fi
+	delete $data
+	do_clean
+	exit 0
+fi
 
-[[ "$minus" == *"a"* ]] && snapdir="$autosnapdir"
 devicedir="$snapdir/$device"
 okdir="$devicedir/ok"
 workingdir="$devicedir/working"
@@ -81,19 +157,16 @@ then
 	echo NOT SSH
 	if [[ ! -e "$from" ]]
 	then
-		err "FROM $from NOT EXIST!"
-		exit 101
+		err  101 "FROM $from NOT EXIST!"
 	fi
 	if [[ "$(ls $from)" == "" ]]
 	then
-		err "FROM $from IS EMPTY!"
-		exit 102
+		err 102 "FROM $from IS EMPTY!"
 	fi
 fi
 if [[ -e "$wto" ]] || [[ -e "$okto" ]]
 then
-	err "FILE $wto OR $okto EXIST!"
-	exit 100
+	err 100 "FILE $wto OR $okto EXIST!"
 fi
 
 to="$wto/data"
@@ -114,11 +187,13 @@ $exclude_fs && echo >> "$excludefile" "/proc"
 $exclude_fs && echo >> "$excludefile" "/run"
 $exclude_fs && echo >> "$excludefile" "/sys"
 $exclude_fs && echo >> "$excludefile" "/tmp"
+$exclude_fs && echo >> "$excludefile" "/snap"
 $exclude_mnt && echo >> "$excludefile" "/mnt"
 $exclude_aux &&  echo >> "$excludefile" "/aux"
 for h_it in $excludedir_homes
 do
 	h="${h_it:1:-1}"
+	$exclude_cache && echo >> "$excludefile" "$h/.cache"
 	$exclude_key && echo >> "$excludefile" "$h/.ssh"
 	$exclude_mountdir && echo >> "$excludefile" "$h/m"
 	$exclude_mountdir && echo >> "$excludefile" "$h/kam"
@@ -156,9 +231,8 @@ then
 	read r
 	if [[ "$r" != "" ]]
 	then
-		err EXIT
 		rm -r $wto
-		exit 0
+		err 0 EXIT
 	fi
 fi
 
@@ -170,24 +244,22 @@ echo -e -n "\e[0m"
 
 if [[ "$r" != "0" ]]
 then
-	echo
-	err RSYNC ERROR $r
-	[[ "$r" != 24 ]] && exit 1
+	echo RSYNC ERROR $r
+	[[ "$r" != 24 ]] && err 1 "RSYNC ERROR"
 fi
 if [[ "$(ls $to)" == "" ]]
 then
-	err "TO DIRECTORY $to IS EMPTY!"
-	exit 104
+	err  104 "TO DIRECTORY $to IS EMPTY!"
 fi
 echo
 echo RSYNC OK
 mv $wto $okto
 if [[ "$?" != "0" ]]
 then
-	echo FINEL MV $?
-	err 2
+	echo 2 FINEL MV $?
 fi
 echo ALL OK
+do_clean
 
 
 #rsync  \

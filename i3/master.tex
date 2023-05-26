@@ -19,11 +19,14 @@
 	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoMasterWorkspace{#3}}
 	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContMasterWorkspace{#3}}
 	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoMasterWorkspace{#3}}
+	\BindKey{\Key{\Alt\Super  }{#1}{#2}}{\Cmd{i3-woman swap-with-workspace -m #3 -s alloc -n}}
+	\BindKey{\Key{\Alt\Shift\Super}{#1}{#2}}{\Cmd{i3-woman swap-master-with-workspace -m #3 -s alloc -n}}
 }
 \def\WorkspaceSlaveAll#1#2#3{
 	\BindKey{\Key{\Super      }{#1}{#2}}{    \GoSlaveWorkspace{#3}}
 	\BindKey{\Key{\Shift\Super}{#1}{#2}}{  \ContSlaveWorkspace{#3}}
 	\BindKey{\Key{\Ctrl\Super }{#1}{#2}}{\ContGoSlaveWorkspace{#3}}
+	\BindKey{\Key{\Alt\Super  }{#1}{#2}}{\Cmd{i3-woman swap-with-workspace -s #3 -n}}
 }
 
 \def\BindArrUp#1#2{
@@ -84,7 +87,8 @@
 
 \IiiiLine{%
 bar \{%
-        status_command "~/.config/i3/status.out 2>~/.status.log"%
+        % status_command "~/.config/i3/status.out 2>~/.status.log"%
+        status_command "~/bin/i3csstatus i3 -c .config/i3/i3csstatus.conf -i 2>~/.i3csstatus.log"%
 \}%
 }
 
@@ -93,7 +97,10 @@ bar \{%
 \IiiiLine{floating_modifier $mod} %$
 
 %%%%%%%%%%%%%% Standard workspaces %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\IiiiLine{exec_always i3-workspace-daemon}
+\IiiiLine{exec_always "i3-woman exit; i3-woman-daemon --gui"}
+\IiiiLine{for_window [title="^i3-woman$"] move to workspace 0}
+\IiiiLine{for_window [title="^i3-woman-daemon-tmp-window$"] move to workspace tmp}
+
 \for{I}{0}{13}{\countJ\countI
 \WorkspaceSlaveAll{1}{\the\countI}{\the\countJ}
 }
@@ -105,8 +112,25 @@ bar \{%
 \for{Iter}\in{{Left}{Right}{Up}{Down}}{
 \csname BindArr\Iter\endcsname{\Super}{\FocusWind{\Iter}}
 \csname BindArr\Iter\endcsname{\Shift\Super}{\MoveCont{\Iter}}
-\csname BindArr\Iter\endcsname{\Ctrl\Super}{\MoveWorkspace{\Iter}}
 }
+\BindKey{\Key{\Super}{4}{10}}{\MoveWorkspace{next}}
+
+\BindKey{\Key{\Super}{4}{9}}{\Cmd{i3-woman goto-workspace -s alloc -n}}
+\BindKey{\Key{\Shift\Super}{4}{9}}{\Cmd{i3-woman goto-workspace -m alloc -n}}
+\BindKey{\Key{\Ctrl\Super}{4}{9}}{\Cmd{i3-woman goto-with-container-to -s alloc -n}}
+\BindKey{\Key{\Ctrl\Shift\Super}{4}{9}}{\Cmd{i3-woman goto-with-container-to -m alloc -n}}
+
+\BindKey{\Key{\Super}{4}{11}}{\Cmd{i3-woman gui}}
+% \IiiiLine{for_window [title="i3-workspace-daemon"] move container to workspace 0}
+
+\BindArrDown{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -m next-skip -n}}
+\BindArrUp{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -m prev-skip -n}}
+\BindArrLeft{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -s prev-skip -n}}
+\BindArrRight{\Ctrl\Super}{\Cmd{i3-woman goto-workspace -s next-skip -n}}
+\BindArrDown{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -m next -n}}
+\BindArrUp{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -m prev -n}}
+\BindArrLeft{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -s prev-limit -n}}
+\BindArrRight{\Ctrl\Shift\Super}{\Cmd{i3-woman goto-workspace -s next-limit -n}}
 
 \BindKey{\Key{\Super}{4}{5}}{\SplitContV}
 \BindKey{\Key{\Super}{3}{5}}{\SplitContH}
@@ -213,10 +237,10 @@ bar \{%
 
 
 % TV
-\BindKey{\Key{\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/playlist/channels}}
-\BindKey{\Key{\Shift\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
-\BindKey{\Key{\Ctrl\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/playlist/channels}}
-\BindKey{\Key{\Ctrl\Shift\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://localhost:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://localhost:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
+% \BindKey{\Key{\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/playlist/channels}}
+% \BindKey{\Key{\Shift\Super}{4}{11}}{\Cmd{vlc http://192.168.1.191:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://192.168.1.191:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://192.168.1.191:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
+% \BindKey{\Key{\Ctrl\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/playlist/channels}}
+% \BindKey{\Key{\Ctrl\Shift\Super}{4}{11}}{\Cmd{vlc http://localhost:9981/stream/mux/53d6b078f24454f7f0ac0dd323f69569 http://localhost:9981/stream/mux/df4d0d285682018251b68a9b81e0293a http://localhost:9981/stream/mux/47b53b11fb6dcabc260b7784de9eb45f}}
 
 
 

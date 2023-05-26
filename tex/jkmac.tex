@@ -1,5 +1,10 @@
 \input ucwmac2.tex
 
+\def\makeatletter{\catcode`@=11 }
+\def\makeatother{\catcode`@=12 }
+\makeatletter
+
+
 \def\pair#1#2{$\left<#1,#2\right>$}
 \def\E{{\bf E}}
 \def\O{{\cal O}}
@@ -66,3 +71,14 @@
 
 \def\nl{\hfil\penalty -1000000}
 
+\def\loadpic#1#2{% pic width, pic file. Could be more universal...
+  \def\@mpty{width }\edef\wdt@{width #1}\ifx\@mpty\wdt@\def\wdt@{}\fi
+  \pdfximage\wdt@{#2}
+}
+\def\putpic{\pdfrefximage\pdflastximage}
+\def\centerpic#1#2{%pic width, pic file
+\loadpic{#1}{#2}
+\cline{\putpic}}%
+
+
+\makeatother

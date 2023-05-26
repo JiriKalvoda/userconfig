@@ -1,0 +1,4 @@
+M(K_Pause, release_action=MONITOR_POWER("toggle"), propagate=100)
+EXEC_ON_STARTUP(CMD("xset -dpms"))
+
+

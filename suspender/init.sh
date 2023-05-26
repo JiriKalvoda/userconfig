@@ -1,5 +1,5 @@
 #!/bin/bash
 cd "$(dirname "$0")"
+. ../userconfig-lib.sh
 
-chmod +x suspender
-confln suspender ~/bin/
+confln suspender.py ~/bin/ -E

@@ -1,0 +1,110 @@
+\def\OutputMode{i3}
+\input keymap-utils.tex
+\input keymap-abstract.tex
+\input keymap-keyboard.tex
+
+\input keymap-i3-keyboard.tex
+
+\def\addoutput#1{\long\edef\output{\output #1}}
+\def\bindkey#1#2{%
+\addoutput{bindcode #1 }#2\addoutput{\nl}%
+}
+\def\BindKey#1#2{%
+\addoutput{bindcode #1 }#2\addoutput{\nl}%
+}
+
+
+
+
+\def\ModeDefaultName{default}
+\def\UpModeName{ERR}
+\def\ModeName{ERR}
+\long\def\Mode#1#2{
+{
+\let\UpModeName=\ModeName
+\edef\ModeName{#1}
+\long\edef\output{}
+\ifx\ModeName\ModeDefaultName\else\addoutput{mode "#1"\nl\{\nl}\fi
+#2
+\ifx\ModeName\ModeDefaultName\else\addoutput{\}}\fi
+\immediate\write\file{\output\nl
+}\relax
+}
+}
+
+
+\input keymap-catcode-to-file.tex
+
+\def\beginCmdEsc{%
+\def"{\SimBackslash\SimBackslash\SimQuotes}%
+\def\\{\SimBackslash\SimBackslash\SimBackslash\SimBackslash}%
+}
+
+\def\Ctrl{ctrl+}
+\def\Shift{shift+}
+\def\Super{Mod4+}
+\def\Alt{Mod1+}
+\def\Key#1#2#3{%
+#1\csname keyCodeK#2K#3\endcsname%
+}
+
+\def\confirmCmd#1#2{\Cmd{i3-nagbar -t warning -m '#1' -b 'Yes' '#2'}}
+
+%%%%%%%%%%%%%% general Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\GoMode#1{\addoutput{mode "#1"; }\Cmd{i3-mode-log "#1"}}
+\def\Cmd#1{\addoutput{exec "}\beginCmdEsc\addoutput{#1}\endEsc\addoutput{"}}
+
+%%%%%%%%%%%%%% WM Commands %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% workspaces
+\def\GoWorkspace#1{\Cmd{i3-woman goto-workspace -w #1}}
+\def\ContWorkspace#1{\Cmd{i3-woman container-to -w #1}}
+\def\ContGoWorkspace#1{\Cmd{i3-woman goto-with-container-to -w #1}}
+
+\def\GoMasterWorkspace#1{\Cmd{i3-woman goto-workspace -m #1}}
+\def\ContMasterWorkspace#1{\Cmd{i3-woman container-to -m #1}}
+\def\ContGoMasterWorkspace#1{\Cmd{i3-woman goto-with-container-to -m #1}}
+
+\def\GoSlaveWorkspace#1{\Cmd{i3-woman goto-workspace -s #1}}
+\def\ContSlaveWorkspace#1{\Cmd{i3-woman container-to -s #1}}
+\def\ContGoSlaveWorkspace#1{\Cmd{i3-woman goto-with-container-to -s #1}}
+
+\def\MoveWorkspace#1{\addoutput{ move workspace to output #1}}
+% Container
+\def\FocusWind#1{\addoutput{ focus #1}}
+\def\MoveCont#1{\addoutput{ move #1}}
+\def\SplitContV{\addoutput{ split v }}
+\def\SplitContH{\addoutput{ split h }}
+\def\SplitContT{\addoutput{ split v; layout tabbed }}
+\def\FullscreenContToggle{\addoutput{ fullscreen toggle }}
+\def\LayoutCont#1{\addoutput{ layout #1 }}
+\def\ResizeCont#1#2#3{\addoutput{ resize #1 #2 #3 px or #3 ppt }}
+\def\FloatingToggleCont{\addoutput{floating toggle}}
+\def\StickyToggleCont{\addoutput{sticky toggle}}
+% Restart i3
+\def\RestartProg{\Cmd{terminal -e ~/.config/i3/i3-restart}}
+\def\RestartProgII{\addoutput{restart}}
+
+%%%%%%%%%%%%%% System modificator %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\ExitProg{\confirmCmd{Do you really want to EXIT i3 }{i3-msg exit}}
+\def\ExitShutdown{\confirmCmd{Do you really want to SHUTDOWN? }{poweroff}}
+\def\ExitSuspend{\Cmd{suspender}}
+\def\ExitRestart{\confirmCmd{Do you really want to REBOOT? }{reboot}}
+
+%%%%%%%%%%%%%% Not bind commmand %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\def\And#1#2{#1\addoutput{ ; }#2}
+\def\AndII#1#2{#1\addoutput{ ; }#2}
+\def\RunCmd#1{\addoutput{exec "}\beginCmdEsc\addoutput{#1}\endEsc\addoutput{"\nl}}
+\def\IiiiLine#1{\addoutput{#1\nl}}
+\def\IiiiInline#1{\addoutput{#1}}
+
+
+\newwrite\file
+\immediate\openout\file = ./i3.config
+
+\Mode{\ModeDefaultName}{
+\input ./master.tex
+}
+
+\closeout\file
+\bye
+

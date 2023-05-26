@@ -1,4 +1,0 @@
-#!/bin/bash
-cd ~/.config/i3/
-i3-workspace exit
-tex keymap-i3 && i3-msg restart
