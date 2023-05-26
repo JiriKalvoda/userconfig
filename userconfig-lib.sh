@@ -25,6 +25,13 @@ err()
 	echo -en $Red
 	echo -n ERROR $@
 	echo -en $None
+	echo
+	if [[ $state_run_dir != "" ]]
+	then
+		echo faild > $state_run_dir/state
+		echo $@ > $state_run_dir/error
+		echo -e "${Blue}INSTALL FAIL $install_name$None"
+	fi
 	exit 1
 }
 
@@ -140,7 +147,34 @@ r()
 	return $ret
 }
 
+install_try_push(){
+	$USERCONFIG_ROOT/state_push.sh
+}
+
+install_config_load(){
+	install_config_path=$USERCONFIG_ROOT/state/install_config
+	if [[ ! -f $install_config_path ]]
+	then
+		echo -e "${Red}No install config, creating${None}"
+		(
+			echo "ic_vrsion=0"
+			echo "ic_name=$USER@$(hostname)"
+			echo "ic_push='ssh jirikalvoda@ucw.cz'"
+			echo "ic_pull='movingssh -xd $USER@$(hostname)'"
+			echo "ic_userconfig_path='$(cd USERCONFIG_ROOT ; pwd)'"
+		) > $install_config_path
+		vim $install_config_path || exit 1
+	fi
+	. $install_config_path
+}
+
+reln(){
+	[[ -h $2 ]] && (rm $2 || err rm faild)
+	ln -sr $1 $2 || err reln faild
+}
+
 install_begin(){
+	install_config_load
 	if [[ "$install_name" ==  "" ]]
 	then
 		install_name=$(pwd)/$(basename $0)
@@ -149,7 +183,7 @@ install_begin(){
 		install_name=${install_name//\//-}
 	fi
 	state_dir=$USERCONFIG_ROOT/state/$install_name
-	state_run_dir=$USERCONFIG_ROOT/state/$(date +%Y-%m-%d--%H-%M-%S)
+	state_run_dir=$state_dir/$(date +%Y-%m-%d--%H-%M-%S)
 	mkdir -p $state_dir
 	if [[ -e $state_run_dir ]]
 	then
@@ -157,16 +191,23 @@ install_begin(){
 		err "State run dir exist, wait a second"
 		exit 1
 	fi
+	mkdir -p $state_run_dir
+	mkdir -p $state_run_dir/files
 	echo -e "${Blue}INSTALLING $install_name$None"
 	echo $state_dir $state_run_dir
-	echo installing > $state_dir/state
-	reln -sr $state_run_dir $state_dir/last
-	(
-		echo state=installing
-		echo date=$(date -Iseconds)
-		echo commit=$(git rev-parse --verify HEAD)
-	) > $state_dir/state
+	echo installing > $state_run_dir/state
+	date -Iseconds > $state_run_dir/date
+	git rev-parse --verify HEAD > $state_run_dir/commit
+	git diff > $state_run_dir/git_diff
+	reln $state_run_dir $state_dir/last
 }
 
 install_ok(){
+	echo  ok > $state_dir/state
+	echo -e "${Blue}INSTALL DONE $install_name$None"
+	reln $state_run_dir $state_dir/last_ok
+	unset state_dir
+	unset state_run_dir
+	unset install_name
+	install_try_push
 }
