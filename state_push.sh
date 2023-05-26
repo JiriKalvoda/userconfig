@@ -1,5 +1,6 @@
 #!/bin/bash
-. ../userconfig-lib.sh
+cd "$(dirname "$0")"
+. userconfig-lib.sh
 
 install_config_load
 

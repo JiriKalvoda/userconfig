@@ -1,5 +1,3 @@
-cd "$(dirname "$0")"
-
 Red="\e[31m"
 Green="\e[32m"
 Yellow="\e[33m"
