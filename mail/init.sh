@@ -19,6 +19,8 @@ confln robot-send-mail ~/bin/
 r mkdir -p ~/.config/certs
 r -bc 'ssh jirikalvoda@kam.mff.cuni.cz cat /etc/ssl/certs/ca-certificates.crt > ~/.config/certs/nikam-ssl.cert'
 
+confln robot-send-mail ~/bin/
+
 
 if [[ ! -L ~/Maildir ]]
 then
