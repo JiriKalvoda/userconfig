@@ -9,7 +9,7 @@ need_state_server
 
 catuniq()
 {
-	cat "$@" | sort | uniq -u |(
+	cat "$@" | sort -u |(
 		while read -r line
 		do
 			num=999
