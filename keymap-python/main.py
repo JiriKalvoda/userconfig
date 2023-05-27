@@ -43,6 +43,8 @@ def which(cmd):
     import shutil
     return shutil.which(cmd)
 
+set_global("HOST")(open("/etc/hostname").read().strip())
+
 @set_global()
 def alternatives(*cmds_list):
     for i in cmds_list:
