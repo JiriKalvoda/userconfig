@@ -17,7 +17,7 @@ confln config-default ~/.tunel/
 
 vim ~/.tunel/config
 
-r ssh -o HostKeyAlias=localhost localhost echo OK ssh localhost
-r -b '. ~/.tunel/config-default && . ~/.tunel/config && ssh $user@$server echo OK ssh server'
+r -c ssh -o HostKeyAlias=localhost localhost echo OK ssh localhost
+r -bc '. ~/.tunel/config-default && . ~/.tunel/config && ssh $user@$server echo OK ssh server'
 
 install_ok
