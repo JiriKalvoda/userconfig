@@ -11,7 +11,7 @@ user="${2:---user}"
 exe="$3"
 par="$4"
 opt="$5"
-installToUser=False
+installToUser=false
 
 if [ -z "$name" ] || [ -z "$user" ] || [ -z "$exe" ]
 then 
