@@ -1,0 +1,8 @@
+@ACTION_INIT()
+def ssh(self, target, command):
+    self.command = command
+    self.target = target
+
+@ACTION_IMPLEMENT(ssh)
+def f(self):
+    return CMD(f"movingssh -x {self.target} {ESCAPE_BASH(self.command.get_cmd())}")

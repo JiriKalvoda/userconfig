@@ -2,6 +2,8 @@
 
 snapdir="/mnt/snapshot"
 autosnapdir="/mnt/snapshot"
+snapdrive="/dev/mapper/snapshot"
+autosnapdrive="/dev/mapper/snapshot"
 
 case "$device" in
   test)
@@ -28,9 +30,5 @@ case "$device" in
 		exclude_mountdir=false
 		excludedir_homes="'/files/home'"
   		ms root@$device
-    ;;
-  *)
-	err DEVICE $device NOT EXIST
-    exit 200
     ;;
 esac

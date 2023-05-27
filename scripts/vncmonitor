@@ -1,0 +1,16 @@
+xrandr --newmode "1920x1200_59.95"  193.25  1920 2056 2256 2592  1200 1203 1209 1245 -hsync +vsync
+xrandr --addmode DP-1 1920x1200_59.95
+
+xrandr --output DP-1 --mode  1920x1200_59.95 --pos 0x0 --output eDP-1 --mode 1920x1080 --pos 0x1200
+
+(
+echo xrandr --output DisplayPort-0 --output DVI-D-0 --off
+echo vncviewer 10.10.10.30 -autopass -viewonly -fullscreen -nocursorshape '<<EOF' '2>&1' '>.local/share/xorg/vncviewer.log'
+cat ~/.vnc/passwd
+echo EOF
+) | movingssh -x campione tee .xinitrc
+
+x11vnc -clip 1920x1200+0+0 -passwdfile ~/.vnc/passwd -noxkb -repeat
+
+xrandr --output eDP-1 --mode 1920x1080 --pos 0x0 --output DP-1 --off
+
