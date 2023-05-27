@@ -25,7 +25,7 @@ err()
 	echo -n ERROR $@
 	echo -en $None
 	echo
-	if [[ $state_run_dir != "" ]]
+	if [[ "${state_run_dir:-}" != "" ]]
 	then
 		echo faild > $state_run_dir/state
 		echo $@ > $state_run_dir/error
