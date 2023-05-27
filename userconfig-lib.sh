@@ -197,6 +197,7 @@ install_begin(){
 	echo -e "${Blue}INSTALLING $install_name$None"
 	echo $state_dir $state_run_dir
 	echo installing > $state_run_dir/state
+	printf "%q " "$0" "$@" > $state_run_dir/args
 	date -Iseconds > $state_run_dir/date
 	git rev-parse --verify HEAD > $state_run_dir/commit
 	git diff > $state_run_dir/git_diff
