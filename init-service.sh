@@ -1,6 +1,13 @@
 #!/bin/bash
+switches=""
+while [[ "$1" == "-"* ]] && [[ "$1" != "--"* ]]
+do
+	switches="$switches$1"
+	shift
+done
+
 name="$1"
-user="$2"
+user="${2:---user}"
 exe="$3"
 par="$4"
 opt="$5"
@@ -10,7 +17,7 @@ if [ -z "$name" ] || [ -z "$user" ] || [ -z "$exe" ]
 then 
 	echo "Script for creating systemd deamon"
 	echo "Usage:"
-	echo "	$0 name [user/'--user'] exec [cmd parametrs] [daemon options]"
+	echo "	$0 name [-d] [user/'--user'] exec [cmd parametrs] [daemon options]"
 	exit 100
 fi
 
@@ -88,7 +95,7 @@ else
 fi
 systemctl $systemctlUserArg daemon-reload
 
-if [[ "$opt" != *d* ]]
+if [[ "$switches" != *d* ]]
 then
 	systemctl $systemctlUserArg enable $name
 	systemctl $systemctlUserArg restart $name

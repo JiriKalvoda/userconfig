@@ -20,8 +20,7 @@ do
 		then
 			echo NO CHANGE
 		else
-			echo CHANGE:
-			cat new
+			echo CHANGE: "$(tr '\n' ' ' < new)"
 			ssh $user@$server -p$port "cat > $serverDir/$name"  < new
 			if [ $? == 0 ]
 			then

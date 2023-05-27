@@ -1,0 +1,782 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="full-alpha"
+   height="135"
+   width="310"
+   version="1.0"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="jk-Alpha.svg"
+   style="enable-background:new"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1918"
+   inkscape:window-height="1038"
+   id="namedview3396"
+   showgrid="false"
+   inkscape:snap-bbox="true"
+   inkscape:bbox-nodes="true"
+   inkscape:zoom="1.5486909"
+   inkscape:cx="30.671066"
+   inkscape:cy="-17.756933"
+   inkscape:window-x="1920"
+   inkscape:window-y="20"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="full-alpha"
+   inkscape:object-paths="false"
+   inkscape:bbox-paths="false"
+   inkscape:snap-global="true"
+   inkscape:snap-nodes="true"
+   inkscape:snap-bbox-edge-midpoints="false"
+   inkscape:object-nodes="true"
+   inkscape:snap-smooth-nodes="true"
+   inkscape:snap-bbox-midpoints="false"
+   showguides="true"
+   inkscape:guide-bbox="true"
+   inkscape:showpageshadow="2"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1" />
+<defs
+   id="defs4958">
+  <filter
+     id="filter3145"
+     color-interpolation-filters="sRGB">
+    <feBlend
+       id="feBlend3147"
+       in2="BackgroundImage"
+       mode="darken" />
+  </filter>
+</defs>
+<metadata
+   id="metadata112">
+  <rdf:RDF>
+    <cc:Work
+       rdf:about="">
+      <dc:format>image/svg+xml</dc:format>
+      <dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      <dc:title>Full Keyboard-Alpha.svg</dc:title>
+      <cc:license
+         rdf:resource="https://www.gnu.org/licenses/gpl.txt" />
+      <dc:creator>
+        <cc:Agent>
+          <dc:title>Onboard Devel Team at https://launchpad.net/~onboard</dc:title>
+        </cc:Agent>
+      </dc:creator>
+      <dc:rights>
+        <cc:Agent>
+          <dc:title>GPL-3+ license</dc:title>
+        </cc:Agent>
+      </dc:rights>
+      <dc:publisher>
+        <cc:Agent>
+          <dc:title>Onboard Devel Team</dc:title>
+        </cc:Agent>
+      </dc:publisher>
+      <dc:source>https://launchpad.net/onboard</dc:source>
+      <dc:relation>This file is part of Onboard</dc:relation>
+      <dc:contributor>
+        <cc:Agent>
+          <dc:title>Copyright © 2016, Francesco Fumanti &lt;francesco.fumanti@gmx.net&gt;
+Copyright © 2011-2014, marmuta &lt;marmvta@gmail.com&gt;</dc:title>
+        </cc:Agent>
+      </dc:contributor>
+    </cc:Work>
+  </rdf:RDF>
+</metadata>
+<g
+   id="RALT">
+  <path
+     id="RALT_50pt"
+     d="m 0,97 33.160387,0, 0-20 v 18 l -33.078595,0 0,57.841659 190.225845,0 0,-18.232316 23.64773,0 0,18.262417 70.90015,0 0,-55.426713 20.23917,-1.065456 0,19.381607 -19.33298,0 0,37.336862 -286.002304,0 z"
+     style="fill:#e5d8b2;fill-opacity:1;stroke:#000000;stroke-width:1"
+     sodipodi:nodetypes="ccccccccccccccccc" />
+</g>
+<rect
+   id="AB01"
+   height="18"
+   width="18"
+   y="97.5"
+   x="45.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE02"
+   height="18"
+   width="18"
+   y="40.5"
+   x="38.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE03"
+   height="18"
+   width="18"
+   y="40.5"
+   x="57.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD09"
+   height="18"
+   width="18"
+   y="59.5"
+   x="181.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE01"
+   height="18"
+   width="18"
+   y="40.5"
+   x="19.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE06"
+   height="18"
+   width="18"
+   y="40.5"
+   x="114.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE07"
+   height="18"
+   width="18"
+   y="40.5"
+   x="133.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE04"
+   height="18"
+   width="18"
+   y="40.5"
+   x="76.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE05"
+   height="18"
+   width="18"
+   y="40.5"
+   x="95.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD03"
+   height="18"
+   width="18"
+   y="59.5"
+   x="67.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD02"
+   height="18"
+   width="18"
+   y="59.5"
+   x="48.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD01"
+   height="18"
+   width="18"
+   y="59.5"
+   x="29.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE09"
+   height="18"
+   width="18"
+   y="40.5"
+   x="171.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD07"
+   height="18"
+   width="18"
+   y="59.5"
+   x="143.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD06"
+   height="18"
+   width="18"
+   y="59.5"
+   x="124.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD05"
+   height="18"
+   width="18"
+   y="59.5"
+   x="105.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD04"
+   height="18"
+   width="18"
+   y="59.5"
+   x="86.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB10"
+   height="18"
+   width="18"
+   y="97.5"
+   x="216.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC11"
+   height="18"
+   width="18"
+   y="78.5"
+   x="224.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC10"
+   height="18"
+   width="18"
+   y="78.5"
+   x="205.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="LCTL"
+   height="18"
+   width="27"
+   y="116.5"
+   x="0.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="RCTL"
+   height="18"
+   width="27"
+   y="116.5"
+   x="235"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="TAB"
+   height="18"
+   width="28"
+   y="59.5"
+   x="0.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="LALT"
+   height="18"
+   width="23"
+   y="116.5"
+   x="52.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="TLDE"
+   height="18"
+   width="18"
+   y="40.5"
+   x="0.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="LSGT"
+   height="18"
+   width="18"
+   y="97.5"
+   x="26.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="LFSH"
+   height="18"
+   width="25"
+   y="97.5"
+   x="0.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="BKSP"
+   height="18"
+   width="35"
+   y="40.5"
+   x="247.5"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:0.99999994" />
+<rect
+   id="CAPS"
+   height="18"
+   width="18"
+   y="0.60980344"
+   x="104.7812"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="BKSL"
+   height="18"
+   width="18"
+   y="78.5"
+   x="243.5"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:0.99999994" />
+<rect
+   id="MENU"
+   height="18"
+   width="22.999998"
+   y="0.4911584"
+   x="125.33268"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:1" />
+<rect
+   id="AD10"
+   height="18"
+   width="18"
+   y="59.5"
+   x="200.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD11"
+   height="18"
+   width="18"
+   y="59.5"
+   x="219.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD12"
+   height="18"
+   width="18"
+   y="59.5"
+   x="238.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB08"
+   height="18"
+   width="18"
+   y="97.5"
+   x="178.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE11"
+   height="18"
+   width="18"
+   y="40.5"
+   x="209.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE10"
+   height="18"
+   width="18"
+   y="40.5"
+   x="190.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE12"
+   height="18"
+   width="18"
+   y="40.5"
+   x="228.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC04"
+   height="18"
+   width="18"
+   y="78.5"
+   x="91.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC05"
+   height="18"
+   width="18"
+   y="78.5"
+   x="110.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC06"
+   height="18"
+   width="18"
+   y="78.5"
+   x="129.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC07"
+   height="18"
+   width="18"
+   y="78.5"
+   x="148.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB09"
+   height="18"
+   width="18"
+   y="97.5"
+   x="197.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC01"
+   height="18"
+   width="18"
+   y="78.5"
+   x="34.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC02"
+   height="18"
+   width="18"
+   y="78.5"
+   x="53.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC03"
+   height="18"
+   width="18"
+   y="78.5"
+   x="72.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB05"
+   height="18"
+   width="18"
+   y="97.5"
+   x="121.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB04"
+   height="18"
+   width="18"
+   y="97.5"
+   x="102.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AE08"
+   height="18"
+   width="18"
+   y="40.5"
+   x="152.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB06"
+   height="18"
+   width="18"
+   y="97.5"
+   x="140.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC08"
+   height="18"
+   width="18"
+   y="78.5"
+   x="167.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AC09"
+   height="18"
+   width="18"
+   y="78.5"
+   x="186.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB03"
+   height="18"
+   width="18"
+   y="97.5"
+   x="83.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB02"
+   height="18"
+   width="18"
+   y="97.5"
+   x="64.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AD08"
+   height="18"
+   width="18"
+   y="59.5"
+   x="162.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="RWIN"
+   height="18"
+   width="20"
+   y="116.5"
+   x="214.5"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:0.99999994" />
+<rect
+   id="SPCE"
+   height="18"
+   width="113"
+   y="116.5"
+   x="76.5"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:1" />
+<rect
+   id="RTSH"
+   height="18"
+   width="47"
+   y="97.5"
+   x="235.5"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:1" />
+<rect
+   id="LWIN"
+   height="18"
+   width="23"
+   y="116.5"
+   x="28.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="AB07"
+   height="18"
+   width="18"
+   y="97.5"
+   x="159.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="INS"
+   height="18"
+   width="18"
+   y="40.5"
+   x="285.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="HOME"
+   height="18"
+   width="18"
+   y="40.5"
+   x="303.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="DELE"
+   height="18"
+   width="18"
+   y="59.5"
+   x="284.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="END"
+   height="18"
+   width="18"
+   y="59.5"
+   x="303.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="PGUP"
+   height="18"
+   width="18"
+   y="97.5"
+   x="303.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="PGDN"
+   height="18"
+   width="18"
+   y="77.5"
+   x="303.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="UP"
+   height="18"
+   width="18"
+   y="97.5"
+   x="284.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="DOWN"
+   height="18"
+   width="18"
+   y="116.5"
+   x="284.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="LEFT"
+   height="18"
+   width="18"
+   y="116.5"
+   x="265.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="RGHT"
+   height="18"
+   width="18"
+   y="116.5"
+   x="303.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="F10"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="219" />
+<rect
+   id="F3"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="67" />
+<rect
+   id="F2"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="48" />
+<rect
+   id="ESC"
+   height="18"
+   width="18"
+   y="19.5"
+   x="0.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="F12"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="257" />
+<rect
+   id="F11"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="238" />
+<rect
+   id="F9"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="200" />
+<rect
+   id="F6"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="133.5" />
+<rect
+   id="F7"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="152.5" />
+<rect
+   id="F1"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="29" />
+<rect
+   id="F4"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="86" />
+<rect
+   id="F8"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="171.5" />
+<rect
+   id="F5"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="19.5"
+   x="114.5" />
+<rect
+   id="Prnt"
+   height="18"
+   width="18"
+   y="0"
+   x="160"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="Scroll"
+   height="18"
+   width="18"
+   y="0"
+   x="180"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="Pause"
+   height="18"
+   width="18"
+   y="0"
+   x="200.5"
+   style="fill:#e5d8b2;stroke:#000000" />
+<rect
+   id="settings"
+   style="fill:#e5d8b2;stroke:#000000"
+   height="18"
+   width="18"
+   y="0"
+   x="260" />
+<rect
+   id="hide"
+   height="36.098255"
+   width="37.591492"
+   y="0.20425481"
+   x="283.70425"
+   style="fill:#e5d8b2;stroke:#000000;stroke-width:1.40851" />
+
+
+     id=&quot;g4172&quot;&gt;
+  <rect
+   id="doubleclick"
+   style="fill:#eca76b;fill-opacity:0.90196073;stroke:#000000"
+   height="18"
+   width="18"
+   y="0"
+   x="80" />
+<rect
+   id="dragclick"
+   style="fill:#eca76b;fill-opacity:0.90196073;stroke:#000000"
+   height="18"
+   width="18"
+   y="0"
+   x="0" />
+<rect
+   id="hoverclick"
+   style="fill:#eca76b;fill-opacity:0.90196073;stroke:#000000"
+   height="18"
+   width="18"
+   y="0"
+   x="20" />
+<rect
+   id="secondaryclick"
+   style="fill:#eca76b;fill-opacity:0.90196073;stroke:#000000;stroke-width:0.99999994000000003"
+   height="18"
+   width="18"
+   y="0"
+   x="40" />
+<rect
+   id="middleclick"
+   style="fill:#eca76b;fill-opacity:0.90196073;stroke:#000000;stroke-width:0.99999994000000003"
+   height="18"
+   width="18"
+   y="0"
+   x="60" />
+<g
+   id="RTRN">
+  <path
+     sodipodi:nodetypes="ccccccc"
+     inkscape:connector-curvature="0"
+     id="RTRN_100pct"
+     d="m 257.5,59.5 25,0 0,37 -20,0 0,-19 -5,0 z"
+     style="fill:#e5d8b2;fill-opacity:1;stroke:#000000;stroke-width:1" />
+  <path
+     inkscape:label="#RTRN_50pct"
+     sodipodi:nodetypes="ccccccc"
+     inkscape:connector-curvature="0"
+     id="RTRN_50pct"
+     d="m 262.25,64.25 15.5,0 0,27.5 -10.5,0 0,-19 -5,0 z"
+     style="fill:#e5d8b2;fill-opacity:1;stroke:#000000;stroke-width:1;enable-background:new;opacity:0.2">
+    <desc
+       id="desc4182">Scaled-down key at 50% key_size.
+
+Group this with the full size return key to enable interpolation between these two paths when key_size is applied.</desc>
+  </path>
+</g>
+</svg>

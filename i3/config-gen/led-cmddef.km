@@ -72,7 +72,7 @@ def m_led_light(key, name, boost=0):
     for i in range(4):
         M(key(add_col=i), led_light(name, i, 3))
     for i in range(boost):
-        M(key(add_col=4+i), led_light_boost(name, i, boost))
+        M(key(add_col=4+i), led_light_boost(name, i+1, boost))
 
 def m_led_color(key, name):
     for i in range(4):
@@ -108,3 +108,36 @@ def led_set_mode(name):
     with mode:
         pass
     return mode
+
+
+@ACTION_INIT()
+def table_cmd(self, mqtt_name, device_name, cmd):
+    self.mqtt_name = mqtt_name
+    self.device_name = device_name
+    self.cmd = cmd
+
+@ACTION_IMPLEMENT(table_cmd)
+def f(self):
+    return mqtt_pub(self.mqtt_name, f"table/{self.device_name}/action", self.cmd)
+
+
+def table_all_keys(mqtt_name, device_name):
+    def t_cmd(cmd):
+        return table_cmd(mqtt_name, device_name, cmd)
+    M(K_T, CMD(f"osdc --to=display --min-duration=0 --duration=100 Press"), release_action=CMD("osdc --to=display --min-duration=500 --duration=500 --color=red Release"))
+    def map_table_key(k, key):
+        #M(k, AND(CMD(f"osdc --to=display --min-duration=0 --duration=100 Press"), t_cmd(f"K{key},2000")), release_action=AND(CMD("osdc --to=display --min-duration=500 --duration=500 --color=red Release"), t_cmd("K-1")))
+        M(k, t_cmd(f"K{key},2000"), release_action=t_cmd("K-1"))
+        M(k(SHIFT), t_cmd(f"K{key}"))
+    map_table_key(K_Up, 0)
+    map_table_key(K_Down, 1)
+    map_table_key(K_1, 2)
+    map_table_key(K_2, 3)
+    map_table_key(K_3, 4)
+    map_table_key(K_4, 5)
+    map_table_key(K_M, 6)
+    for k in [K_Left, K_Right, K_Left(SHIFT), K_Right(SHIFT)]:
+        M(k, t_cmd("K-1"))
+    M(K_Q, t_cmd("LL"))
+    M(K_W, t_cmd("LM"))
+    M(K_E, t_cmd("LH"))

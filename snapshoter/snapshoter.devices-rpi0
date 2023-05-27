@@ -7,7 +7,7 @@ case "$device" in
     ;;
   rpi0 )
 		from=/
-		exclude_aux=false
+		exclude_aux=true
 	;;
   rpi[1-7])
 	    exclude_aux=false
@@ -26,9 +26,5 @@ case "$device" in
 		exclude_mountdir=false
 		excludedir_homes="'/files/home'"
   		ms root@$device
-    ;;
-  *)
-	err DEVICE $device NOT EXIST
-    exit 200
     ;;
 esac

@@ -1,1 +1,3 @@
-build_git
+build_git*
+__pycache__
+state

@@ -7,6 +7,8 @@ Blue="\e[34m"
 Magenta="\e[35m"
 None="\e[0m"
 
+date=${CONFLN_DATE:-$(date +%Y-%m-%d--%H-%M-%S)}
+
 
 from="$1"
 to="$2"
@@ -20,12 +22,19 @@ Copy()
 {
 	[[ "$par" == *c* ]]
 }
+RemoveExtension()
+{
+	[[ "$par" == *E* ]]
+}
 
 if [[ "$to" == *"/" ]]
 then
 	to="$to$(basename "$from")"
+	if RemoveExtension
+	then
+		to="${to%.*}"
+	fi
 fi
-
 
 
 typeEq()
@@ -42,7 +51,14 @@ if [[ "$from" == "" ]] || [[ "$to" == "" ]]
 then
 	echo $0 - Config linker 1>&2
 	echo Usage: 1>&2
-	echo "	$0 from to [parametrs]" 1>&2
+	echo "	$0 from to [parameters]" 1>&2
+	echo "	to:" 1>&2
+	echo "		filename" 1>&2
+	echo "		directory when parameter terminate with '/'" 1>&2
+	echo "	parameters:" 1>&2
+	echo "		-r Remove old file" 1>&2
+	echo "		-c copy file (no soft link)" 1>&2
+	echo "		-E remove extension" 1>&2
 	exit 1
 fi
 
@@ -78,7 +94,7 @@ then
 		[[ "$in" == "n" ]] && exit 0
 		if [[ "$in" == "d" ]]
 		then
-			typeEq || echo -e "$Red Type are not equival.$None"
+			typeEq || echo -e "$Red Types are not equivalent.$None"
 			diff "$to" "$from" --color=always -r
 		fi
 	done
@@ -87,9 +103,9 @@ then
 		rm "$to" || err rm
 		echo -n "Old file deleted"
 	else
-		old="$to.old.$(date +%Y-%m-%d--%H-%M-%S)"
+		old="$to.old.$date"
 		echo -n " Old file is: $old"
-		mv "$to" "$old" || err mv 
+		mv -n "$to" "$old" || err mv old file 
 	fi
 fi
 

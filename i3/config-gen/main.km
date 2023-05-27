@@ -1,6 +1,7 @@
 #!/bin/env keymap-i3
 
 LOAD("local.km", only_if_exists=True)
+LOAD_LIB("led-cmddef.km")
 
 def workspace_slave_all(k, workspace):
     M(k.with_mod(SUPER), GOTO_WORKSPACE(slave=workspace))
@@ -35,7 +36,7 @@ def app_workspace(key, workspace, cmd):
 
 ################ On start run ################
 EXEC_ON_STARTUP(CMD("xrdb ~/.Xresources"))
-cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch")
+cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch -option grp:switch -option compose:rctrl")
 EXEC_ON_STARTUP(cmd_set_xkbmap)
 EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
 EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
@@ -174,8 +175,8 @@ with ADD_MODIFICATOR(SUPER):
         M(KEY(4,1), CMD('osdd-run & sleep 1;osdc --color=red RESTART'))
         M(KEY(4,1, SHIFT), CMD('osdc --color=red test --color=blue 123456789 --color=green 123456789123456789123456789123456789123456789123456789 --color=white 123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789123456789'))
         def bind_osd_enable(k, output):
-            M(k, CMD('osdc --cmd-now=enable:{output} --color=red Enable {output}'))
-            M(k(SHIFT), CMD('osdc --cmd-after=disable:{output} --color=red Disable {output}'))
+            M(k, CMD(f'osdc --cmd-now=enable:{output} --color=red Enable {output}'))
+            M(k(SHIFT), CMD(f'osdc --cmd-after=disable:{output} --color=red Disable {output}'))
         bind_osd_enable(KEY(4, 2), "led")
         bind_osd_enable(KEY(4, 3), "loglast")
         bind_osd_enable(KEY(4, 4), "display0")
@@ -184,6 +185,8 @@ with ADD_MODIFICATOR(SUPER):
         M(K_B, cmd_set_xkbmap)
         M(K_H, ROOT_MODE_AND(CMD("blueman-manager")))
         M(K_Y, ROOT_MODE_AND(CMD("alsamixer")))
+
+        LOAD("xrandr.km", only_if_exists=True)
 
 
 
@@ -240,6 +243,10 @@ with ADD_MODIFICATOR(SUPER):
     bind_pasman(K("["), "roficlip")
     bind_pasman(K("]"), "rofichrome")
 
+    M(K_V(SHIFT), release_action=CMD('xdotool keyup super shift ctrl alt; xdotool type --clearmodifiers "$(date +%Y-%m-%d)"'))
+
+    with M(K_T(SHIFT), GO_MODE(STD_MODE("TABLE-jug9/1"))).action.mode:
+        table_all_keys("jug9", "1")
+        
     with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
         LOAD("led-jug9-1.km")
-

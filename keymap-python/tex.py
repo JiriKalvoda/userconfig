@@ -2,6 +2,8 @@
 from main import *
 import tex_template
 
+g["TARGET"] = "tex"
+
 print(tex_template.template)
 
 def print_mod(mod):
@@ -13,15 +15,11 @@ def print_mod(mod):
     if mod & Modificator.ALT: r = "Alt " + r
     return r
 
+@set_global("TEX_te")
 def te(x):
     return x.replace("[", "").replace("]", "").replace("$", "")
 
-def action_serialize(name):
-    def l(f):
-        setattr(g[name], "serialize", f)
-        return f
-    return l
-
+@set_global("TEX_p")
 def p(r, g, b, text):
     return f"$printkey[$rgb[{r} {g} {b}]][{text}]"
 

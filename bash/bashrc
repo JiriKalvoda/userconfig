@@ -157,11 +157,11 @@ l(){
 ######################### vim
 if which nvim >/dev/null 2>/dev/null
 then
-	EDITOR=nvim
+	export EDITOR=nvim
+	export MANPAGER='nvim +Man!'
 else
-	EDITOR=vim
+	export EDITOR=vim
 fi
-export EDITOR
 e(){
 	$EDITOR "$@"
 }
@@ -211,6 +211,12 @@ zath(){
 		zathura "$i" & sleep 0.2
 	done
 }
+zath1(){
+	for i in "$@"
+	do
+		zathura "$i" --page=1 & sleep 0.2
+	done
+}
 
 ######################### Separators
 promt(){
@@ -240,6 +246,15 @@ cp(){
 real_mv="$(which mv)"
 mv(){
 	$real_mv -i "$@"
+}
+mňau(){
+	cat "$@"
+}
+rs(){
+	rsync --recursive --info=progress2 --info=name1 --sparse  --stats  "$@"
+}
+rsa(){
+	rs -at "$@"
 }
 
 ######################### git
@@ -639,11 +654,6 @@ do
 	  . $i
 done 2>/dev/null
 
-mv2md()
-{
-	tr -d "{}"  | pandoc -f mediawiki -t markdown
-}
-
 aux()
 {
 	if [[ "$(pwd)" == /aux/* ]]
@@ -660,6 +670,10 @@ lpl()
 {
 	lp -o Duplex=DuplexTumble -o XRFold=BiFoldStaple -o XROutputMode=HighResolution "$@"
 }
+lp1l()
+{
+	lp -o Duplex=DuplexTumble -o XROutputMode=HighResolution "$@"
+}
 
 
 h(){
@@ -674,3 +688,5 @@ x()
 {
 	h "$(which x)" "$@"
 }
+
+

@@ -380,9 +380,16 @@ def global__action_implement(cls):
     return l
 def action_implement(name):
     return global__action_implement(g[name])
+
 @set_global()
-def action_serialize(cls):
-    return set_member(cls, "serialize")
+def global__action_serialize(cls):
+    def l(f):
+        cls.serialize = f
+        return f
+    return l
+def action_serialize(name):
+    return global__action_serialize(g[name])
+
 
 
 

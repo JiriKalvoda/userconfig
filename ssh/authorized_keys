@@ -1,0 +1,23 @@
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJBnGYElbRT5ZeNfsEU4LCZ2dh9YPSle5L/ph3tsgyX jirikalvoda@ucw.cz jiri,root@arch normal 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILzXHI0dvETIXVv1++10hzD+7RRkSkolin1eATT8U2MY jirikalvoda@ucw.cz jiri,root@arzen normal 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINHQOGFRJFO30xi7CJYcOdYs1Tq7b9okw1JpNpBiwZU/ jirikalvoda@ucw.cz none@phone normal 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMjqy7CAAVJkP1f9QTjpES19URMquzJ2dId+kjyNBa4v jirikalvoda@ucw.cz jiri,root@samet normal 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMhHz/3ojv4jut/0o009r7J9fs/H8s1YilhsxWULgafx jirikalvoda@ucw.cz jiri,root@external normal 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIM0o+H7Qo27AbWaX/kbuLZCQoQYrwqPZDSq0BvWbHU1j jirikalvoda@ucw.cz jiri,root@rpi* normal 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEKC3dzeSby5q7jg3KSkCaCFD6LI5wLYeBY9SGmHmvjv jirikalvoda@ucw.cz jiri,root@hluk normal 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDUnKb8M2T810vRCvMGDIAssU9kLjpnPblwjJBHknUyS jirikalvoda@ucw.cz jiri@teplo normal 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILCy1oKv+275MDeYrxtNmYpjrt3cbmoidN4qEN+su5ST jirikalvoda@ucw.cz jirikalvoda@kam normal 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHJu6Ro+laLJVkqZlP8e6FKOY0rUK+NNKuJpdas7sDU1 jirikalvoda@ucw.cz jirikalvoda@gimli normal 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIA+m7flghlCFz9cXrbyoj9zLIiE+nlaCbzwirOfO+4ed jirikalvoda@ucw.cz jirikalvoda@ucw normal 2023-05-26
+
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKQNAzN6Lbjz7WrtFDOhyKFP25QOvz/dLeg7kakan3Ze jirikalvoda@ucw.cz jiri,root@arch secret 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIcNiSLH7zcl+hfgW2agDuviP51G89JWlFocy3Q+ELXW jirikalvoda@ucw.cz jiri,root@arzen secret 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEcOH5/yw+IdkvmZrjKgwkJqJvFuXQznVUmcX+5B8YDC jirikalvoda@ucw.cz none@phone secret 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIANn7UygX0ANTotoEtFRLh+POkxLp3nBdgvsYD+T01Hq jirikalvoda@ucw.cz jiri,root@samet secret 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKD9jHvCUGpex2vxiA0lU5nCMMu0pbwkhYtLL4K2fe08 jirikalvoda@ucw.cz jiri,root@external secret 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKSKlW9R4hbpTWk2FKI5qmZKmQSjxpiigOGaeUZxi0k3 jirikalvoda@ucw.cz jiri,root@rpi* secret 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB0Bk0fGCcURja5gy8vr2ixF8x4rnTiAElOj+XA5BZVW jirikalvoda@ucw.cz jiri,root@hluk secret 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILWFUzjGzgcNg5rCy2xD8V7hKvXdLoirObAQIMwshTWh jirikalvoda@ucw.cz jiri@teplo secret 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHrnGROJUO7rSSm3l932eRel5eoEQcoZstPKdF6oJFFB jirikalvoda@ucw.cz jirikalvoda@kam secret 2023-05-26
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPbCTO54tDb0t9yA+WlfdcvRCM+VLrQ/sETIiAGdTXij jirikalvoda@ucw.cz jirikalvoda@gimli secret 2023-05-27
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILjdgRKy5sTUwdSzzeQAUfmnkJaF4YXCvpS9U0tp7FL4 jirikalvoda@ucw.cz jirikalvoda@ucw secret 2023-05-26

@@ -1,0 +1,8 @@
+#movingssh -x arch DISPLAY=:0 osdc SMS  --duration=10000 --min-duration=3000  "'$(cat url)'" "'$(cat mode)'"
+#osdc pasman find page "$(cat url)" $(cat mode)
+if [[ "$(cat findmode)" == "rofi" ]]
+then
+DISPLAY=:0 pasman-osd $(cat findmode) $(cat mode)
+else
+DISPLAY=:0 pasman-osd $(cat findmode) "$(cat url)" $(cat mode)
+fi
