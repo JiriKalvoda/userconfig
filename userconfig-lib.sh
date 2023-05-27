@@ -212,3 +212,10 @@ install_ok(){
 	unset install_name
 	install_try_push
 }
+
+need_state_server(){
+	userconfig_state_server=~/userconfig_state
+	[[ ! -d $userconfig_state_server ]] && err This is not userconfig state server
+	true
+}
+
