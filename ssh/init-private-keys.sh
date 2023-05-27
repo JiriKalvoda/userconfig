@@ -60,9 +60,9 @@ then
 	[[ -d $new_dir ]] && r rm -r $new_dir
 	r mkdir -p $new_dir
 	r chmod 777 $new_dir
-	for i in id_ed25519{_secret,,_trash},{,.pub}
+	for i in id_ed25519{_secret,,_trash}{,.pub}
 	do
-		r -b "$(print " %q") cat .ssh/$i > $new_dir/$i"
+		r -b "$(printf " %q" "$@") cat .ssh/$i > $new_dir/$i"
 	done
 	fix_chmod $new_dir
 	conflnall $new_dir
