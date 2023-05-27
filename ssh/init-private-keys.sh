@@ -31,6 +31,12 @@ conflnall(){
 	confln $1/id_ed25519_trash.pub ~/.ssh/ c
 }
 
+fix_chmod(){
+	r chmod 600 $1/id_ed25519{_secret,,_trash}
+	r chmod 644 $1/id_ed25519{_secret,,_trash}.pub
+}
+
+
 
 if [[ "$action" == "gen" ]]
 then
@@ -38,6 +44,7 @@ then
 	new_dir=~/.ssh/new
 	[[ -d $new_dir ]] && r rm -r $new_dir
 	r mkdir -p $new_dir
+	r chmod 777 $new_dir
 	r ssh-keygen -t ed25519 -C "jirikalvoda@ucw.cz $places secret $date" -f $new_dir/id_ed25519_secret
 	r ssh-keygen -t ed25519 -C "jirikalvoda@ucw.cz $places normal $date" -f $new_dir/id_ed25519 -N ""
 	r ssh-keygen -t ed25519 -C "jirikalvoda@ucw.cz $places trash $date" -f $new_dir/id_ed25519_trash -N ""
@@ -52,10 +59,12 @@ then
 	new_dir=~/.ssh/new
 	[[ -d $new_dir ]] && r rm -r $new_dir
 	r mkdir -p $new_dir
+	r chmod 777 $new_dir
 	for i in id_ed25519{_secret,,_trash},{,.pub}
 	do
 		r -b "$(print " %q") cat .ssh/$i > $new_dir/$i"
 	done
+	fix_chmod $new_dir
 	conflnall $new_dir
 	r rm -r $new_dir
 elif [[ "$action" == "none" ]]
@@ -65,7 +74,7 @@ else
 	err Wrong action
 fi
 
-
+fix_chmod ~/.ssh/
 
 r cp ~/.ssh/*.pub  $state_run_dir/files/
 
