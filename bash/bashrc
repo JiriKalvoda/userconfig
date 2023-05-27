@@ -362,6 +362,9 @@ pde(){
 makej(){
 	make -j8 "$@"
 }
+makeme(){
+	make "$@" "$(cat /etc/hostname)"
+}
 
 
 
