@@ -41,7 +41,7 @@ confln()
 
 init-service()
 {
-	$USERCONFIG_ROOT/init-service "$@"
+	$USERCONFIG_ROOT/init-service.sh "$@"
 }
 
 git_clupdate()
