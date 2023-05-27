@@ -8,7 +8,7 @@ date=$(date +%Y-%m-%d)
 default_places=$USER@$(hostname)
 echo -n set places "(default $default_places):"
 read places
-[[ $places == "" ]] && places=default_places
+[[ $places == "" ]] && places=$default_places
 
 new_dir=~/.ssh/new
 [[ -d $new_dir ]] && r rm -r $new_dir
