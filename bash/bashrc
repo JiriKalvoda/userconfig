@@ -348,6 +348,12 @@ neopeč(){
 	neofetch
 }
 
+######################### ip
+
+ipa(){
+	ip -br -c a
+}
+
 ######################### root
 please(){
 	root $(fc -ln -1)
