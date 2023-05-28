@@ -4,9 +4,12 @@ then
 	export LD_SSHTYPE=localhost 
 fi
 
+keyArg=""
+[[ -e ~/.config/root_key ]] && keyArg="-i ~/.config/root_key"
+
 if [[ "$@" == "" ]]
 then
-	LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD 
+	LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD $keyArg
 else
-	LD_SSHTYPE=localhost LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD -t cd "$PWD" \; "$@" 
+	LD_SSHTYPE=localhost LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD -t $keyArg cd "$PWD" \; "$@"
 fi
