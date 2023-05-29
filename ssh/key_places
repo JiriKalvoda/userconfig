@@ -1,0 +1,13 @@
+[secret]
+root@teplo
+root,cmsuser@contest.kam.mff.cuni.cz
+
+[secret,normal]
+root@rpi1
+
+[normal]
+ksp-web@gimli
+gitlab.kam.mff.cuni.cz
+gitlab.com
+github.com
+gitea.ks.matfyz.cz
