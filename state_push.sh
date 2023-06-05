@@ -6,7 +6,7 @@ install_config_load
 
 if [[ $ic_push == "" ]]
 then
-	echo "${Red}No push hook for state dir!$None"
+	echo -e "${Red}No push hook for state dir!$None"
 	exit 1
 else
 	cd $USERCONFIG_ROOT/state || err cd faild
