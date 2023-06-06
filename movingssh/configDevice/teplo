@@ -1,0 +1,5 @@
+if [[ "$usernameSpec" == "root" ]]
+then
+	keyFile=~/.ssh/id_ed25519_secret
+	useAgent=true
+fi
