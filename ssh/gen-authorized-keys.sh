@@ -35,7 +35,7 @@ catuniq()
 }
 catuniq $userconfig_state_server/*/state/ssh-init-private-keys.sh/last_ok/files/id_ed25519.pub > keys_normal
 catuniq $userconfig_state_server/*/state/ssh-init-private-keys.sh/last_ok/files/id_ed25519_secret.pub > keys_secret
-catuniq $userconfig_state_server/*/state/ssh-init-private-keys.sh/last_ok/files/id_ed25519_secret.pub > keys_trash
+catuniq $userconfig_state_server/*/state/ssh-init-private-keys.sh/last_ok/files/id_ed25519_trash.pub > keys_trash
 
 cat keys_secret > authorized_keys_secret
 
