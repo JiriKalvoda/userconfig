@@ -1,0 +1,13 @@
+https://bugs.launchpad.net/netplan/+bug/1999178
+
+Just logging in to confirm that changing in /etc/nsswitch.conf:
+
+group: files [SUCCESS=merge] systemd
+
+to:
+
+group: files systemd
+
+does resolve the issue.
+
+Hopefully this can be fixed soon. Alternately it would be fantastic if netplan could just output a systemd network config to an arbitrary directory...
