@@ -1,0 +1,131 @@
+#!/bin/bash
+
+# Get the value of a key in a desktop file's Desktop Entry group.
+# Example: Use get_key foo.desktop Exec
+# to get the values of the Exec= key for the Desktop Entry group.
+get_key()
+{
+    local file="${1}"
+    local key="${2}"
+    local desktop_entry=""
+
+    IFS_="${IFS}"
+    IFS=""
+    while read line
+    do
+        case "$line" in
+            "[Desktop Entry]")
+                desktop_entry="y"
+            ;;
+            # Reset match flag for other groups
+            "["*)
+                desktop_entry=""
+            ;;
+            "${key}="*)
+                # Only match Desktop Entry group
+                if [ -n "${desktop_entry}" ]
+                then
+                    echo "${line}" | cut -d= -f 2-
+                fi
+        esac
+    done < "${file}"
+    IFS="${IFS_}"
+}
+
+last_word()
+{
+    read first rest
+    echo "$rest"
+}
+
+
+# This handles backslashes but not quote marks.
+first_word()
+{
+    read first rest
+    echo "$first"
+}
+
+#-----------------------------------------
+# Recursively search .desktop file
+
+search_desktop_file()
+{
+    local default="$1"
+    local dir="$2"
+    local target="$3"
+
+    local file=""
+    # look for both vendor-app.desktop, vendor/app.desktop
+    if [ -r "$dir/$default" ]; then
+      file="$dir/$default"
+    elif [ -r "$dir/`echo $default | sed -e 's|-|/|'`" ]; then
+      file="$dir/`echo $default | sed -e 's|-|/|'`"
+    fi
+
+    if [ -r "$file" ] ; then
+        command="$(get_key "${file}" "Exec" | first_word)"
+        icon="$(get_key "${file}" "Icon")"
+        # FIXME: Actually LC_MESSAGES should be used as described in
+        # http://standards.freedesktop.org/desktop-entry-spec/latest/ar01s04.html
+        localised_name="$(get_key "${file}" "Name")"
+        set -- $(get_key "${file}" "Exec" | last_word)
+        # We need to replace any occurrence of "%f", "%F" and
+        # the like by the target file. We examine each
+        # argument and append the modified argument to the
+        # end then shift.
+        local args=$#
+        local replaced=0
+        while [ $args -gt 0 ]; do
+            case $1 in
+                %[c])
+                    replaced=1
+                    arg="${localised_name}"
+                    shift
+                    set -- "$@" "$arg"
+                    ;;
+                %[fFuU])
+                    replaced=1
+                    arg="$target"
+                    shift
+                    set -- "$@" "$arg"
+                    ;;
+                %[i])
+                    replaced=1
+                    shift
+                    set -- "$@" "--icon" "$icon"
+                    ;;
+                *)
+                    arg="$1"
+                    shift
+                    set -- "$@" "$arg"
+                    ;;
+            esac
+            args=$(( $args - 1 ))
+        done
+        [ $replaced -eq 1 ] || set -- "$@" "$target"
+        env "$command" "$@"
+
+        if [ $? -eq 0 ]; then
+            exit_success
+        fi
+    fi
+
+    for d in "$dir/"*/; do
+        [ -d "$d" ] && search_desktop_file "$default" "$d" "$target"
+    done
+}
+
+app="$1"
+target="$2"
+
+xdg_user_dir="$XDG_DATA_HOME"
+[ -n "$xdg_user_dir" ] || xdg_user_dir="$HOME/.local/share"
+
+xdg_system_dirs="$XDG_DATA_DIRS"
+[ -n "$xdg_system_dirs" ] || xdg_system_dirs=/usr/local/share/:/usr/share/
+
+for x in `echo "$xdg_user_dir:$xdg_system_dirs" | sed 's/:/ /g'`; do
+	search_desktop_file "$app" "$x/applications/" "$target"
+done
+
