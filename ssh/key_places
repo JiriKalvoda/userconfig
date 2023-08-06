@@ -1,9 +1,11 @@
 [secret]
 root@teplo
+root@rpi-nula
 root,cmsuser@contest.kam.mff.cuni.cz
 
 [secret,normal]
 root@rpi1
+
 
 [normal]
 ksp-web@gimli
@@ -11,3 +13,6 @@ gitlab.kam.mff.cuni.cz
 gitlab.com
 github.com
 gitea.ks.matfyz.cz
+
+[trash]
+jk2089@reu.dimacs.rutgers.edu
