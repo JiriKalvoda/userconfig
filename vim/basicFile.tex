@@ -1,14 +1,24 @@
-\documentclass[a4]{article}
-\usepackage[czech]{babel}    % české nastavení
-\usepackage[utf8]{inputenc}   % pro unicode UTF-10
-\pdfgentounicode=1
+\input ucwmac.tex
+\ucwmodule{verb}
+\ucwmodule{ofs}
+\chyph
+\parskip 3pt
+\parindent 0pt
+\raggedbottom
 
-\title{}
-\author{Jiří Kalvoda}
+\font\hhdfont csbx17
+\font\hdfont csbx12
+\font\smallboldfont csbx10 at 7.5pt
+\def\hhd#1{\bigskip\leftline{\hfill\hhdfont #1\hfill}\interlinepenalty 10000}
 
-\begin{document}
+\newcount\countH
+\def\hd#1{\penalty-2000\bigskip\advance\countH1\relax\leftline{\hdfont\the\countH. #1}\nobreak}
 
-\maketitle
+\hhd{}
 
 
-\end{document}
+
+
+
+\bye
+

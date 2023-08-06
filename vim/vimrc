@@ -303,16 +303,18 @@ function! Compile(isVimRun)
 		execute "AddExec cmake --build ".NameDir()." ".CompileArg()
 	elseif s == "arduino"
 		execute "AddExec arduino-cli compile --fqbn arduino:avr:uno ".NameDir()."/ ".CompileArg()
-	elseif s == "tex"
+	elseif s == "latex"
 		execute "AddExec pdflatex ".NameAll()." ".CompileArg()
 	elseif s == "ptex"
 		execute "AddExec pdftex ".NameAll()." ".CompileArg()
 	elseif s == "ksptex"
 		execute "AddExec ~/org/ksp/bin/tex2pdf ".CompileArg()." ".NameAll()." ".NameNoE().".pdf"
-	elseif s == "ctex"
+	elseif s == "tex"
 		execute "AddExec pdfcsplain ".NameAll()." ".CompileArg()
 	elseif s == "ltex"
 		execute "AddExec luatex ".NameAll()." ".CompileArg()
+	elseif s == "markdown"
+		execute "AddExec pandoc ".NameAll()." -o ".NameNoE().".pdf ".CompileArg()
 	elseif s == "asy"
 		execute "AddExec asy ".NameAll()." ".CompileArg()
 	elseif s == "make"
@@ -361,9 +363,11 @@ function! Run(isVimRun,input)
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ptex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
-	elseif s == "ctex"
+	elseif s == "latex"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "ltex"
+		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
+	elseif s == "markdown"
 		execute "AddExec gopen ".NameNoE().".pdf ".RunArg()" "
 	elseif s == "cs"
 		w
