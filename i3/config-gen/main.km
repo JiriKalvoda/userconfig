@@ -206,6 +206,8 @@ with ADD_MODIFICATOR(SUPER):
     M(K_C(CTRL|SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --user-data-dir=$(mktemp -d)"))
     M(K_C(CTRL), CMD("firefox"))
 
+    M(K_A(CTRL), CMD("chromium  --new-window https://slovnik.seznam.cz/"))
+
     # Tea timer
     I3_DIRECT("""
     for_window [title="Tea Timer"] floating enable
