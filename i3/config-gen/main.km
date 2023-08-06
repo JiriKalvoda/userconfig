@@ -252,3 +252,9 @@ with ADD_MODIFICATOR(SUPER):
         
     with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
         LOAD("led-jug9-1.km")
+
+    #Better xdg-open
+    I3_DIRECT("""
+    for_window [title="better xdg-open"] floating enable
+    """)
+
