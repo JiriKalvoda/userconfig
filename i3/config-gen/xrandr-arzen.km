@@ -10,6 +10,9 @@ def xrandr_set(mode_name, eDP_1=(fhd, (0,0)), DP_1=None, HDMI_1=None, after="", 
 xrandr_set("std")
 xrandr_set("std_small", eDP_1=((1280,720), (0,0)))
 
+xrandr_set("samsung", eDP_1=(fhd, (2560, 1440-1080)), DP_1=(qhd, (0,0)))
+xrandr_set("samsung_only", eDP_1=None, DP_1=(qhd, (0,0)))
+
 
 xrandr_set("verbatim_left_hand", eDP_1=(fhd, (1080, 0)), DP_1=(fhd, (0,0), left), after=map_touchscreen, primary="DP_1")
 xrandr_set("verbatim_left_hand_only", eDP_1=None, DP_1=(fhd, (0,0), left), after=map_touchscreen, primary="DP_1")
@@ -19,6 +22,7 @@ xrandr_set("verbatim_right_hand_only", eDP_1=None, DP_1=(fhd, (0,0), right), aft
 
 xrandr_set("verbatim_left_table", eDP_1=(fhd, (1920, 0)), DP_1=(fhd, (0,0)), after=map_touchscreen, primary="DP_1")
 xrandr_set("verbatim_right_table", eDP_1=(fhd, (0, 0)), DP_1=(fhd, (1920,0)), after=map_touchscreen, primary="DP_1")
+xrandr_set("verbatim_table_only", eDP_1=None, DP_1=(fhd, (0,0)), after=map_touchscreen, primary="DP_1")
 
 
 xrandr_set("camomile", eDP_1=(fhd, (0, 1200)), HDMI_1=((1920, 1200), (0,0)), primary="HDMI_1")
@@ -30,10 +34,14 @@ else:
     M(K_N,           r_std)
     M(K_N(SHIFT),    r_std_small)
 
+    M(K_M,           r_samsung)
+    M(K_M(SHIFT),    r_samsung_only)
+
     M(K_J(),         r_verbatim_left_hand)
     M(K_J(SHIFT),    r_verbatim_left_hand_only)
 
     M(K_K(),         r_verbatim_left_table)
+    M(K_K(SHIFT),    r_verbatim_table_only)
     M(K(";"),        r_verbatim_right_table)
 
     M(K("'"),        r_verbatim_right_hand)
