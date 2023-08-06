@@ -1,5 +1,17 @@
 #!/bin/bash
 
+if [[ "$TARGET" == "terapeut" ]]
+then
+
+snapdir="/mnt/terapeut-snapshot"
+snapdrive="/dev/mapper/terapeut-snapshot"
+case "$device" in
+  arzen)
+		from=/
+esac
+
+else
+
 snapdir="/mnt/snapshot"
 autosnapdir="/mnt/snapshot"
 snapdrive="/dev/mapper/snapshot"
@@ -32,3 +44,5 @@ case "$device" in
   		ms root@$device
     ;;
 esac
+
+fi
