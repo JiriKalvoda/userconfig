@@ -57,7 +57,7 @@ int main(int argc, char ** argv)
 	xdo = xdo_new(0);
 	char * dev = "/dev/input/by-id/usb-Wacom_Co._Ltd._CTL-672_0ME00M1038175-event-mouse";
 	//char * dev = "/dev/input/by-id/usb-Wacom_Co._Ltd._CTL-672_0LE00M1089419-event-mouse";
-	if(argc > 1) dev =argv[1];
+	if(argc > 1) dev = argv[1];
     struct input_event ev;
     ssize_t n;
     int fd;
