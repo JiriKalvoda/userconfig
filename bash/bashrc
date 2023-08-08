@@ -532,11 +532,6 @@ promt_color_right=32
 
 
 ######################### configuration by devices
-if [ "$device_name" == "externalArch" ] ;
-then
-	promt_color_user=33
-fi
-
 if [[ "$device_name" == acid ]] || [[ "$device_name" == poppi ]]
 then
 	promt_color_dir=91
@@ -573,6 +568,13 @@ then
 		promt_color_user=91
 	fi
 fi
+#
+######################### non-native instalations
+if [ "$device_name" == "externalArch" ] || [ -e /etc/is_virtual ];
+then
+	promt_color_user=33
+fi
+
 
 ######################### phone: no device name
 if [ "$SSH_CONNECTION" == "" ]
