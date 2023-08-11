@@ -110,7 +110,7 @@ def open_xdg_open(terminal=False):
         exit(0)
     else:
         xdg_open_bin = shutil.which("xdg-open-real") or shutil.which("xdg-open") 
-        p = subprocess.run([*terminal_cmd(terminal), xdg_open_bin, arg])
+        p = subprocess.run([*terminal_cmd(terminal), xdg_open_bin, path_to_filename(arg)])
         exit(p.returncode)
 
 def open_desktop(desktop_app=None, terminal=False):
