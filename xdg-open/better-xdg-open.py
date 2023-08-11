@@ -73,22 +73,40 @@ def terminal_cmd(terminal=True):
 def shell_escape(*args):
     return " ".join("'" + i.replace("'", "'\"'\"'") + "'" for i in args)
 
+def path_to_filename(arg):
+    if not is_file_url_or_path(arg):
+        return arg
+    arg = file_url_to_path(arg)
+    return arg.split('/')[-1]
+
 def is_vm():
     return m_win._vm.isChecked()
 def vm_run(cmd, gui=False):
     r = subprocess.run(["vm", "extended_name", m_win._vm_name.text()], stdout=subprocess.PIPE, encoding='utf-8')
     vm_id, vm_user = r.stdout.strip().split("\n")
+    if is_file_url_or_path(arg):
+        r = subprocess.run(["vm", "sshfs", vm_id, "--user", vm_user], encoding='utf-8')
+        r = subprocess.run(["vm", "sshfs_mountdir", vm_id, "--user", vm_user], stdout=subprocess.PIPE, encoding='utf-8')
+        mountdir = r.stdout.strip()
+
+        path = file_url_to_path(arg)
+        filename = path.split('/')[-1]
+
+        import tempfile
+        tmp_dir = tempfile.mkdtemp(prefix="xdg-open-", dir=mountdir+'~')
+        tmp_dir_name = tmp_dir.split('/')[-1]
+        shutil.copy(file, tmp_dir+"/"+filename)
     if gui:
-        p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, shell_escape(*cmd)])
+        p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, f"cd {tmp_dir_name}; {shell_escape(*cmd)}"])
     else:
-        p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, shell_escape(*cmd)])
+        p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "-t", f"cd {tmp_dir_name}; {shell_escape(*cmd)}"])
 
 
 
 def open_xdg_open(terminal=False):
     end()
     if is_vm():
-        vm_run(["xdg-open", arg], gui=not terminal)
+        vm_run(["xdg-open", path_to_filename(arg)], gui=not terminal)
         exit(0)
     else:
         xdg_open_bin = shutil.which("xdg-open-real") or shutil.which("xdg-open") 
@@ -98,7 +116,7 @@ def open_xdg_open(terminal=False):
 def open_desktop(desktop_app=None, terminal=False):
     end()
     if is_vm():
-        vm_run(["open-desktop-file", desktop_app or xdg_default, arg], gui=not terminal)
+        vm_run(["open-desktop-file", desktop_app or xdg_default, path_to_filename(arg)], gui=not terminal)
         exit(0)
     else:
         p = subprocess.run([*terminal_cmd(terminal), script_dir+"/open-desktop-file", desktop_app or xdg_default, arg])
@@ -106,18 +124,26 @@ def open_desktop(desktop_app=None, terminal=False):
 
 def open_vim():
     end()
-    vim_bin = shutil.which("nvim") or shutil.which("vim") 
-    p = subprocess.run([*terminal_cmd(), vim_bin, arg])
-    exit(p.returncode)
+    if is_vm():
+        p = vm_run(["vim", path_to_filename(arg)], gui=False)
+        exit(0)
+    else:
+        vim_bin = shutil.which("nvim") or shutil.which("vim") 
+        p = subprocess.run([*terminal_cmd(), vim_bin, arg])
+        exit(p.returncode)
 
 def open_browser(window=False, anonim=False, session=False):
     import tempfile
     end()
     anonim_arg = ["--incognito"] if anonim else []
-    window_arg = ["--new‐window"] if window else []
+    window_arg = ["--new-window"] if window else []
     session_arg = ["--user-data-dir="+tempfile.mkdtemp()] if session else []
-    p = subprocess.run(["chromium", *anonim_arg, *window_arg, *session_arg, arg])
-    exit(p.returncode)
+    if is_vm():
+        p = vm_run(["chromium", *anonim_arg, *window_arg, *session_arg, path_to_filename(arg)], gui=True)
+        exit(0)
+    else:
+        p = subprocess.run(["chromium", *anonim_arg, *window_arg, *session_arg, arg])
+        exit(p.returncode)
 
 
 def copy(arg, do_exit=True):
