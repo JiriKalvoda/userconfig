@@ -69,6 +69,13 @@ else:
     r = subprocess.run(['xdg-mime', 'query', 'default', filetype], stdout=subprocess.PIPE, encoding='utf-8')
     xdg_default = r.stdout.strip() if not r.returncode else None
 
+with open("/usr/share/applications/mimeinfo.cache") as f:
+    x = [i.strip() for i in f.read().split('\n') if i.startswith(filetype+"=")]
+    assert len(x) <= 1
+    possible_apps = list(x[0][len(filetype)+1:].split(';')) if len(x) else []
+
+print(possible_apps)
+
 
 def end():
     m_win.hide()
@@ -81,6 +88,11 @@ def terminal_cmd(terminal=True):
 
 def shell_escape(*args):
     return " ".join("'" + i.replace("'", "'\"'\"'") + "'" for i in args)
+def shell_escape_if_list(a):
+    if isinstance(a, str):
+        return a
+    return shell_escape(*a)
+
 
 def path_to_filename(arg):
     if not is_file_url_or_path(arg):
@@ -91,6 +103,7 @@ def path_to_filename(arg):
 def is_vm():
     return m_win._vm.isChecked()
 def vm_run(cmd, gui=False):
+    cmd = shell_escape_if_list(cmd)
     r = subprocess.run(["vm", "extended_name", m_win._vm_name.text()], stdout=subprocess.PIPE, encoding='utf-8')
     vm_id, vm_user = r.stdout.strip().split("\n")
     if is_file_url_or_path(arg):
@@ -101,14 +114,13 @@ def vm_run(cmd, gui=False):
         path = file_url_to_path(arg)
         filename = path.split('/')[-1]
 
-        import tempfile
         tmp_dir = tempfile.mkdtemp(prefix="xdg-open-", dir=mountdir+'~')
         tmp_dir_name = tmp_dir.split('/')[-1]
         shutil.copy(file, tmp_dir+"/"+filename)
     if gui:
-        p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, f"cd {tmp_dir_name}; {shell_escape(*cmd)}"])
+        p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, f"cd {tmp_dir_name}; {cmd}"])
     else:
-        p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "-t", f"cd {tmp_dir_name}; {shell_escape(*cmd)}"])
+        p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "-t", f"cd {tmp_dir_name}; {cmd}"])
 
 
 
@@ -122,13 +134,43 @@ def open_xdg_open(terminal=False):
         p = subprocess.run([*terminal_cmd(terminal), xdg_open_bin, path_to_filename(arg)])
         exit(p.returncode)
 
+def get_app():
+    cur_it = m_win._app_list.currentItem()
+    if cur_it is not None:
+        return cur_it.data(42)
+    else:
+        return xdg_default
+
 def open_desktop(desktop_app=None, terminal=False):
+    if desktop_app is None:
+        desktop_app = get_app()
     end()
     if is_vm():
         vm_run(["open-desktop-file", desktop_app or xdg_default, path_to_filename(arg)], gui=not terminal)
         exit(0)
     else:
         p = subprocess.run([*terminal_cmd(terminal), script_dir+"/open-desktop-file", desktop_app or xdg_default, arg])
+        exit(p.returncode)
+
+def set_default():
+    subprocess.run(["xdg-mime", "default", get_app(), filetype], check=True)
+
+def open_bash():
+    end()
+    cmd =f"""
+export f={shell_escape(arg)}
+export filetype={shell_escape(filetype)}
+export default={shell_escape(xdg_default)}
+echo XDG-OPEN SHELL
+echo f="$f"
+echo filetype="$filetype"
+echo default="$default"
+exec bash"""
+    if is_vm():
+        p = vm_run(cmd, gui=False)
+        exit(0)
+    else:
+        p = subprocess.run([*terminal_cmd(), "bash", "-c", cmd])
         exit(p.returncode)
 
 def open_vim():
@@ -141,17 +183,17 @@ def open_vim():
         p = subprocess.run([*terminal_cmd(), vim_bin, arg])
         exit(p.returncode)
 
-def open_browser(window=False, anonim=False, session=False):
+def open_browser(window=False, incognito=False, session=False):
     import tempfile
     end()
-    anonim_arg = ["--incognito"] if anonim else []
+    incognito_arg = ["--incognito"] if incognito else []
     window_arg = ["--new-window"] if window else []
     session_arg = ["--user-data-dir="+tempfile.mkdtemp()] if session else []
     if is_vm():
-        p = vm_run(["chromium", *anonim_arg, *window_arg, *session_arg, path_to_filename(arg)], gui=True)
+        p = vm_run(["chromium", *incognito_arg, *window_arg, *session_arg, path_to_filename(arg)], gui=True)
         exit(0)
     else:
-        p = subprocess.run(["chromium", *anonim_arg, *window_arg, *session_arg, arg])
+        p = subprocess.run(["chromium", *incognito_arg, *window_arg, *session_arg, arg])
         exit(p.returncode)
 
 
@@ -160,6 +202,9 @@ def copy(arg, do_exit=True):
     if do_exit:
         exit(p.returncode)
     return p
+
+def back_default():
+    m_win._app_list.setCurrentItem(None)
 
 
 qtoverride = lambda x: x  # only documentation of code
@@ -176,9 +221,9 @@ class BetterLabel(QLabel):
     def mousePressEvent(self, event):
         global copyed_label
         copy(self.text(), do_exit=False)
-        self.setStyleSheet("color: #990000")
         if copyed_label:
             copyed_label.setStyleSheet("color: #000000")
+        self.setStyleSheet("color: #990000")
         copyed_label = self
 
 
@@ -217,27 +262,45 @@ class MainWindow(QWidget):
 
         
         self._lay.addWidget(self.new_button('_copy', "&copy"))
-        self._lay.addWidget(self.new_button('_vim', "&vim"))
+        self._lay.addWidget(self.new_button('_vim', "&edit with vim"))
+        self._lay.addWidget(self.new_button('_bash', "&bash"))
+        
+        self._lay_browser = QHBoxLayout()
+        self._lay_browser.addWidget(self.new_button('_browser', "chromium &t&a&b"))
+        self._lay_browser.addWidget(self.new_button('_browser_w', "chromium &window"))
+        self._lay.addLayout(self._lay_browser)
+
+        self._lay_browser2 = QHBoxLayout()
+        self._lay_browser2.addWidget(self.new_button('_browser_incognito', "chromium &incognito"))
+        self._lay_browser2.addWidget(self.new_button('_browser_session', "chromium &session"))
+        self._lay.addLayout(self._lay_browser2)
 
         self._vm = QGroupBox("&Virtual machine");
         self._vm_lay = QHBoxLayout()
         self._vm.setLayout(self._vm_lay)
         self._vm.setCheckable(True)
         self._vm.setChecked(False)
+        self._vm_name_lay = QHBoxLayout()
+        self._vm_name_title = QLabel("<u>n</u>ame:")
+        self._vm_name_lay.addWidget(self._vm_name_title)
         self._vm_name = QLineEdit(self._vm)
         self._vm_name.setText("+")
-        self._vm_lay.addWidget(self._vm_name)
+        self._vm_name_lay.addWidget(self._vm_name)
+        self._vm_lay.addLayout(self._vm_name_lay)
         self._lay.addWidget(self._vm)
-        
-        self._lay_browser = QHBoxLayout()
-        self._lay_browser.addWidget(self.new_button('_browser', "chromium &tab"))
-        self._lay_browser.addWidget(self.new_button('_browser_w', "chromium &window"))
-        self._lay.addLayout(self._lay_browser)
 
-        self._lay_browser2 = QHBoxLayout()
-        self._lay_browser2.addWidget(self.new_button('_browser_anonim', "chromium &anonim"))
-        self._lay_browser2.addWidget(self.new_button('_browser_session', "chromium &session"))
-        self._lay.addLayout(self._lay_browser2)
+        self._default_lay = QHBoxLayout()
+        self._default_lay.addWidget(self.new_button('_back_default', "&default: "+xdg_default))
+        self._default_lay.addWidget(self.new_button('_set_default', "&use as default"))
+        self._lay.addLayout(self._default_lay)
+
+        self._app_list = QListWidget()
+        for i in possible_apps:
+            item = QListWidgetItem(i, self._app_list);
+            item.setData(42, i)
+            if i == xdg_default:
+               self._app_list.setCurrentItem(item)
+        self._lay.addWidget(self._app_list)
 
         self._lay_open = QHBoxLayout()
         self._lay_open.addWidget(self.new_button('_open', "&open"))
@@ -259,8 +322,8 @@ class MainWindow(QWidget):
     def _browser_w_clicked(self, x):
         open_browser(window=True)
     @pyqtSlot(bool)
-    def _browser_anonim_clicked(self, x):
-        open_browser(anonim=True)
+    def _browser_incognito_clicked(self, x):
+        open_browser(incognito=True)
     @pyqtSlot(bool)
     def _browser_session_clicked(self, x):
         open_browser(session=True)
@@ -272,6 +335,9 @@ class MainWindow(QWidget):
     @pyqtSlot(bool)
     def _vim_clicked(self, x):
         open_vim()
+    @pyqtSlot(bool)
+    def _bash_clicked(self, x):
+        open_bash()
 
     @pyqtSlot(bool)
     def _xdg_open_clicked(self, x):
@@ -286,6 +352,17 @@ class MainWindow(QWidget):
     @pyqtSlot(bool)
     def _open_t_clicked(self, x):
         open_desktop(terminal=True)
+
+    @pyqtSlot(bool)
+    def _back_default_clicked(self, x):
+        back_default()
+    @pyqtSlot(bool)
+    def _set_default_clicked(self, x):
+        set_default()
+
+    @qtoverride
+    def focusNextPrevChild(self, next):
+        return False
 
     @qtoverride
     def keyPressEvent(self, event):
@@ -303,21 +380,57 @@ class MainWindow(QWidget):
         }
         ESCAPE = 16777216;
         ENTER = 16777220;
+        TAB = 16777217;
 
         print(event, type(event), event.text(), event.key(), int(event.modifiers()))
         mod = int(event.modifiers())
         key = int(event.key())
 
+        print(app.focusWidget())
+
+        if app.focusWidget() in [self._vm_name, self._app_list]:
+            if key in [ESCAPE, ENTER]:
+                self.setFocus()
+            return
+
+
+
         event.accept()
 
         if key == ESCAPE:
             exit(0)
-        if key == ENTER:
-            open_xdg_open()
+        if key in [ENTER, ord("O")]:
+            open_desktop(terminal=(mod == SHIFT))
+        if key == ord("X"):
+            open_xdg_open(terminal=(mod == SHIFT))
+        if key == ord("T"):
+            open_desktop(terminal=True)
+        if key == ord("E"):
+            open_vim()
+        if key == ord("B"):
+            open_bash()
+        if key == ord("C"):
+            copy(arg)
+        if key == TAB:
+            open_browser()
+        if key == ord("W"):
+            open_browser(window=True)
+        if key == ord("I"):
+            open_browser(incognito=True)
+        if key == ord("S"):
+            open_browser(session=True)
 
-
-
-
+        if key == ord("V"):
+            self._vm.setChecked(not self._vm.isChecked())
+        if key == ord("N"):
+            self._vm.setChecked(True)
+            self._vm_name.setFocus()
+            self._vm_name.selectAll()
+        if key == ord("U"):
+            set_default()
+        if key == ord("D"):
+            back_default()
+            
 
 app = QApplication(sys.argv)
 
