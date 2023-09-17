@@ -12,6 +12,7 @@ import shutil
 import sys, os
 
 import re
+import tempfile
 
 def is_file_url_or_path(arg):
     if re.search("^file://", arg):
@@ -38,7 +39,15 @@ echo "$file"
         return r.stdout.strip()
     return arg
 
-arg = sys.argv[1]
+
+assert len(sys.argv) <= 2
+if len(sys.argv) == 2:
+    arg = sys.argv[1]
+else:
+    arg_tmp_file = tempfile.NamedTemporaryFile()
+    subprocess.run(["cat"], stdout=arg_tmp_file)
+    arg = arg_tmp_file.name
+
 script_dir = "/".join(sys.argv[0].split("/")[:-1])
 file = file_url_to_path(arg) if is_file_url_or_path(arg) else None
 absolute_file = file
