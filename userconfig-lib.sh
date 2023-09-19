@@ -36,12 +36,12 @@ err()
 
 confln()
 {
-	$USERCONFIG_ROOT/confln "$@"
+	$USERCONFIG_ROOT/confln "$@" || err confln faild
 }
 
 init-service()
 {
-	$USERCONFIG_ROOT/init-service.sh "$@"
+	$USERCONFIG_ROOT/init-service.sh "$@" || err init-service faild
 }
 
 git_clupdate()
