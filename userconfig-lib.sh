@@ -138,7 +138,7 @@ r()
 		if $exit_on_err
 		then
 			echo -e " └─   \e[31mRETURN $ret => EXIT\e[0m"
-			exit $r
+			exit $ret
 		else
 			echo -e " └─   \e[31mRETURN $ret\e[0m"
 		fi
