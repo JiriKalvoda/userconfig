@@ -262,7 +262,7 @@ fi
 log_dir="$(mktemp -d)"
 mkdir $log_dir/last
 date -u +%s > $log_dir/last/$(cat $snapdir/name)
-rsync $sshcmd -r $log_dir/ $from/.snapshoter
+rsync  "${sshcmd//"'"/}" -r $log_dir/ $from/.snapshoter
 rm -r $log_dir
 
 
