@@ -5,6 +5,8 @@ root,cmsuser@contest.kam.mff.cuni.cz
 
 [secret,normal]
 root@rpi1
+omnian
+krabicka_s_internetem
 
 
 [normal]
@@ -13,6 +15,7 @@ gitlab.kam.mff.cuni.cz
 gitlab.com
 github.com
 gitea.ks.matfyz.cz
+git.jug9.cz
 
 [trash]
 jk2089@reu.dimacs.rutgers.edu
