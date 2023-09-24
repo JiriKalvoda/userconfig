@@ -183,9 +183,15 @@ with ADD_MODIFICATOR(SUPER):
         bind_osd_enable(KEY(4, 5), "display1")
 
         M(K_B, cmd_set_xkbmap)
+        M(K_H(SHIFT), ROOT_MODE_AND(CMD("terminal -e blueman-applet")))
         M(K_H, ROOT_MODE_AND(CMD("blueman-manager")))
-        M(K_Y, ROOT_MODE_AND(CMD("alsamixer")))
+        M(K_Y, ROOT_MODE_AND(CMD("amixer")))
 
+        M(K_O, CMD("osdc --output=display -- \"$(wifi on)\""))
+        M(K_P, CMD("osdc --output=display -- \"$(wifi off)\""))
+        M(K_I, ROOT_MODE_AND(CMD("terminal -e nmtui")))
+
+        M(K_B(SHIFT), ROOT_MODE_AND(CMD("arandr")))
         LOAD("xrandr.km", only_if_exists=True)
 
 
