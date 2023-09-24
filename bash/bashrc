@@ -444,15 +444,15 @@ promt_rvalue() {
 }
 promt_NoUser=0
 promt_usrCut(){
-	lastcmd=$?;
+	lastcmd=$?
 	usr="\u@\h"
-	usr=${usr@P}
+	usr="${usr@P}"
 	if [ $promt_NoUser -eq 0 ]; then 
 		if [ $lastcmd -ne 0 ]; then 
 			lastcmdStr="[$lastcmd]";
-			printf  ${usr:${#lastcmdStr}} | sed -e 's/* \(.*\)/(\1)/'
+			echo "${usr:${#lastcmdStr}}" #| sed -e 's/* \(.*\)/(\1)/'
 		else
-			printf  $usr | sed -e 's/* \(.*\)/(\1)/'
+			echo "$usr" #| sed -e 's/* \(.*\)/(\1)/'
 		fi
 	fi
 	exit $lastcmd
@@ -460,7 +460,7 @@ promt_usrCut(){
 
 ######################### $ and new line
 promt_NewLine=0;
-promt_MakNewLine(){
+promt_MakeNewLine(){
 	if [ $promt_NewLine -ne 0 ]; then 
 		printf  '\n$' #| sed -e 's/* \(.*\)/(\1)/'
 	else
@@ -610,7 +610,7 @@ promt_pwd(){
 		then
 			echo -ne "\001\e[${promt_color_dir}m\002[\001\e[${promt_color_venv}m\002$ve\001\e[${promt_color_dir}m\002].${wd#$ve}"
 		else
-			echo -ne "\001\e[${promt_color_venv}m[$ve]\e[${promt_color_dir}m$wd"
+			echo -ne "\001\e[${promt_color_venv}m\002[$ve]\001\e[${promt_color_dir}m\002$wd"
 		fi
 	fi
 }
@@ -628,16 +628,14 @@ promt_right()
 
 ######################### PS1
 promt_PS1='\
-\[$(promt_right)\]\
-${debian_chroot:+($debian_chroot)}\
-\[\033[01;${promt_color_rvalue}m\]$(promt_rvalue)\
-\[\033[01;${promt_color_user}m\]$(promt_usrCut)\
-\[\033[${promt_color_dolar}m\]:\
+\[\e[01;${promt_color_rvalue}m\]$(promt_rvalue)\
+\[\e[01;${promt_color_user}m\]$(promt_usrCut)\
+\[\e[${promt_color_dolar}m\]:\
 $(promt_pwd)\
-\[\033[00m\]\[\033[01;${promt_color_git}m\]$(promt_parse_git_branch)\
-\[\033[0m\]\
-\[\033[${promt_color_dolar}m\]\
-$(promt_MakNewLine)\[\033[21m\]\[\033[0m\] '
+\[\e[00m\]\[\e[01;${promt_color_git}m\]$(promt_parse_git_branch)\
+\[\e[0m\]\
+\[\e[${promt_color_dolar}m\]\
+$(promt_MakeNewLine)\[\e[21m\]\[\e[0m\] '
 
 PS1="$promt_PS1"
 
