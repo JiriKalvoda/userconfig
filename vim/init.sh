@@ -1,5 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
+. ../userconfig-lib.sh
+install_begin
 
 confln vimrc ~/.vimrc
 confln nvim.vim ~/.config/nvim/init.vim
@@ -13,3 +15,4 @@ do
 	confln $i ~/.basicFile/
 done
 
+install_ok

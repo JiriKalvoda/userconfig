@@ -21,24 +21,35 @@ def i3_woman_serialize(cmd, args):
 
 have_i3_woman = not not which("i3-woman")
 
+def workspace_num(args):
+    if args.workspace is not None:
+        return args.workspace
+    if args.slave is not None:
+        return args.slave
+    if args.master is not None:
+        try:
+            return str(int(args.master) + 100)
+        except ValueError:
+            return 1
+
 @action_serialize("GOTO_WORKSPACE")
 def f(self):
     if have_i3_woman:
         return i3_woman_serialize("goto-workspace", self)
     else:
-        return "workspace {workspace_num(self)}"
+        return f"workspace {workspace_num(self)}"
 @action_serialize("CONT_WORKSPACE")
 def f(self):
     if have_i3_woman:
         return i3_woman_serialize("container-to", self)
     else:
-        return "move container to workspace {workspace_num(self)}"
+        return f"move container to workspace {workspace_num(self)}"
 @action_serialize("CONT_AND_GOTO_WORKSPACE")
 def f(self):
     if have_i3_woman:
         return i3_woman_serialize("goto-with-container-to", self)
     else:
-        return "move container to workspace {workspace_num(self)}; workspace {workspace_num(self)}"
+        return f"move container to workspace {workspace_num(self)}; workspace {workspace_num(self)}"
 @action_serialize("SWAP_WORKSPACE")
 def f(self):
     return i3_woman_serialize("swap-with-workspace", self)

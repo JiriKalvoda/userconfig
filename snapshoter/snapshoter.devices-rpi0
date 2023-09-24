@@ -27,4 +27,8 @@ case "$device" in
 		excludedir_homes="'/files/home'"
   		ms root@$device
     ;;
+	hluk)
+		exclude_aux=false
+		fromdir=/
+		ms root@$device
 esac

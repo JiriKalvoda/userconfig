@@ -36,12 +36,12 @@ err()
 
 confln()
 {
-	$USERCONFIG_ROOT/confln "$@"
+	$USERCONFIG_ROOT/confln "$@" || err confln faild
 }
 
 init-service()
 {
-	$USERCONFIG_ROOT/init-service.sh "$@"
+	$USERCONFIG_ROOT/init-service.sh "$@" || err init-service faild
 }
 
 git_clupdate()
@@ -138,7 +138,7 @@ r()
 		if $exit_on_err
 		then
 			echo -e " └─   \e[31mRETURN $ret => EXIT\e[0m"
-			exit $r
+			exit $ret
 		else
 			echo -e " └─   \e[31mRETURN $ret\e[0m"
 		fi

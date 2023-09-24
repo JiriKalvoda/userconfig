@@ -1,7 +1,12 @@
 #!/bin/env keymap-i3
 
+import os
+
+is_vm = os.path.isfile("/etc/is_virtual")
+
 LOAD("local.km", only_if_exists=True)
-LOAD_LIB("led-cmddef.km")
+if not is_vm:
+    LOAD_LIB("led-cmddef.km")
 
 def workspace_slave_all(k, workspace):
     M(k.with_mod(SUPER), GOTO_WORKSPACE(slave=workspace))
@@ -38,10 +43,11 @@ def app_workspace(key, workspace, cmd):
 EXEC_ON_STARTUP(CMD("xrdb ~/.Xresources"))
 cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_switch -option grp:switch -option compose:rctrl")
 EXEC_ON_STARTUP(cmd_set_xkbmap)
-EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
-EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
-EXEC_ON_STARTUP(CMD("numlockx on"))
-EXEC_ON_STARTUP(TERMINAL(CMD("m-daemon")))
+if not is_vm:
+    EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
+    EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
+    EXEC_ON_STARTUP(CMD("numlockx on"))
+    EXEC_ON_STARTUP(TERMINAL(CMD("m-daemon")))
 
 ################ View option ################
 
@@ -56,11 +62,18 @@ for_window [class=".*"] border pixel 1
 font pango:monospace 9
 """[1:-1])
 
-I3_DIRECT("""
-bar {
-        status_command "~/bin/i3csstatus i3 -c .config/i3/i3csstatus.conf -i 2>~/.i3csstatus.log"
-}
-"""[1:-1])
+if WHICH("i3csstatus"):
+    I3_DIRECT("""
+    bar {
+            status_command "~/bin/i3csstatus i3 -c .config/i3/i3csstatus.conf -i 2>~/.i3csstatus.log"
+    }
+    """[1:-1])
+else:
+    I3_DIRECT("""
+    bar {
+            status_command "i3status"
+    }
+    """[1:-1])
 
 
 ################ Mouse ################
@@ -73,10 +86,10 @@ M(K_PrtSc(SUPER),CMD("maim -uo > ~/screenshot.png && gimp ~/screenshot.png"), pr
 
 ################ OSD ################
 for k in [K_Not, K_BackSlash(SUPER)]:
-	M(k,CMD('osdc --duration=1 --output=loglast ""'))
-	M(k(SHIFT),CMD('osdc --cmd-now=skip --do-not-que= --output=no --duration=1 ""'))
-	M(k(CTRL),CMD('osd-clock --output=display'))
-	M(k(CTRL+SHIFT),TERMINAL(CMD('tail -n500 ~/.osdd_log;read')))
+    M(k,CMD('osdc --duration=1 --output=loglast ""'))
+    M(k(SHIFT),CMD('osdc --cmd-now=skip --do-not-que= --output=no --duration=1 ""'))
+    M(k(CTRL),CMD('osd-clock --output=display'))
+    M(k(CTRL+SHIFT),TERMINAL(CMD('tail -n500 ~/.osdd_log;read')))
 
 ################ PLAYERCTL ################
 M(K_X(SUPER+SHIFT), CMD("playerctl play-pause"))
@@ -253,11 +266,12 @@ with ADD_MODIFICATOR(SUPER):
 
     M(K_V(SHIFT), release_action=CMD('xdotool keyup super shift ctrl alt; xdotool type --clearmodifiers "$(date +%Y-%m-%d)"'))
 
-    with M(K_T(SHIFT), GO_MODE(STD_MODE("TABLE-jug9/1"))).action.mode:
-        table_all_keys("jug9", "1")
-        
-    with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
-        LOAD("led-jug9-1.km")
+    if not is_vm:
+        with M(K_T(SHIFT), GO_MODE(STD_MODE("TABLE-jug9/1"))).action.mode:
+            table_all_keys("jug9", "1")
+            
+        with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
+            LOAD("led-jug9-1.km")
 
     #Better xdg-open
     I3_DIRECT("""
