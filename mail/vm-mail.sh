@@ -1,8 +1,9 @@
 
-x=$(vm  extended_name ${1:+})
-name=$(echo "$x" | head -n2 | tail -n1)
-user=$(echo "$x" | head -n1)
+x="$(vm  extended_name "${1:-+}")"
+id=$(echo "$x" | head -n1)
+user=$(echo "$x" | head -n2 | tail -n1)
 
+echo $user@$id
 
-vm ssh $user@$name unzip-mail - --output=mail
-vm vncapp $user@$name chromium --new-window mail/page/index.html
+vm ssh $user@$id -- -- bin/unzip-mail - --output=mail
+vm vncapp $user@$id -- 'chromium --new-window mail/page/index.html'

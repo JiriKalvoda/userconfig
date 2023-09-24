@@ -22,6 +22,7 @@ if args.output is None:
 else:
     output = args.output
     os.mkdir(output)
+output+='/'
 
 attachments_dir = output+"/attachments/"
 os.mkdir(attachments_dir)
@@ -63,28 +64,28 @@ def go(x, id, directory):
     if filename is None:
         filename = f"[{x.get_content_type().replace('/','-')}]"
     # TODO kolize
+    dirfile = directory+"/"+filename
 
     print(filename, x.get_content_type(), type(x), x.is_attachment())
     if x.is_multipart():
-        d = directory+"/"+filename
-        os.mkdir(d)
+        os.mkdir(output+dirfile)
         for id, i in enumerate(x.iter_parts()):
-            go(i, id, d)
+            go(i, id, dirfile)
     else:
-        with open(directory+"/"+filename, "wb") as f:
+        with open(output+dirfile, "wb") as f:
             f.write(x.get_payload(decode=True))
     if x.is_attachment():
         # TODO kolize
-        os.symlink(directory+"/"+filename, attachments_dir+filename)
+        os.symlink("../"+dirfile, attachments_dir+filename)
     else:
         if x.get_content_type() == "text/html":
             with open(page_dir+"/index.html", "w") as f:
                 f.write(modify_html(x.get_payload(decode=True)))
         else:
             if x.get_filename():
-                os.symlink(directory+"/"+filename, page_dir+filename)
+                os.symlink("../"+dirfile, page_dir+filename)
 
-go(m, 0, output)
+go(m, 0, "")
 
 body = m.get_body()
 print(body.get_content_type())
