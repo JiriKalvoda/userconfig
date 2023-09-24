@@ -15,6 +15,8 @@ confln m-daemon ~/bin/
 confln m-daemon ~/bin/
 confln m-repeat-notification ~/bin/
 confln robot-send-mail ~/bin/
+confln unzip-mail.py ~/bin/ E
+confln vm-mail.sh ~/bin/vmm
 
 r mkdir -p ~/.config/certs
 r -bc 'ssh jirikalvoda@kam.mff.cuni.cz cat /etc/ssl/certs/ca-certificates.crt > ~/.config/certs/nikam-ssl.cert'
