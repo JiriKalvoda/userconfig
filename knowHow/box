@@ -1,0 +1,6 @@
+ vim /etc/config/dhcp
+ while true; do cat /tmp/datarail/state/modem0_state  | grep SI; sleep 1 ; done
+ vi /etc/config/wireless
+ vim /etc/config/network
+
+rootremount-rw
