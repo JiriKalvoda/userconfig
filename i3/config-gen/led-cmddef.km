@@ -80,6 +80,13 @@ def m_led_color(key, name):
 
 
 @ACTION_INIT()
+def led_gui(self, name):
+    self.name = led_whole_name(name)
+@ACTION_IMPLEMENT(led_gui)
+def f(self):
+    return ROOT_MODE_AND(CMD(f"terminal -e led-gui '{self.name}'"))
+
+@ACTION_INIT()
 def mqtt_pub(self, mqtt_name, topic, text, retain=False):
     self.mqtt_name = mqtt_name
     self.topic = topic
@@ -94,6 +101,7 @@ def m_base_keys(name, boost=1):
     m_led_light(K_F1, "", boost=boost)
     M(K_F7, GO_MODE(led_set_mode("")))
     m_led_color(K_F9, "")
+    M(K_Backspace, led_gui(""))
 
 def led_mode(name):
     mode = STD_MODE(f"LED-{led_whole_name(name)}", )

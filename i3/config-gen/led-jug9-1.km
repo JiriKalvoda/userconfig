@@ -3,6 +3,7 @@ LOAD_LIB("led-cmddef.km")
 
 with add_led_prefix("jug9/1"):
     m_base_keys("")
+    m_led_light(K_Q, "podpatro", boost=1)
     m_led_light(K_Z, "okno", boost=1)
     m_led_light(K_A, "podpatro", boost=1)
 
