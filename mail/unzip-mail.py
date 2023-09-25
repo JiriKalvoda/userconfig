@@ -18,22 +18,36 @@ args = parser.parse_args()
 
 
 def modify_html(html_str):
+    #print(html_str)
     parser = AdvancedHTMLParser.AdvancedHTMLParser()
     parser.parseStr(html_str)
     def go(nd):
         if isinstance(nd, AdvancedHTMLParser.Tags.AdvancedTag):
+            for k, v in nd.attributesList:
+                if v == 'None':
+                    nd.setAttribute(k, v) # HACK for fixing lib
             if args.charset_fix:
                 if nd.tagName == 'meta' and nd.hasAttribute('http-equiv') and nd.getAttribute('http-equiv') == "Content-Type":
                     nd.setAttribute('content', 'text/html; charset=utf-8')
             if nd.tagName == 'img':
                 src = nd.getAttribute('src')
-                print(src)
+                #print(src)
                 if src.startswith('cid:'):
                     src = src[4:]
                 nd.setAttribute('src', src)
             if not nd.isSelfClosing:
                 for x in nd.childBlocks:
                     go(x)
+            #print(nd.tagName)
+            #for x in nd.childBlocks:
+                #print("    ", type(x))
+                #try:
+                    #print("    ", x.tagName)
+                    #print("    ", x.attributesList)
+                #except AttributeError:
+                    #pass
+                #print("    ", x)
+            #print(nd.innerHTML)
     for nd in parser.getRootNodes():
         go(nd)
 
@@ -80,7 +94,7 @@ def go(x, id, directory):
     # TODO kolize
     dirfile = directory+"/"+filename
 
-    print(filename, x.get_content_type(), type(x), x.is_attachment())
+    #print(filename, x.get_content_type(), type(x), x.is_attachment())
     if x.is_multipart():
         os.mkdir(output+dirfile)
         for id, i in enumerate(x.iter_parts()):
@@ -104,5 +118,5 @@ go(m, 0, "")
 main_html = page_htmls[0] if len(page_htmls) else (page_texts[0] if len(page_texts) else None)
 if main_html is not None:
     with open(page_dir+"/index.html", "w") as f:
-        f.write(modify_html(main_html.get_payload(decode=True)))
+        f.write(modify_html(main_html.get_payload(decode=True).decode('utf-8')))
 
