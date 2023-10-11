@@ -450,9 +450,9 @@ promt_usrCut(){
 	if [ $promt_NoUser -eq 0 ]; then 
 		if [ $lastcmd -ne 0 ]; then 
 			lastcmdStr="[$lastcmd]";
-			echo "${usr:${#lastcmdStr}}" #| sed -e 's/* \(.*\)/(\1)/'
+			echo "${usr:${#lastcmdStr}}"
 		else
-			echo "$usr" #| sed -e 's/* \(.*\)/(\1)/'
+			echo "$usr"
 		fi
 	fi
 	exit $lastcmd
