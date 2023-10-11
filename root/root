@@ -1,7 +1,7 @@
 #!/bin/bash
-if [[ "$LD_SSHTYPE" == "" ]]
+if [[ "$LC_SSHTYPE" == "" ]]
 then
-	export LD_SSHTYPE=localhost 
+	export LC_SSHTYPE=localhost 
 fi
 
 keyArg=""
@@ -9,7 +9,7 @@ keyArg=""
 
 if [[ "$@" == "" ]]
 then
-	LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD $keyArg
+	LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LC_SSHTYPE -o SendEnv=LC_CD $keyArg
 else
-	LD_SSHTYPE=localhost LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LD_SSHTYPE -o SendEnv=LC_CD -t $keyArg cd "$PWD" \; "$@"
+	LC_SSHTYPE=localhost LC_CD="$PWD" ssh root@localhost -Y -o SendEnv=LC_SSHTYPE -o SendEnv=LC_CD -t $keyArg cd "$PWD" \; "$@"
 fi
