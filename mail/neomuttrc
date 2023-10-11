@@ -70,7 +70,7 @@ set header_color_partial
 color header bold red default "(dkim|spf|dmarc)=fail"
 color header green default "(dkim|spf|dmarc)=pass"
 
-set pgp_sign_as=0x146A04044068269A
+set pgp_sign_as=29CD088CECD51AB28AFE89F9AA8C9DF427B93882
 
 tag-transforms "reu"   "R"   \
                 "unread"  "u"   \
