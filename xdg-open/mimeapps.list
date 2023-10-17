@@ -11,6 +11,7 @@ x-scheme-handler/https=chromium.desktop
 x-scheme-handler/about=chromium.desktop
 x-scheme-handler/unknown=chromium.desktop
 image/png=feh.desktop
+image/jpeg=feh.desktop
 
 [Added Associations]
 x-scheme-handler/tg=userapp-Telegram Desktop-XEEW60.desktop;
