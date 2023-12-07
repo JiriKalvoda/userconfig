@@ -117,10 +117,15 @@ def vm_run(cmd, gui=False):
         tmp_dir = tempfile.mkdtemp(prefix="xdg-open-", dir=mountdir+'~')
         tmp_dir_name = tmp_dir.split('/')[-1]
         shutil.copy(file, tmp_dir+"/"+filename)
-    if gui:
-        p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, f"cd {tmp_dir_name}; {cmd}"])
+        if gui:
+            p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, "--", f"cd {tmp_dir_name}; {cmd}"])
+        else:
+            p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "--", "-t", "--", f"cd {tmp_dir_name}; {cmd}"])
     else:
-        p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "-t", f"cd {tmp_dir_name}; {cmd}"])
+        if gui:
+            p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, "--", cmd])
+        else:
+            p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "--", "-t", "--", cmd])
 
 
 
