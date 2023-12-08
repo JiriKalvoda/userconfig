@@ -154,6 +154,8 @@ let g:VimRun = ""
 let g:useVimRun = 0
 
 
+hi clear SpellBad
+hi SpellBad cterm=underline ctermfg=009
 
 command! -nargs=+ AddExecF  let g:toExec = g:toExec . <q-args>
 command! -nargs=+ AddExec  AddExecF promt; echo <q-args>; <args>;
@@ -575,7 +577,7 @@ endfunction
 
 function ListCharsDefault()
 	se list
-   set listchars=tab:>-
+	set listchars=tab:>-,trail:·,nbsp:~
 	syntax on
 endfunction
 
