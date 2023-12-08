@@ -17,7 +17,7 @@ if [ -z "$name" ] || [ -z "$user" ] || [ -z "$exe" ]
 then 
 	echo "Script for creating systemd deamon"
 	echo "Usage:"
-	echo "	$0 name [-d] [user/'--user'] exec [cmd parametrs] [daemon options]"
+	echo "	$0 name {user/'--user'} exec [cmd parametrs] [daemon options]"
 	exit 100
 fi
 
