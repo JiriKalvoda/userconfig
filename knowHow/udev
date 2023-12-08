@@ -1,0 +1,9 @@
+
+udevadm control --log-priority=info/debug
+
+udevadm info /sys/class/net/enp3s0f4u1u1
+
+udevadm control --reload-rules && udevadm trigger
+
+
+
