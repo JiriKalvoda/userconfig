@@ -10,6 +10,7 @@ do
 done
 
 git remote add ucw jirikalvoda@jabberwock.ucw.cz:GIT/userconfig
+git remote add kam git@gitlab.kam.mff.cuni.cz:jirikalvoda/userconfig.git
 git remote add gitlab git@gitlab.com:JiriKalvoda/userconfig.git
 git remote add github git@github.com:JiriKalvoda/userconfig.git
 
