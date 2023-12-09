@@ -1,0 +1,6 @@
+[Unit]
+Description=Scripts configuring network: %i
+
+[Service]
+Type=oneshot
+ExecStart=/etc/net/%i

@@ -1,0 +1,6 @@
+[Unit]
+Description=Broadcast to %i
+
+[Service]
+Type=oneshot
+ExecStart=ping -c 4 -b %i

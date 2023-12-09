@@ -1,0 +1,6 @@
+[Unit]
+Description=Wifi %i and notify to remove neighbors
+
+[Service]
+Type=oneshot
+ExecStart=/root/userconfig/network/flush-neigh/wifi-and-send.py %i

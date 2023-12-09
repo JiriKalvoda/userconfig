@@ -1,0 +1,6 @@
+[Unit]
+Description=Set WiFi: %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/wifi %i

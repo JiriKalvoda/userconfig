@@ -1,27 +1,34 @@
+#!/usr/bin/python3
 import socket
 from time import sleep
 import subprocess
 import json
+import sys, os
 
-interfaces = socket.getaddrinfo(host=socket.gethostname(), port=None, family=socket.AF_INET)
-allips = [ip[-1][0] for ip in interfaces]
-print(allips)
+import syslog
 
-msg = b'hello world'
-for i in range(100):
+subprocess.run(["wifi", sys.argv[1]])
+
+import random
+
+msg = f'hello {random.randrange(0,255)}'
+sleep(1)
+for i in range(300):
     p = subprocess.run(["ip", "-json", "a"], capture_output=True, encoding="utf-8")
     data = json.loads(p.stdout)
     ipv4 = [a["local"] for i in data for a in i["addr_info"] if a["family"]=="inet"]
-    print(ipv4)
+    syslog.syslog(f"{ipv4}")
     for ip in ipv4:
         if ip.startswith("10.19.13"):
-            print(f'sending on {ip}')
+            sleep(1)
+            syslog.syslog(f'sending on {ip} {msg}')
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)  # UDP
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-            sock.bind((ip,0))
-            sock.sendto(msg, ("10.19.13.255", 5005))
+            print(sock.bind((ip,0)))
+            print(sock.sendto(msg.encode('utf-8'), ("10.19.13.255", 59423)))
             sock.close()
+            syslog.syslog(f'done')
             exit(0)
-
     sleep(0.1)
-exit(1)
+
+exit(10)

@@ -1,0 +1,6 @@
+ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", IMPORT="/lib/udev/rename_netiface %k sm"
+ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_NAME_MAC}=="enx00e04c420339", IMPORT="/lib/udev/rename_netiface %k orico"
+
+ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start net-config@con-sm"
+ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start set-wifi-and-flush-neigh@off"
+ACTION=="remove", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start set-wifi-and-flush-neigh@on"
