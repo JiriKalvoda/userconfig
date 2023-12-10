@@ -6,3 +6,5 @@
 [core]
 	 #autocrlf=auto
 [pull]
+[init]
+	defaultBranch = master
