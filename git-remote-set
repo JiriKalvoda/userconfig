@@ -2,7 +2,7 @@
 cd "$(dirname "$0")"
 
 git remote -v
-echo 
+echo
 
 git remote | while read r
 do
@@ -10,9 +10,10 @@ do
 done
 
 git remote add ucw jirikalvoda@jabberwock.ucw.cz:GIT/userconfig
+git remote add hluk jiri@hluk.fnuk.eu:GIT/userconfig
 git remote add kam git@gitlab.kam.mff.cuni.cz:jirikalvoda/userconfig.git
 git remote add gitlab git@gitlab.com:JiriKalvoda/userconfig.git
 git remote add github git@github.com:JiriKalvoda/userconfig.git
 
-echo 
+echo
 git remote -v
