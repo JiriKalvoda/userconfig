@@ -1,7 +1,11 @@
 [secret]
 root@teplo
 root@rpi-nula
+root@troposphere
+root@blattovzduch,blattozem,blattobod,blattobrana
+
 root,cmsuser@contest.kam.mff.cuni.cz
+root,cmsuser,vyberko-autotest@cms-test.kam.mff.cuni.cz
 
 [secret,normal]
 root@rpi1
