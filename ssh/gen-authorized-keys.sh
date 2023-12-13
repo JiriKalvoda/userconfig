@@ -19,6 +19,7 @@ catuniq()
 			echo $user $host $num >/dev/stderr
 			[[ $host == arch ]] && num=001
 			[[ $host == arzen ]] && num=002
+			[[ $host == hopik ]] && num=003
 			[[ $host == phone ]] && num=101
 			[[ $host == samet ]] && num=102
 			[[ $host == external ]] && num=301
