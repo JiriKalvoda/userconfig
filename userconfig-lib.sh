@@ -19,6 +19,13 @@ then
 	exit 1
 fi
 
+version(){
+	version=$1
+}
+default_version(){
+	[[ "$version" == "" ]] && version 0
+}
+
 err()
 {
 	echo -en $Red
@@ -36,6 +43,7 @@ err()
 
 need_root()
 {
+	default_version
 	if [[ $UID != 0 ]]
 	then
 		echo -e "\e[31mROOT REQUIRE\e[0m"
@@ -184,6 +192,7 @@ reln(){
 }
 
 install_begin(){
+	default_version
 	install_config_load
 	if [[ "$install_name" ==  "" ]]
 	then
@@ -203,8 +212,9 @@ install_begin(){
 	fi
 	mkdir -p $state_run_dir
 	mkdir -p $state_run_dir/files
-	echo -e "${Blue}INSTALLING $install_name$None"
+	echo -e "${Blue}INSTALLING $install_name$None (version $version)"
 	echo $state_dir $state_run_dir
+	echo $version > $state_run_dir/version
 	echo installing > $state_run_dir/state
 	printf "%q " "$0" "$@" > $state_run_dir/args
 	date -Iseconds > $state_run_dir/date
@@ -229,3 +239,10 @@ need_state_server(){
 	true
 }
 
+if [[ $1 == -v ]]
+then
+	version(){
+		echo $1
+		exit 0
+	}
+fi
