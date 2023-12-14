@@ -34,6 +34,16 @@ err()
 	exit 1
 }
 
+need_root()
+{
+	if [[ $UID != 0 ]]
+	then
+		echo -e "\e[31mROOT REQUIRE\e[0m"
+		exit 1
+	fi
+	echo -e "\e[32mROOT REQUIRE\e[0m"
+}
+
 confln()
 {
 	$USERCONFIG_ROOT/confln "$@" || err confln faild

@@ -1,6 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
+need_root
 install_begin
 
 confln net-config@.service /lib/systemd/system/ cr
