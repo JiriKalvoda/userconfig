@@ -10,6 +10,8 @@ confln dhcpcd-custom@.service /lib/systemd/system/ cr
 
 confln jk-net.rules /etc/udev/rules.d/ cr
 
+confln iwd.conf /etc/iwd/main.conf cr
+
 h=$(hostname)
 for i in $h/scripts/*;
 do
