@@ -1,13 +1,18 @@
 #!/bin/bash
 cd "$(dirname "$0")"
+. ../userconfig-lib.sh
+need_root
+install_begin
 
-echo -e "\e[31mROOT REQUIRE\e[0m"
+cd "$(dirname "$0")"
 
 confln config-default.h config.h c
 
-g++ ./light.c -o /usr/bin/light
-chmod u+s /usr/bin/light
-g++ ./lightInfo.c -o /usr/bin/lightInfo
-chmod u+s /usr/bin/lightInfo
-cp ./lightGUI.sh  /usr/bin/lightGUI
-chmod o+x /usr/bin/lightGUI
+r g++ ./light.c -o /usr/bin/light
+r chmod u+s /usr/bin/light
+r g++ ./lightInfo.c -o /usr/bin/lightInfo
+r chmod u+s /usr/bin/lightInfo
+r cp ./lightGUI.sh  /usr/bin/lightGUI
+r chmod o+x /usr/bin/lightGUI
+
+install_ok
