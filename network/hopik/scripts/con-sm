@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -ueo pipefail
+
+#interface=enp3s0f4u1u1
+interface=sm
+
+echo R | socat unix:/run/conntrack_hack -
+ip link set $interface up
+ip addres add 10.19.13.24/24 dev $interface
+ip route add default via 10.19.13.254
+(echo domain lan;  echo nameserver 10.19.13.254 ) | resolvconf -a enp3s0f4u1u1

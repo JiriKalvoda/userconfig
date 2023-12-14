@@ -1,0 +1,38 @@
+#!/bin/sh
+
+msg_prefix="$interface: dhcpd.enter-hook:"
+
+echo $msg_prefix $reason $interface $if_up $ifssid
+
+conntrack_hack(){
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix conntrack_hack
+		(echo R | socat unix:/run/conntrack_hack - ) &
+	fi
+}
+
+if [[ "$interface" == w ]]
+then
+
+	if [ "$ifssid" ==  MS-KAM-GUESTS ]
+	then
+		conntrack_hack
+		if [ "$reason" == STATIC6 ]
+		then
+			echo $msg_prefix set ipv6 default route
+			ip -6 route add default via 2001:718:1e03:81a::1
+		fi
+	fi
+
+	if [ "$ifssid" == luminiferous-aether-jk-5g ]
+	then
+		conntrack_hack
+	fi
+
+	if [ "$ifssid" == samet-5G  ]
+	then
+		conntrack_hack
+	fi
+
+fi
