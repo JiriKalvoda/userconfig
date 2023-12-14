@@ -1,8 +1,11 @@
 #!/bin/bash
 cd "$(dirname "$0")"
+. ../userconfig-lib.sh
+need_root
+install_begin
 
-cp /usr/share/X11/xkb/symbols/cz /usr/share/X11/xkb/symbols/cz_backup`date +%s`
-cp cz /usr/share/X11/xkb/symbols/cz
+confln cz /usr/share/X11/xkb/symbols/cz c
 
-cp keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
+confln keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf cr
 
+install_ok
