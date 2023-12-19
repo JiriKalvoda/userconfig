@@ -1,16 +1,21 @@
 [secret]
-root@teplo
+root@teplo [out of date]
 root@rpi-nula
-root@troposphere
+root@troposphere [out of date]
 root@blattovzduch,blattozem,blattobod,blattobrana
 
+root@bilbo
 root,cmsuser@contest.kam.mff.cuni.cz
 root,cmsuser,vyberko-autotest@cms-test.kam.mff.cuni.cz
+root@mo-worker* [out of date]
+kam:/etc/kam/bin/fix-root-keys
 
 [secret,normal]
 root@rpi1
-omnian
-krabicka_s_internetem
+omnian [out of date]
+krabicka_s_internetem [out of date]
+
+root,ksifr,toodledoodle@ksp_vm
 
 
 [normal]
