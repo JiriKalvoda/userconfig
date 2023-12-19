@@ -467,7 +467,7 @@ promt_color_right=32
 
 
 ######################### configuration by devices
-if [[ "$device_name" == acid ]] || [[ "$device_name" == poppi ]]
+if [[ "$device_name" == arch ]] || [[ "$device_name" == arzen ]]
 then
 	promt_color_dir=91
 fi
@@ -476,7 +476,7 @@ then
 	promt_color_dir=92
 fi
 # 93 -> git
-if [ "$device_name" == "arzen" ] ;
+if [ "$device_name" == hopik ] ;
 then
 	promt_color_dir=94
 fi
