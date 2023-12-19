@@ -213,7 +213,6 @@ install_begin(){
 	mkdir -p $state_run_dir
 	mkdir -p $state_run_dir/files
 	echo -e "${Blue}INSTALLING $install_name$None (version $version)"
-	echo $state_dir $state_run_dir
 	echo $version > $state_run_dir/version
 	echo installing > $state_run_dir/state
 	printf "%q " "$0" "$@" > $state_run_dir/args
@@ -224,7 +223,7 @@ install_begin(){
 }
 
 install_ok(){
-	echo  ok > $state_dir/state
+	echo  ok > $state_run_dir/state
 	echo -e "${Blue}INSTALL DONE $install_name$None"
 	reln $state_run_dir $state_dir/last_ok
 	unset state_dir
