@@ -73,8 +73,10 @@ class Installation:
         if s == "ok":
             if v == cv:
                 return f"\033[92mOK\033[39m"
-        elif s == "fail":
-            return "\033[91mF{v_if_n_curr}\033[39m"
+            else:
+                return f"\033[93m{v}\033[39m"
+        elif s == "faild":
+            return f"\033[91mF{v_if_n_curr}\033[39m"
         elif s == "installing":
             return f"\033[91mI{v_if_n_curr}\033[39m"
         else:
@@ -115,8 +117,8 @@ if args.server:
     head_user = ["", "" ]
     for name, i in devices:
         u, m = name.split("@")
-        head_mach.append(m)
-        head_user.append(u)
+        head_mach.append(m[:5])
+        head_user.append("jiklv" if u == "jirikalvoda" else u)
     head = [head_mach, head_user, tabulate.SEPARATING_LINE]
     print(tabulate.tabulate(head+table))
 else:
