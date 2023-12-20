@@ -1,4 +1,4 @@
-#!/bin/env keymap-i3
+#!/usr/bin/env keymap-i3
 
 import os
 

@@ -11,7 +11,7 @@ confln xrandr-cmddef.km ~/.config/i3/
 
 (
 	cd ~/.config/i3
-	./config-gen > config
+	r -b './config-gen > config'
 )
 
 install_ok
