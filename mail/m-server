@@ -1,16 +1,35 @@
 #!/bin/bash
 if [[ "$1" == "" ]]
 then
-	CM_COLOR=red $HOME/bin/cm -c1 -C60 ~/Maildir/.* -od -ob -oo -op -ol1  -os -k -K -Ll2\
+	#r=$(date +%y-%m-%d--%H-%M-%S--$RANDOM)
+	CM_COLOR=red $HOME/bin/cm -f -c300 -C30 ~/Maildir/. ~/Maildir/.[a-z,A-Z]* -od -ob -oo -op -ol1  -os -of  \
+		-sduration=6000 -smin-duration=3000 -scolor=orange\
+		-rto=exec -r=m-repeat-notification -r="%t %n %m%B" -b"\n<%a> %n %m" -B ""\
+		-m "$HOME/bin/osdc --to=exec m t lf %s "\
+
+		#-a]"$HOME/bin/osdc --to=exec m t rf %s"\
+		#-a\\"$0 lf %s"\
+		#-a="mutt -f %s"\
+		#-lred #-on9 -ol1\
+elif [[ "$1" == "s" ]]
+then
+	r=$(date +%y-%m-%d--%H-%M-%S--$RANDOM)
+	CM_COLOR=red $HOME/bin/cm -f -d -c300 -C30 ~/Maildir/. ~/Maildir/.[a-z,A-Z]* -od -ob -oo -op -ol1  -os -of -k -K -Ll2\
 		-sduration=6000 -smin-duration=3000 -scolor=orange\
 		-m" $HOME/bin/osdc --to=exec m t lf %s "\
 		-a]"$HOME/bin/osdc --to=exec m t rf %s"\
-		-a\\"$0 %s"\
+		-a\\"$0 lf %s"\
 		-a="mutt -f %s"\
-		-r"to:exec\n:m-repeat-notification\n:%t %n %m%B\n\n" -R"\\\\n<%a> %n %m"
+		-r"to:exec\n:m-repeat-notification\n:%t %n %m%B\n\n" -R"\\\\n<%a> %n %m" 2>/dev/null
+
 elif [[ "$1" == "h" ]]
 then
-	$HOME/bin/cm -c1  ~/Maildir/.* -ob -oo -op -ol1  -os -sduration=6000 -smin-duration=3000 -scolor=orange -m"$0 %s"
-else
-	neomutt -f $1
+	CM_COLOR=red $HOME/bin/cm uuuuuu-f -c300 -C30 ~/Maildir/. ~/Maildir/.[a-z,A-Z]* -od -ob -oo -op -ol1  -os -of  \
+		-sduration=6000 -smin-duration=3000 -scolor=orange\
+		-rto=exec -r=m-repeat-notification -r="%t %n %m%B" -b"\n<%a> %n %m" -B ""\
+		-m "neomutt -f %s"\
+
+elif [[ "$1" == "lf" ]] || [[ "$1" == "rf" ]]
+then
+	neomutt -f $2
 fi
