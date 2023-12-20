@@ -121,5 +121,5 @@ if args.server:
     print(tabulate.tabulate(head+table))
 else:
     local = load_state_dir()
-    table = [[name, local[name].short()] for name in local]
-    print(tabulate.tabulate(table))
+    table = [[name, name_to_path(name), current_version(name), local[name].last_ok().version, local[name].short()] for name in sorted(local)]
+    print(tabulate.tabulate([["Name", "Path", "cv", "iv", "state"], tabulate.SEPARATING_LINE]+table))
