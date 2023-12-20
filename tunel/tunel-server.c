@@ -60,16 +60,18 @@ int main(int argc, char ** argv)
 
 		if(!r && !no_end)
 		{
-			printf("Timeout (%d)\n",tv.tv_sec);
+			printf("%lld: Timeout (%d)\n", (long long)time(NULL), tv.tv_sec);
 			end();
 		}
 		//printf("a\n");
 		int ch = getchar();
 		if(ch<0)
 		{
-			printf("EOF\n");
+			printf("%lld: EOF\n", (long long)time(NULL));
 			end();
 		}
+		printf("%lld: Server read char %d\n", (long long)time(NULL), ch);
+		fflush(stdout);
 		//printf("|%d|\n",ch);
 	}
 	return 0;
