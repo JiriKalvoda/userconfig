@@ -155,10 +155,10 @@ r()
 	else
 		if $exit_on_err
 		then
-			echo -e " └─   \e[31mRETURN $ret => EXIT\e[0m"
-			exit $ret
+			echo -e " └─   \e[31mRETURNED $ret => EXIT\e[0m"
+			err subprocess faild
 		else
-			echo -e " └─   \e[31mRETURN $ret\e[0m"
+			echo -e " └─   \e[31mRETURNED $ret\e[0m"
 		fi
 	fi
 	return $ret
