@@ -12,7 +12,7 @@
 #
 
 [database]
-path=/home/jiri/Maildir
+path=Maildir
 
 # User configuration
 #
