@@ -59,7 +59,9 @@ confln()
 
 init-service()
 {
-	$USERCONFIG_ROOT/init-service.sh "$@" || err init-service faild
+	(
+		. $USERCONFIG_ROOT/init-service.sh "$@"
+	) || err init-service faild
 }
 
 git_clupdate()
