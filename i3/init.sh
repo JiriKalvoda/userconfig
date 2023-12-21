@@ -13,6 +13,9 @@ EOF
 r g++ status.cpp -o ~/.config/i3/status.out
 
 r ../git-clupdate git@gitlab.kam.mff.cuni.cz:jirikalvoda/i3-woman.git build_git_i3-woman
+r -b "cd build_git_i3-woman; make"
+confln build_git_i3-woman/daemon.py ~/bin/i3-woman-daemon
+confln build_git_i3-woman/client ~/bin/i3-woman
 
 r ../git-clupdate git@gitlab.kam.mff.cuni.cz:jirikalvoda/i3csstatus.git build_git_i3csstatus
 r -b "cd build_git_i3csstatus ; dotnet build --no-self-contained --configuration Release"
