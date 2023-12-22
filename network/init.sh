@@ -1,6 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
+version 1
 need_root
 install_begin
 
