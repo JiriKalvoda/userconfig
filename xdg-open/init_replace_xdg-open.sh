@@ -1,9 +1,8 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
+need_root
 install_begin
-
-echo -e "\e[31mROOT REQUIRE\e[0m"
 
 if not grep  "BETTER XDG-OPEN" /usr/bin/xdg-open
 then
