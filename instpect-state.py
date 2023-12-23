@@ -49,7 +49,7 @@ class Log:
         self.state = read(self.dir/"state")
         self.version = read(self.dir/"version") or "0"
         self.date = read(self.dir/"date")
-        self.args = " ".join(read(self.dir/"args").split(" ")[1:])
+        self.args = " ".join((read(self.dir/"args") or "").split(" ")[1:])
 
 class Installation:
     def __init__(self, state_dir, name):
