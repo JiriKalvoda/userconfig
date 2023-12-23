@@ -38,7 +38,7 @@ def age_to_color(age):
 def format_age(age):
     S = age.total_seconds()
     if S < 3*60:
-        return "{int(S)} s"
+        return f"{int(S)} s"
     M = int((S+30)/60)
     if M < 3*60:
         return f"{M} min"
