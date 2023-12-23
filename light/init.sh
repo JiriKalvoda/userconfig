@@ -4,8 +4,6 @@ cd "$(dirname "$0")"
 need_root
 install_begin
 
-cd "$(dirname "$0")"
-
 confln config-default.h config.h c
 
 r g++ ./light.c -o /usr/bin/light
