@@ -1,0 +1,13 @@
+#!/bin/bash
+
+if [[ "$TARGET" == "terapeut" ]]
+then
+
+snapdir="/mnt/terapeut-snapshot"
+snapdrive="/dev/mapper/terapeut-snapshot"
+case "$device" in
+  hopik)
+		from=/
+esac
+
+fi
