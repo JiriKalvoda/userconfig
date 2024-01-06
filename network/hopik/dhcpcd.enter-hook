@@ -25,9 +25,14 @@ then
 		fi
 	fi
 
-	if [ "$ifssid" == luminiferous-aether-jk-5g ]
+	if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
 	then
 		conntrack_hack
+		if [ "$reason" == STATIC6 ]
+		then
+			echo $msg_prefix set ipv6 default route
+			ip -6 route add default via 2a01:510:d504:7510::1
+		fi
 	fi
 
 	if [ "$ifssid" == samet-5G  ]
