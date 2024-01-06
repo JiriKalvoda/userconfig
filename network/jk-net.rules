@@ -1,6 +1,9 @@
 # orico usb-c hub
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:e0:4c:42:03:39",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="orico"
 
+# axagon 2.5Gbit
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:e0:4c:68:00:12",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="axagon"
+
 # samsung monitor
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="54:44:a3:2b:41:e2",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="sm"
 
