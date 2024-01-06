@@ -35,4 +35,11 @@ then
 		conntrack_hack
 	fi
 
+
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix sleep start
+		sleep 0.5
+		echo $msg_prefix sleep end
+	fi
 fi
