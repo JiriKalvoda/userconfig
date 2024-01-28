@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -ueo pipefail
+
+interface=orico
+
+echo R | socat unix:/run/conntrack_hack -
+ip link set $interface up
+ip addres add 192.168.1.50/24 dev $interface
+ip route add default via 192.168.1.1 dev $interface
+(echo domain lan;  echo nameserver 192.168.1.1 ) | resolvconf -a $interface
