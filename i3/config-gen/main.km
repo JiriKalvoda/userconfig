@@ -278,3 +278,7 @@ with ADD_MODIFICATOR(SUPER):
     for_window [title="better xdg-open"] floating enable
     """)
 
+
+if "sway" in ARGS and "vncserver" in ARGS:
+    EXEC_ON_STARTUP(CMD("echo $WAYLAND_DISPLAY"))
+    EXEC_ON_STARTUP(CMD("wayvnc 0.0.0.0 $(( 5800 + ${WAYLAND_DISPLAY:8} )) --config ~/.config/wayvnc/config -S /tmp/wayvnc-ctl-${WAYLAND_DISPLAY:8}"))
