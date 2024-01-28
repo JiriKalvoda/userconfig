@@ -202,7 +202,7 @@ with ADD_MODIFICATOR(SUPER):
 
         M(K_O, CMD("osdc --output=display -- \"$(wifi on)\""))
         M(K_P, CMD("osdc --output=display -- \"$(wifi off)\""))
-        M(K_I, ROOT_MODE_AND(CMD("terminal -e iwctl")))
+        M(K_I, ROOT_MODE_AND(CMD("terminal -e root iwctl")))
 
         M(K_B(SHIFT), ROOT_MODE_AND(CMD("arandr")))
         LOAD("xrandr.km", only_if_exists=True)
