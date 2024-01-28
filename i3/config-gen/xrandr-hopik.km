@@ -1,0 +1,55 @@
+LOAD_LIB("xrandr-cmddef.km")
+map_touchscreen = "for i in {0..10}; do sleep 0.5; xinput | grep WingCoolTouch | while read l; do id=${l:50:2}; xinput map-to-output $id DP-1; done; done;"
+
+def xrandr_set(mode_name, eDP_1=(qhdx, (0,0)), DP_1=None, DP_2=None, HDMI_1=None, after="", primary="eDP_1"):
+    out = xrandr(mode_name, {"eDP_1": eDP_1, "DP_1": DP_1, "DP_2": DP_2,"HDMI_1": HDMI_1}, primary, after)
+    globals()["r_" + mode_name] = out
+    return out
+
+
+xrandr_set("std")
+xrandr_set("std_small", eDP_1=(fhdx, (0,0)))
+xrandr_set("std_small2", eDP_1=((1280,800), (0,0)))
+
+xrandr_set("samsung", eDP_1=(qhdx, (2560, 0)), DP_1=(qhd, (0,0)), primary="DP_1")
+xrandr_set("samsung_only", eDP_1=None, DP_1=(qhd, (0,0)), primary="DP_1")
+
+
+xrandr_set("verbatim_left_hand", eDP_1=(qhdx, (1080, 0)), DP_1=(fhd, (0,0), left), after=map_touchscreen, primary="eDP_1")
+xrandr_set("verbatim_left_hand_only", eDP_1=None, DP_1=(fhd, (0,0), left), after=map_touchscreen, primary="DP_1")
+
+xrandr_set("verbatim_right_hand", eDP_1=(qhdx, (0,0)), DP_1=(fhd, (2560,0), right), after=map_touchscreen, primary="eDP_1")
+xrandr_set("verbatim_right_hand_only", eDP_1=None, DP_1=(fhd, (0,0), right), after=map_touchscreen, primary="DP_1")
+
+xrandr_set("verbatim_left_table", eDP_1=(qhdx, (1920, 0)), DP_1=(fhd, (0,0)), after=map_touchscreen, primary="DP_1")
+xrandr_set("verbatim_right_table", eDP_1=(qhdx, (0, 0)), DP_1=(fhd, (2560,0)), after=map_touchscreen, primary="DP_1")
+xrandr_set("verbatim_table_only", eDP_1=None, DP_1=(fhd, (0,0)), after=map_touchscreen, primary="DP_1")
+
+
+xrandr_set("camomile", eDP_1=(qhdx, (0, 1200)), HDMI_1=((1920, 1200), (0,0)), primary="HDMI_1")
+
+
+if __name__ == "__main__":
+    print(r_std)
+else:
+    M(K_N,           r_std)
+    M(K_N(SHIFT),    r_std_small)
+    M(K_N(CTRL),    r_std_small2)
+
+    M(K_M,           r_samsung)
+    M(K_M(SHIFT),    r_samsung_only)
+
+    M(K_J(),         r_verbatim_left_hand)
+    M(K_J(SHIFT),    r_verbatim_left_hand_only)
+
+    M(K_K(),         r_verbatim_left_table)
+    M(K_K(SHIFT),    r_verbatim_table_only)
+    M(K(";"),        r_verbatim_right_table)
+
+    M(K("'"),        r_verbatim_right_hand)
+    M(K("'", SHIFT), r_verbatim_right_hand_only)
+
+    M(K("/", SHIFT), CMD(map_touchscreen))
+
+    M(K(",")       , r_camomile)
+
