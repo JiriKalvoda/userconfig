@@ -22,6 +22,6 @@ r ../git-clupdate git@gitlab.kam.mff.cuni.cz:jirikalvoda/i3csstatus.git build_gi
 r -b "cd build_git_i3csstatus ; dotnet build --no-self-contained --configuration Release"
 confln build_git_i3csstatus/bin/Release/net7.0/i3csstatus ~/bin/
 
-r ./config-gen/init.sh
+r -c ./config-gen/init.sh
 
 install_ok
