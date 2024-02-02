@@ -78,10 +78,9 @@ then
 		while IFS= read -rd '' var; do export "$var"; done </proc/$CHILD_PID/environ
 		alacritty --working-directory $SHELL_CWD
 	else
-		sshCom="$(ps -p $ssh -o command | sed -n 2p)"
+		sshCom="$(xargs -0 printf "%q " < /proc/$ssh/cmdline)"
 		ssh_cwd="$(xdotool getwindowfocus getwindowname)"
 		ssh_cwd="$(printf "%s\n" "${ssh_cwd##*:}")"
-		#osdc $ssh_cwd
 		#echo "$sshCom" > ~/.tmpSSH
 		sshCom="${sshCom::3} -o SendEnv=LC_CD ${sshCom:3}"
 		while IFS= read -rd '' var; do export "$var"; done </proc/$ssh/environ
