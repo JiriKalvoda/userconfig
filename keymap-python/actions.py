@@ -147,7 +147,7 @@ def f(self):
     return CONFIRM_CMD("i3-msg exit", "Do you really want to EXIT i3?")
 @action_implement("EXIT_LOCK")
 def f(self):
-    return CMD("xtrlock")
+    return CMD("i3lock")
 
 @action_init()
 def LIGHT(self, raw=None, val=None, change=None):
