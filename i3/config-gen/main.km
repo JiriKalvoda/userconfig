@@ -249,8 +249,7 @@ with ADD_MODIFICATOR(SUPER):
     """)
     app_workspace(K_Z, "ZOOM", CMD("zoom"))
 
-    # File browser
-    M(K_N, CMD("nemo"))
+    M(K_N(CTRL), CMD("nemo"))
 
     # Pasman
     def bind_pasman(key, getter):
@@ -277,6 +276,10 @@ with ADD_MODIFICATOR(SUPER):
     I3_DIRECT("""
     for_window [title="better xdg-open"] floating enable
     """)
+
+    # VM
+    M(K_N, CMD("vm terminal_ssh []"))
+    M(K_F(SHIFT), CMD("vm resize_wayland []"))
 
 
 if "sway" in ARGS and "vncserver" in ARGS:
