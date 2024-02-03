@@ -119,6 +119,14 @@ def CONT_TOGGLE(self, prop_name):
     self.prop_name = prop_name
 
 @action_init()
+def FULLSCREEN(self, on=True):
+    self.on = on
+
+@action_init()
+def SHOW_STATUSBAR(self, on=True):
+    self.on = on
+
+@action_init()
 def RESTART_MANAGER(self, prop_name):
     assert_in(prop_name, ["fullscreen", "floating", "sticky"])
     self.prop_name = prop_name
