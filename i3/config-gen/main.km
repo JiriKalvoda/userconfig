@@ -167,10 +167,13 @@ with ADD_MODIFICATOR(SUPER):
     M(K_Q(SHIFT), release_action=CMD("xkill"))
     M(K_Q(CTRL), release_action=CMD("killall xkill"))
 
-    with M(K_ESC, GO_MODE(MODE("LOCK-MOD-ESC"))).action.mode:
-        M(K_ESC(SUPER), GO_MODE(GET_MODE(-2)))
-    with M(K_ESC(SHIFT), GO_MODE(MODE("LOCK-MOD-SHIFT-ESC"))).action.mode:
-        M(K_ESC(SUPER|SHIFT), GO_MODE(GET_MODE(-2)))
+    M(K(".", CTRL), SHOW_STATUSBAR(True))
+    M(K(".", CTRL|SHIFT), SHOW_STATUSBAR(False))
+
+    for k, name in [(K_ESC(SUPER), "LOCK-MOD-ESC"), (K_ESC(SUPER|SHIFT), "LOCK-MOD-SHIFT-ESC")]:
+        with MODE(name) as m:
+            M(k, GO_MODE(GET_MODE(-2)))
+        M(k, AND(FULLSCREEN(False), SHOW_STATUSBAR(True), GO_MODE(m), main=2))
 
     with M(K_X, GO_MODE(STD_MODE("System-modifikator"))).action.mode:
         M(KEY(2,1), LIGHT(raw=0))
