@@ -29,6 +29,7 @@ ip addr add $v4net.$id/24 dev wg-blatto
 ip addr add $v6net::$id/64 dev wg-blatto
 wg set wg-blatto listen-port 12061 private-key /etc/wireguard/blatto/$id.key
 wg set wg-blatto peer \$(cat /etc/wireguard/blatto/blattes.pub) preshared-key /etc/wireguard/blatto/psk endpoint $blattes_ipv4:$port allowed-ips 0.0.0.0/0,::0/0
+ip link set mtu 1432 dev wg-blatto
 ip link set wg-blatto up
 ip route add $ipv4_prefix.0.0/16 via $v4net.1 dev wg-blatto metric 1000
 ip route add ${ipv6_prefix}00::0/56 via $v6net::1 dev wg-blatto metric 1000
