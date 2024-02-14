@@ -11,6 +11,30 @@ conntrack_hack(){
 		(echo R | socat unix:/run/conntrack_hack - ) &
 	fi
 }
+route6(){
+	if [ "$reason" == STATIC6 ]
+	then
+		echo $msg_prefix add ip route: $@
+		ip -6 route add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip route: $@
+		ip -6 route del $@
+	fi
+}
+route(){
+	if [ "$reason" == STATIC ]
+	then
+		echo $msg_prefix add ip route: $@
+		ip -4 route add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip route: $@
+		ip -4 route del $@
+	fi
+}
 
 if [[ "$interface" == w ]]
 then
@@ -21,7 +45,7 @@ then
 		if [ "$reason" == STATIC6 ]
 		then
 			echo $msg_prefix set ipv6 default route
-			ip -6 route add default via 2001:718:1e03:81a::1
+			route6 default via 2001:718:1e03:81a::1 dev w
 		fi
 	fi
 
@@ -30,8 +54,8 @@ then
 		conntrack_hack
 		if [ "$reason" == STATIC6 ]
 		then
-			echo $msg_prefix set ipv6 default route
-			ip -6 route add default via 2a01:510:d504:7510::1
+			route6 default via 2a01:510:d504:7510::1 dev w
+			route 10.12.0.0/16 via 10.12.11.1 dev wg-blatto
 		fi
 	fi
 
