@@ -104,11 +104,11 @@ def is_vm():
     return m_win._vm.isChecked()
 def vm_run(cmd, gui=False):
     cmd = shell_escape_if_list(cmd)
-    r = subprocess.run(["vm", "extended_name", m_win._vm_name.text()], stdout=subprocess.PIPE, encoding='utf-8')
-    vm_id, vm_user = r.stdout.strip().split("\n")
+    r = subprocess.run(["vm", "eval", m_win._vm_name.text()], stdout=subprocess.PIPE, encoding='utf-8')
+    vm_ident = r.stdout.strip()
     if is_file_url_or_path(arg):
-        r = subprocess.run(["vm", "sshfs", vm_id, "--user", vm_user], encoding='utf-8')
-        r = subprocess.run(["vm", "sshfs_mountdir", vm_id, "--user", vm_user], stdout=subprocess.PIPE, encoding='utf-8')
+        r = subprocess.run(["vm", "sshfs", vm_ident], encoding='utf-8')
+        r = subprocess.run(["vm", "internal", "sshfs_mountdir", vm_ident], stdout=subprocess.PIPE, encoding='utf-8')
         mountdir = r.stdout.strip()
 
         path = file_url_to_path(arg)
@@ -118,14 +118,14 @@ def vm_run(cmd, gui=False):
         tmp_dir_name = tmp_dir.split('/')[-1]
         shutil.copy(file, tmp_dir+"/"+filename)
         if gui:
-            p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, "--", f"cd {tmp_dir_name}; {cmd}"])
+            p = subprocess.run(["vm", "vncapp", vm_ident, "--", f"cd {tmp_dir_name}; {cmd}"])
         else:
-            p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "--", "-t", "--", f"cd {tmp_dir_name}; {cmd}"])
+            p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_ident, "--", "-t", "--", f"cd {tmp_dir_name}; {cmd}"])
     else:
         if gui:
-            p = subprocess.run(["vm", "vncapp", vm_user+'@'+vm_id, "--", cmd])
+            p = subprocess.run(["vm", "vncapp", vm_ident, "--", cmd])
         else:
-            p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_user+'@'+vm_id, "--", "-t", "--", cmd])
+            p = subprocess.run([*terminal_cmd(), "vm", "ssh", vm_ident, "--", "-t", "--", cmd])
 
 
 
