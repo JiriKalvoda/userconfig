@@ -3,6 +3,7 @@ set -euo xtrace -o pipefail
 
 vlan_name=$1
 id=$2
+default_routing=${3:-blatto}
 
 eval "$(ssh root@blatto.eu wg-get-metadata $vlan_name)"
 
@@ -19,10 +20,15 @@ cat psk | ssh root@blatto.eu "wg-register $vlan_name $id $(hostname) $(cat $id.p
 #cat psk | ssh root@blatto.eu "cat > /etc/wireguard/$vlan_name/$id.psk"
 
 
+mkdir -p /etc/net
 
-cat <<AMEN
+cat <<AMEN > /etc/net/wg-blatto
 #!/bin/sh
 set -o xtrace
+
+ip link del wg-blatto || true
+ip route flush table 12
+ip -6 route flush table 12
 
 ip link add dev wg-blatto type wireguard
 ip addr add $v4net.$id/24 dev wg-blatto
@@ -31,6 +37,45 @@ wg set wg-blatto listen-port 12061 private-key /etc/wireguard/blatto/$id.key
 wg set wg-blatto peer \$(cat /etc/wireguard/blatto/blattes.pub) preshared-key /etc/wireguard/blatto/psk endpoint $blattes_ipv4:$port allowed-ips 0.0.0.0/0,::0/0
 ip link set mtu 1432 dev wg-blatto
 ip link set wg-blatto up
-ip route add $ipv4_prefix.0.0/16 via $v4net.1 dev wg-blatto metric 1000
-ip route add ${ipv6_prefix}00::0/56 via $v6net::1 dev wg-blatto metric 1000
+
+ip route add throw 10.0.0.0/8 table 12
+ip route add throw 192.168.0.0/16 table 12
+ip route add throw 172.16.0.0/12 table 12
+ip route add $v4net.0/24 dev wg-blatto table 12
+ip rule add not to $blattes_ipv4 ipproto udp dport $port table 12
+ip -6 route add throw fe80::/10 table 12
+ip -6 route add throw fc00::/7 table 12
+ip -6 route add $v6net::/64 dev wg-blatto table 12
+ip -6 rule add table 12
+
+/etc/net/wg-blatto-route $default_routing
 AMEN
+
+cat <<AMEN > /etc/net/wg-blatto-route
+#!/bin/sh
+set -o xtrace
+
+if [[ \$1 == no ]]
+then
+	blatto=del
+	default=del
+elif [[ \$1 == blatto ]]
+then
+	blatto=add
+	default=del
+elif [[ \$1 == all ]]
+then
+	blatto=add
+	default=add
+else
+	echo usage: \$0 no/blatto/all
+	exit 1
+fi
+
+ip route \$blatto $ipv4_prefix.0.0/16 via $v4net.1 dev wg-blatto table 12
+ip route \$blatto ${ipv6_prefix}00::0/56 via $v6net::1 dev wg-blatto table 12
+ip route \$default default via $v4net.1 dev wg-blatto table 12
+ip route \$default default via $v6net::1 dev wg-blatto table 12
+AMEN
+
+chmod +x /etc/net/wg-blatto{,-route}
