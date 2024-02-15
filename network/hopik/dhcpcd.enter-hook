@@ -64,6 +64,14 @@ then
 		conntrack_hack
 	fi
 
+	if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
+	then
+		if [ "$reason" == BOUND ]
+		then
+			systemctl restart cdwifi-autologin
+		fi
+	fi
+
 
 	if [ "$reason" == CARRIER ]
 	then

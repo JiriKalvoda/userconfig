@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 5
+version 6
 need_root
 install_begin
 
@@ -28,5 +28,10 @@ done
 
 r udevadm control --reload-rules
 r udevadm trigger
+
+git_clupdate https://codeberg.org/regnarg/cdwifi-autologin.git build_git_cdwifi-autologin
+
+confln build_git_cdwifi-autologin/cdwifi-autologin.sh /usr/bin/ cE
+confln cdwifi-autologin.service /lib/systemd/system/ cr
 
 install_ok
