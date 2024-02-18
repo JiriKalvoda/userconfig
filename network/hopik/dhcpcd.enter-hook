@@ -45,18 +45,14 @@ then
 		if [ "$reason" == STATIC6 ]
 		then
 			echo $msg_prefix set ipv6 default route
-			route6 default via 2001:718:1e03:81a::1 dev w
+			route6 default via 2001:718:1e03:81a::1 dev w metric 3004
 		fi
 	fi
 
 	if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
 	then
 		conntrack_hack
-		if [ "$reason" == STATIC6 ]
-		then
-			route6 default via 2a01:510:d504:7510::1 dev w
-			route 10.12.0.0/16 via 10.12.11.1 dev wg-blatto
-		fi
+		route6 default via 2a01:510:d504:751a::1 dev w metric 3004
 	fi
 
 	if [ "$ifssid" == samet-5G  ]
@@ -64,7 +60,7 @@ then
 		conntrack_hack
 	fi
 
-	if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
+	if [ "$ifssid" == CDWiFi ]
 	then
 		if [ "$reason" == BOUND ]
 		then
