@@ -4,6 +4,27 @@ msg_prefix="$interface: dhcpd.enter-hook:"
 
 echo $msg_prefix $reason $interface $if_up $ifssid
 
+mtu_wg_blatto(){
+	ip link set wg-blatto mtu $1
+}
+mtu_limit(){
+	if [ "$reason" == CARRIER ]
+	then
+		if [[ $3 -le $2 ]]
+		then
+			$1 $3
+		else
+			$1 $2
+		fi
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		$1 $2
+	fi
+}
+mtu(){
+	mtu_limit mtu_wg_blatto 1432 $(( $1 - 60 ))
+}
 conntrack_hack(){
 	if [ "$reason" == CARRIER ]
 	then
@@ -62,9 +83,10 @@ then
 
 	if [ "$ifssid" == CDWiFi ]
 	then
+		mtu 1340
 		if [ "$reason" == BOUND ]
 		then
-			systemctl restart cdwifi-autologin
+			CDWIFI_IFACE=$interface cdwifi-autologin
 		fi
 	fi
 
