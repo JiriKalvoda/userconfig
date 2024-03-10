@@ -57,6 +57,11 @@ ms()
 	sshcmd="$(echo "$ms_ret" | head -n2 | tail -n1)"
 	usingSSH=true
 }
+ssh()
+{
+	from="$1:$fromdir"
+	usingSSH=true
+}
 
 delete()
 {

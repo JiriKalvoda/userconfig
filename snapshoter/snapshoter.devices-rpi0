@@ -5,16 +5,16 @@ case "$device" in
   test)
 		from=/tmp/testsnap
     ;;
-  rpi0 )
+  rpi0)
 		from=/
 		exclude_aux=true
 	;;
   rpi[1-7])
-	    exclude_aux=false
+	    exclude_aux=true
 		fromdir=/
   		ms root@$device
 	  ;;
-  arch | external | arzen)
+  arch | external | arzen | hopik)
 		fromdir=/
   		ms root@$device
     ;;
@@ -25,10 +25,18 @@ case "$device" in
 		exclude_fs=false
 		exclude_mountdir=false
 		excludedir_homes="'/files/home'"
-  		ms root@$device
+		ms root@$device
     ;;
 	hluk)
 		exclude_aux=false
 		fromdir=/
 		ms root@$device
+	;;
+	blattes)
+		fromdir=/
+		ssh root@$device.blatto.eu
+	;;
+	jug9-stratosphere)
+		fromdir=/
+		ssh root@jug9-stratosphere
 esac
