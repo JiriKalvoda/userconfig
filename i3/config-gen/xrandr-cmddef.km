@@ -1,5 +1,7 @@
 fhd = (1920, 1080)
+fhdx = (1920, 1200)
 qhd = (2560, 1440)
+qhdx = (2560, 1600)
 
 normal = "normal"
 left = "left"

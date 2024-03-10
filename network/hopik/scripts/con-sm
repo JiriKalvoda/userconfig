@@ -1,12 +1,15 @@
 #!/bin/sh
-
-set -ueo pipefail
+set -o xtrace
 
 #interface=enp3s0f4u1u1
 interface=sm
 
 echo R | socat unix:/run/conntrack_hack -
 ip link set $interface up
-ip addres add 10.19.13.24/24 dev $interface
-ip route add default via 10.19.13.254
-(echo domain lan;  echo nameserver 10.19.13.254 ) | resolvconf -a enp3s0f4u1u1
+ip addres add 10.12.11.22/24 dev $interface
+ip addres add 2a01:510:d504:751a::22/64 dev $interface
+ip route add 10.12.0.0/16 via 10.12.11.1 dev $interface metric 1000
+ip route add 2a01:510:d504:7500::0/56 via 2a01:510:d504:751a::1 dev wg-blatto metric 1000
+ip route add default via 10.12.11.1 dev $interface metric 1000
+ip route add default via 2a01:510:d504:751a::1 dev $interface metric 1000
+(echo domain jk.blatto.eu;  echo nameserver 10.12.11.1 ) | resolvconf -a $interface

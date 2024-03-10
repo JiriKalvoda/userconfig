@@ -59,7 +59,9 @@ confln()
 
 init-service()
 {
-	$USERCONFIG_ROOT/init-service.sh "$@" || err init-service faild
+	(
+		. $USERCONFIG_ROOT/init-service.sh "$@"
+	) || err init-service faild
 }
 
 git_clupdate()
@@ -215,7 +217,7 @@ install_begin(){
 	echo -e "${Blue}INSTALLING $install_name$None (version $version)"
 	echo $version > $state_run_dir/version
 	echo installing > $state_run_dir/state
-	printf "%q " "$0" "$@" > $state_run_dir/args
+	printf "%s" "$global_args" > $state_run_dir/args
 	date -Iseconds > $state_run_dir/date
 	git rev-parse --verify HEAD > $state_run_dir/commit
 	git diff > $state_run_dir/git_diff
@@ -237,6 +239,8 @@ need_state_server(){
 	[[ ! -d $userconfig_state_server ]] && err This is not userconfig state server
 	true
 }
+
+global_args="$(printf "%q " "$0" "$@")"
 
 if [[ $1 == -v ]]
 then

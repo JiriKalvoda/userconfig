@@ -1,11 +1,11 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
+version 1
+need_root
 install_begin
 
-echo -e "\e[31mROOT REQUIRE\e[0m"
-
-if not grep  "BETTER XDG-OPEN" /usr/bin/xdg-open
+if ! grep  "BETTER XDG-OPEN" /usr/bin/xdg-open
 then
 	mv /usr/bin/xdg-open /usr/bin/xdg-open-real
 fi

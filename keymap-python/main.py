@@ -11,6 +11,7 @@ g_ph = {}
 modes_stack = []
 all_modes = []
 
+
 def set_global(name=None):
     def l(f):
         nonlocal name
@@ -37,6 +38,15 @@ def set_global_ph(name=None):
 
 INF = 1000
 set_global("INF")(INF)
+
+set_global("ARGS")(args := {})
+for i in sys.argv[2:]:
+    if '=' in i:
+        name, val = i.split('=')[0], '='.join(i.split('=')[1:])
+    else:
+        name, val = i, True
+    assert name not in args
+    args[name] = val
 
 @set_global()
 def which(cmd):

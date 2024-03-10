@@ -97,6 +97,9 @@ def x(self):
 @action_serialize("CONT_TOGGLE")
 def x(self):
     return f"{self.prop_name} toggle"
+@action_serialize("FULLSCREEN")
+def x(self):
+    return f"fullscreen {'enable' if self.on else 'disable'}"
 @action_serialize("GO_MODE")
 def x(self):
     return f'mode "{self.mode.name or "default"}"; exec '+cmd_expand(f"i3-mode-log '{self.mode.name or 'default'}'")
@@ -113,6 +116,9 @@ def f(self):
 def f(self):
     return g["CONFIRM_CMD"]("i3-msg exit", "Do you really want to EXIT i3?")
 
+@action_serialize("SHOW_STATUSBAR")
+def x(self):
+    return f"bar mode {'dock' if self.on else 'invisible'}"
 
 load_main()
 if have_i3_woman:

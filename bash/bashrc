@@ -231,19 +231,19 @@ gia(){
 	git add "$@"
 }
 giac(){
-	git add $@;git commit;
+	git add "$@"; git commit;
 }
 giaac(){
-	git add . $@;git commit;
+	git add . "$@"; git commit;
 }
 giaca(){
-	git add $@;git commit --amend;
+	git add "$@"; git commit --amend;
 }
 giaaca(){
-	git add . $@;git commit --amend;
+	git add . "$@"; git commit --amend;
 }
 gip(){
-	git pull $@;git push $@;
+	git pull "$@"; git push "$@";
 }
 gipma(){
 	b=$1

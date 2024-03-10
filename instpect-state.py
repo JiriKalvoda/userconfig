@@ -48,6 +48,8 @@ class Log:
         self.dir = state_dir/name/logname
         self.state = read(self.dir/"state")
         self.version = read(self.dir/"version") or "0"
+        self.date = read(self.dir/"date")
+        self.args = " ".join((read(self.dir/"args") or "").split(" ")[1:])
 
 class Installation:
     def __init__(self, state_dir, name):
@@ -123,5 +125,5 @@ if args.server:
     print(tabulate.tabulate(head+table))
 else:
     local = load_state_dir()
-    table = [[name, name_to_path(name), current_version(name), local[name].last_ok().version, local[name].short()] for name in sorted(local)]
-    print(tabulate.tabulate([["Name", "Path", "cv", "iv", "state"], tabulate.SEPARATING_LINE]+table))
+    table = [[name, name_to_path(name), local[name].last().args, current_version(name), local[name].last_ok().version,  local[name].short(), local[name].last().date] for name in sorted(local)]
+    print(tabulate.tabulate([["Name", "Path","args", "cv", "iv", "state", "date"], tabulate.SEPARATING_LINE]+table))

@@ -1,0 +1,8 @@
+[Unit]
+Description=Scripts for login to CDWiFi
+
+[Service]
+Type=oneshot
+Environment=CDWIFI_IFACE=w
+ExecStart=/usr/bin/cdwifi-autologin
+WatchdogSec=10

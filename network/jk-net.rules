@@ -1,14 +1,25 @@
 # orico usb-c hub
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:e0:4c:42:03:39",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="orico"
 
+# axagon 2.5Gbit
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:e0:4c:68:00:12",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="axagon"
+
 # samsung monitor
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="54:44:a3:2b:41:e2",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="sm"
 
 # arzen WiFi
-SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="c0:3c:59:ab:9b:8b",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="w"
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="c0:3c:59:ab:9b:8b",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="w"
 
+# hopik WiFi
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="40:1a:58:9d:75:d8",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="w"
+
+# opler monitor
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="b0:4f:13:d2:2d:4b",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="opler"
 
 # samsung-monitor: configuration and wifi on/off
 ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start net-config@con-sm"
 ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start set-wifi-and-flush-neigh@off"
 ACTION=="remove", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start set-wifi-and-flush-neigh@on"
+
+# opler monitor: configuration
+ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enxb04f13d22d4b", RUN+="/usr/bin/systemctl start net-config@con-opler"
