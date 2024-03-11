@@ -11,3 +11,5 @@ ip addres add 2001:718:1e03:81a::4e/64 dev $interface
 ip route add default via 10.10.10.1 dev $interface
 ip route add default via 2001:718:1e03:81a::1 dev $interface
 (echo domain kam.mff.cuni.cz;  echo nameserver 10.10.10.1 ) | resolvconf -a $interface
+
+systemctl reload net-blatto-daemon

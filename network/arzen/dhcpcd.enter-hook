@@ -36,3 +36,8 @@ then
 	fi
 
 fi
+
+if [ "$reason" == BOUND ] || [ "$reason" == NOCARRIER ]
+then
+	systemctl reload net-blatto-daemon
+fi

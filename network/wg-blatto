@@ -116,6 +116,8 @@ then
 fi
 
 echo \$1 > /run/wg-blatto/routing
+
+systemctl reload net-blatto-daemon
 AMEN
 
 chmod +x /etc/net/wg-blatto{,-route}
