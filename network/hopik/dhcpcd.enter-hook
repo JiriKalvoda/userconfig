@@ -63,11 +63,7 @@ then
 	if [ "$ifssid" ==  MS-KAM-GUESTS ]
 	then
 		conntrack_hack
-		if [ "$reason" == STATIC6 ]
-		then
-			echo $msg_prefix set ipv6 default route
-			route6 default via 2001:718:1e03:81a::1 dev w metric 3004
-		fi
+		route6 default via 2001:718:1e03:81a::1 dev w metric 3004
 	fi
 
 	if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
