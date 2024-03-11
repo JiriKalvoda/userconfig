@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -euo xtrace -o pipefail
 
 vlan_name=$1
@@ -61,22 +61,22 @@ adopt_blatto=del
 adopt_default=del
 adopt=del
 
-if [[ \$1 == no ]]
+if [ \$1 = no ]
 then
 	true
-elif [[ \$1 == blatto ]]
+elif [ \$1 = blatto ]
 then
 	blatto=add
-elif [[ \$1 == all ]]
+elif [ \$1 = all ]
 then
 	blatto=add
 	default=add
-elif [[ \$1 == adopt_blatto ]]
+elif [ \$1 = adopt_blatto ]
 then
 	blatto=add
 	adopt_blatto=add
 	adopt=add
-elif [[ \$1 == adopt_all ]]
+elif [ \$1 = adopt_all ]
 then
 	blatto=add
 	default=add
@@ -101,7 +101,7 @@ ip route \$adopt_blatto ${ipv6_prefix}00::0/56 dev wg-blatto table 12 metric 1 s
 ip route \$adopt_default default dev wg-blatto table 12 metric 1 src $adopt_v4net.$id
 ip route \$adopt_default default dev wg-blatto table 12 metric 1 src $adopt_v6net::$id
 
-if [ \$adopt == add ]
+if [ \$adopt = add ]
 then
 	ip addr del $v4net.$id/24 dev wg-blatto metric 100
 	ip addr add $v4net.$id/24 dev wg-blatto metric 100
