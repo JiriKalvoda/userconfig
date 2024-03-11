@@ -27,6 +27,7 @@ cat <<AMEN > /etc/net/wg-blatto
 set -o xtrace
 
 ip link del wg-blatto || true
+rm /run/wg-blatto/ || true
 ip route flush table 12
 ip -6 route flush table 12
 
@@ -48,7 +49,14 @@ ip -6 route add throw fc00::/7 table 12
 ip -6 route add $v6net::/64 dev wg-blatto table 12
 ip -6 rule add table 12
 
-/etc/net/wg-blatto-route $default_routing
+mkdir /run/wg-blatto/
+if [ ${default_routing::5} = auto: ]
+then
+	echo ${default_routing:5} > /run/wg-blatto/autorouting
+	/etc/net/wg-blatto-route no
+else
+	/etc/net/wg-blatto-route $default_routing
+fi
 AMEN
 
 cat <<AMEN > /etc/net/wg-blatto-route
@@ -106,6 +114,8 @@ then
 	ip addr del $v4net.$id/24 dev wg-blatto metric 100
 	ip addr add $v4net.$id/24 dev wg-blatto metric 100
 fi
+
+echo \$1 > /run/wg-blatto/routing
 AMEN
 
 chmod +x /etc/net/wg-blatto{,-route}
