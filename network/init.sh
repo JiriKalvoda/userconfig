@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 7
+version 8
 need_root
 install_begin
 
@@ -29,9 +29,11 @@ done
 r udevadm control --reload-rules
 r udevadm trigger
 
-git_clupdate https://codeberg.org/regnarg/cdwifi-autologin.git build_git_cdwifi-autologin
-
+r -c git_clupdate https://codeberg.org/regnarg/cdwifi-autologin.git build_git_cdwifi-autologin
 confln build_git_cdwifi-autologin/cdwifi-autologin.sh /usr/bin/ cE
 confln cdwifi-autologin.service /lib/systemd/system/ cr
+
+confln blatto-daemon.py /usr/bin/net-blatto-daemon c
+init-service net-blatto-daemon root /usr/bin/net-blatto-daemon "" "ExecReload=/bin/kill -HUP \$MAINPID"
 
 install_ok
