@@ -8,9 +8,9 @@ case "$device" in
 		from=/
 		exclude_aux=false
 	;;
-  arch | external | arzen)
+  arch | external | arzen | hopik)
 		fromdir=/
-  		ms root@$device
+  		ssh root@w.$device.jk.l.blatto.eu
     ;;
   phone)
 		fromdir="'/data/data/com.termux/'"
