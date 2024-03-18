@@ -85,6 +85,10 @@ then
 			CDWIFI_IFACE=$interface cdwifi-autologin
 		fi
 	fi
+	if [ "$ifssid" == Onboard-WiFi ]
+	then
+		mtu 1340
+	fi
 
 
 	if [ "$reason" == CARRIER ]
