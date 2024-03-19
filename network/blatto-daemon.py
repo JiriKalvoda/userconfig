@@ -59,6 +59,7 @@ while True:
 
     interfaces = {}
     blatto = False
+    blatto_wg = False
     for i in ipa:
         if i["operstate"] in ["UP", "UNKNOWN"]:
             out = {
