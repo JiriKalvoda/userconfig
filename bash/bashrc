@@ -130,13 +130,29 @@ view(){
 }
 
 ######################### ping, traceroute
-pink(){ ping kam.mff.cuni.cz "$@"
+pink(){
+	ping kam.mff.cuni.cz "$@"
+}
+pink4(){
+	ping 195.113.20.16 "$@"
+}
+pink6(){
+	ping 2001:718:1e03:801::10 "$@"
 }
 traceroutek(){ traceroute kam.mff.cuni.cz "$@"
 }
 pin8(){ ping 8.8.8.8 "$@"
 }
 traceroute8(){ traceroute 8.8.8.8 "$@"
+}
+pinb(){
+	ping blatto.eu "$@"
+}
+pinb4(){
+	ping 95.85.217.30 "$@"
+}
+pinb6(){
+	ping 2a01:510:d504:75a0::1 "$@"
 }
 
 
