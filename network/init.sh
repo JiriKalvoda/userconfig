@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 8
+version 9
 need_root
 install_begin
 
@@ -24,7 +24,12 @@ do
 done
 
 [ -f $h/dhcpcd.conf ] && confln $h/dhcpcd.conf /etc/ cr
-[ -f $h/dhcpcd.enter-hook ] && confln $h/dhcpcd.enter-hook /etc/ cr
+if [ -f $h/dhcpcd.enter-hook ]
+then
+	confln dhcpcd.enter-hook-defaults /etc/ cr
+	confln dhcpcd.enter-hook-defs /etc/ cr
+	confln $h/dhcpcd.enter-hook /etc/ cr
+fi
 
 r udevadm control --reload-rules
 r udevadm trigger

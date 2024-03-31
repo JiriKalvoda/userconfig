@@ -1,0 +1,56 @@
+msg_prefix="$interface: dhcpd.enter-hook:"
+
+echo $msg_prefix $reason $interface $if_up $ifssid
+
+mtu_wg_blatto(){
+	ip link set wg-blatto mtu $1
+}
+mtu_limit(){
+	if [ "$reason" == CARRIER ]
+	then
+		if [[ $3 -le $2 ]]
+		then
+			$1 $3
+		else
+			$1 $2
+		fi
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		$1 $2
+	fi
+}
+mtu(){
+	mtu_limit mtu_wg_blatto 1432 $(( $1 - 60 ))
+}
+conntrack_hack(){
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix conntrack_hack
+		(echo R | socat unix:/run/conntrack_hack - ) &
+	fi
+}
+route6(){
+	if [ "$reason" == STATIC6 ]
+	then
+		echo $msg_prefix add ip route: $@
+		ip -6 route add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip route: $@
+		ip -6 route del $@
+	fi
+}
+route(){
+	if [ "$reason" == STATIC ]
+	then
+		echo $msg_prefix add ip route: $@
+		ip -4 route add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip route: $@
+		ip -4 route del $@
+	fi
+}

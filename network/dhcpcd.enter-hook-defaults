@@ -1,0 +1,34 @@
+
+if [ "$ifssid" ==  MS-KAM-GUESTS ]
+then
+	conntrack_hack
+	route6 default via 2001:718:1e03:81a::1 dev w metric 3004
+fi
+
+if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
+then
+	conntrack_hack
+	route6 default via 2a01:510:d504:751a::1 dev w metric 3004
+fi
+
+if [ "$ifssid" == samet-5G  ]
+then
+	conntrack_hack
+fi
+
+if [ "$ifssid" == CDWiFi ]
+then
+	mtu 1340
+	if [ "$reason" == BOUND ]
+	then
+		CDWIFI_IFACE=$interface cdwifi-autologin
+	fi
+fi
+if [ "$ifssid" == Onboard-WiFi ]
+then
+	mtu 1340
+fi
+if [ "$ifssid" == OEBB ]
+then
+	mtu 1340
+fi
