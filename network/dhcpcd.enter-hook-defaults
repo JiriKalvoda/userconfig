@@ -8,7 +8,19 @@ fi
 if [ "$ifssid" == blatto-jk-5g ] || [ "$ifssid" == blatto-jk-2g ]
 then
 	conntrack_hack
-	route6 default via 2a01:510:d504:751a::1 dev w metric 3004
+
+	route 10.12.11.0/24 dev $interface metric 300 table 12
+	route default via 10.12.11.1 dev $interface metric 300 table 12
+	route6 2a01:510:d504:751a::0/64 dev $interface metric 300 table 12
+	route6 default via 2a01:510:d504:751a::1 dev $interface metric 300 table 12
+
+	for i in 2 3 4
+	do
+		route default via 10.12.11.$i metric 300 table 12$i
+		route 10.12.11.0/24 dev $interface metric 300 table 12$i
+	done
+
+	route6 default via 2a01:510:d504:751a::1 dev $interface metric 3004
 fi
 
 if [ "$ifssid" == samet-5G  ]
@@ -21,7 +33,7 @@ then
 	mtu 1340
 	if [ "$reason" == BOUND ]
 	then
-		CDWIFI_IFACE=$interface cdwifi-autologin
+		CDWIFI_IFACE=$interface CDWIFI_CURL="direct curl" cdwifi-autologin
 	fi
 fi
 if [ "$ifssid" == Onboard-WiFi ]

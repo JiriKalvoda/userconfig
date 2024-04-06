@@ -12,6 +12,19 @@ ip route add 10.12.0.0/16 via 10.12.11.1 dev $interface metric 1000
 ip route add 2a01:510:d504:7500::0/56 via 2a01:510:d504:751a::1 dev wg-blatto metric 1000
 ip route add default via 10.12.11.1 dev $interface metric 1000
 ip route add default via 2a01:510:d504:751a::1 dev $interface metric 1000
+
+ip route add 10.12.11.0/24 dev $interface metric 100 table 12
+ip route add default via 10.12.11.1 dev $interface metric 100 table 12
+ip -6 route add 2a01:510:d504:751a::0/64 dev $interface metric 100 table 12
+ip -6 route add default via 2a01:510:d504:751a::1 dev $interface metric 100 table 12
+
+for i in 2 3 4
+do
+	ip route add route default via 10.12.11.$i metric 100 table 12$i
+	ip route add route 10.12.11.0/24 dev $interface metric 100 table 12$i
+done
+
+
 (echo domain jk.blatto.eu;  echo nameserver 10.12.11.1 ) | resolvconf -a $interface
 
 systemctl reload net-blatto-daemon

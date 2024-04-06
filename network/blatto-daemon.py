@@ -79,20 +79,6 @@ while True:
                 w = iwc[i["ifname"]]
                 out["essid"] = w["essid"]
             interfaces[i["ifname"]] = out
-    if blatto_wg:
-        try:
-            autorouting = open("/run/wg-blatto/autorouting").read().strip()
-            current_routing = open("/run/wg-blatto/routing").read().strip()
-            wanted_routing = "no" if blatto else autorouting
-            p(f"blatto-wg routing: {current_routing} -> {wanted_routing}")
-            if wanted_routing != current_routing:
-                subprocess.run(["/etc/net/wg-blatto-route", wanted_routing])
-
-            current_routing = open("/run/wg-blatto/routing").read().strip()
-            blatto_wg["routing"] = current_routing
-
-        except FileNotFoundError as e:
-            p(f"blatto-wg routing: {e}")
     send({"blatto-wg": blatto_wg, "blatto": blatto, "interfaces": interfaces}, "2a01:510:d504:751a::1" if blatto else "2a01:510:d504:751b::1")
     p("DONE")
     signal.sigtimedwait([signal.SIGHUP], 10)

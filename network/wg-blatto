@@ -3,7 +3,9 @@ set -euo xtrace -o pipefail
 
 vlan_name=$1
 id=$2
-default_routing=${3:-blatto}
+adopt=false
+
+[ "${3:-no}" == adopt ] && adopt=true
 
 eval "$(ssh root@blatto.eu wg-get-metadata $vlan_name)"
 
@@ -22,14 +24,15 @@ cat psk | ssh root@blatto.eu "wg-register $vlan_name $id $(hostname) $(cat $id.p
 
 mkdir -p /etc/net
 
-cat <<AMEN > /etc/net/wg-blatto
+(
+cat <<AMEN
 #!/bin/sh
 set -o xtrace
 
+do_route_flush=\${1:-false}
+
 ip link del wg-blatto || true
 rm /run/wg-blatto/ || true
-ip route flush table 12
-ip -6 route flush table 12
 
 ip link add dev wg-blatto type wireguard
 ip addr add $v4net.$id/24 dev wg-blatto metric 100
@@ -39,85 +42,62 @@ wg set wg-blatto peer \$(cat /etc/wireguard/blatto/blattes.pub) preshared-key /e
 ip link set mtu 1432 dev wg-blatto
 ip link set wg-blatto up
 
-ip route add throw 10.0.0.0/8 table 12
-ip route add throw 192.168.0.0/16 table 12
-ip route add throw 172.16.0.0/12 table 12
-ip route add $v4net.0/24 dev wg-blatto table 12
-ip rule add not to $blattes_ipv4 ipproto udp dport $port table 12
-ip -6 route add throw fe80::/10 table 12
-ip -6 route add throw fc00::/7 table 12
-ip -6 route add $v6net::/64 dev wg-blatto table 12
-ip -6 rule add table 12
-
-mkdir /run/wg-blatto/
-if [ ${default_routing::5} = auto: ]
-then
-	echo ${default_routing:5} > /run/wg-blatto/autorouting
-	/etc/net/wg-blatto-route no
-else
-	/etc/net/wg-blatto-route $default_routing
-fi
 AMEN
 
-cat <<AMEN > /etc/net/wg-blatto-route
-#!/bin/sh
-set -o xtrace
+for ups in $upstreams
+do
+	ups_id=upstream_${ups}_id
+	ups_id=${!ups_id}
+	echo ip link del wg-blatto2$ups || true
+	echo ip link add wg-blatto2$ups type sit remote $ipv4_prefix.$vlid.$ups_id local any mode any
+	echo ip link set wg-blatto2$ups up
+	echo
+done
 
-blatto=del
-default=del
-adopt_blatto=del
-adopt_default=del
-adopt=del
+cat <<AMEN
 
-if [ \$1 = no ]
-then
-	true
-elif [ \$1 = blatto ]
-then
-	blatto=add
-elif [ \$1 = all ]
-then
-	blatto=add
-	default=add
-elif [ \$1 = adopt_blatto ]
-then
-	blatto=add
-	adopt_blatto=add
-	adopt=add
-elif [ \$1 = adopt_all ]
-then
-	blatto=add
-	default=add
-	adopt_blatto=add
-	adopt_default=add
-	adopt=add
-else
-	echo usage: \$0 no/blatto/all/adopt_blatto/adopt_all
-	exit 1
-fi
+for ipv in 4 6
+do
+	for tind in 12 12{2,3,4} 612 612{2,3,4}
+	do
+		\$do_route_flush && ip -\$ipv route flush table \$tind
+		ip -\$ipv rule add fwmark \$tind table \$tind priority \$tind
+	done
+	ip -\$ipv rule add fwmark 6 table 612 priority 32666
+done
 
+ip route add default via $v4net.1 dev wg-blatto table 12 metric 1100
+ip route add default via $v6net::1 dev wg-blatto table 12 metric 1100
 
-ip route \$blatto $ipv4_prefix.0.0/16 via $v4net.1 dev wg-blatto table 12 metric 100
-ip route \$blatto ${ipv6_prefix}00::0/56 via $v6net::1 dev wg-blatto table 12 metric 100
-ip route \$default default via $v4net.1 dev wg-blatto table 12 metric 100
-ip route \$default default via $v6net::1 dev wg-blatto table 12 metric 100
+ip route add default dev wg-blatto2mn  table 122 metric 1100 src $v4net.$id
+ip route add default dev wg-blatto2awn table 123 metric 1100 src $v4net.$id
+ip route add default dev wg-blatto2mul table 124 metric 1100 src $v4net.$id
 
-ip addr \$adopt $adopt_v4net.$id/32 dev wg-blatto metric 1
-ip addr \$adopt $adopt_v6net::$id/128 dev wg-blatto metric 1
-ip route \$adopt_blatto $ipv4_prefix.0.0/16 dev wg-blatto table 12 metric 1 src $adopt_v4net.$id
-ip route \$adopt_blatto ${ipv6_prefix}00::0/56 dev wg-blatto table 12 metric 1 src $adopt_v6net::$id
-ip route \$adopt_default default dev wg-blatto table 12 metric 1 src $adopt_v4net.$id
-ip route \$adopt_default default dev wg-blatto table 12 metric 1 src $adopt_v6net::$id
+mkdir /run/wg-blatto/
 
-if [ \$adopt = add ]
-then
-	ip addr del $v4net.$id/24 dev wg-blatto metric 100
-	ip addr add $v4net.$id/24 dev wg-blatto metric 100
-fi
-
-echo \$1 > /run/wg-blatto/routing
+echo $adopt > /run/wg-blatto/adopt
 
 systemctl reload net-blatto-daemon
 AMEN
+if $adopt
+then
+cat <<AMEN
+ip addr add $adopt_v4net.$id/32 dev wg-blatto metric 1000
+ip addr add $adopt_v6net::$id/128 dev wg-blatto metric 1000
 
-chmod +x /etc/net/wg-blatto{,-route}
+ip route add default dev wg-blatto table 12 metric 1000 src $adopt_v4net.$id
+ip route add default dev wg-blatto table 12 metric 1000 src $adopt_v6net::$id
+
+ip route add default dev wg-blatto2mn table 122 metric 1000 src $adopt_v4net.$id
+ip route add default dev wg-blatto2awn table 123 metric 1000 src $adopt_v4net.$id
+ip route add default dev wg-blatto2mul table 124 metric 1000 src $adopt_v4net.$id
+
+ip addr del $v4net.$id/24 dev wg-blatto metric 1100
+ip addr add $v4net.$id/24 dev wg-blatto metric 1100
+AMEN
+fi
+) > /etc/net/wg-blatto
+
+rm /etc/net/wg-blatto-route || true
+
+chmod +x /etc/net/wg-blatto
