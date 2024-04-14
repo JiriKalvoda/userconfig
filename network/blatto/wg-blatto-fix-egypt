@@ -1,0 +1,7 @@
+#!/bin/bash
+
+. /etc/net/blatto.config
+
+p=$(( 40000 + $RANDOM % 100))
+(echo "hodnytunel"; sleep 1) | socat - udp:$blatto_public_ipv4:$blatto_wg_port,sourceport=$p;
+wg set wg-blatto listen-port $p private-key /etc/wireguard/blatto/22.key

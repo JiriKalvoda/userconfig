@@ -1,0 +1,8 @@
+blatto_username=jirkalvoda
+blatto_user=jk
+blatto_user_id=1
+blatto_device_id=$fixme
+blatto_wg=true
+blatto_wg_adopt=true
+
+. /etc/net/blatto.config-defaults

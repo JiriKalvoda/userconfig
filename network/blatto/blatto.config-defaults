@@ -1,0 +1,28 @@
+set -u
+true ${blatto_wg:=false}
+true ${blatto_wg_adopt:=false}
+
+true ${blatto_ipv6_prefix:=2a01:510:d504:75}
+true ${blatto_ipv4_prefix:=10.12}
+true ${blatto_public_ipv4:=95.85.217.30}
+
+true ${blatto_vlid:=1$blatto_user_id}
+true ${blatto_wg_vlid:=6$blatto_user_id}
+true ${blatto_wg_port:=120$blatto_wg_vlid}
+true ${blatto_wg_ip:=$blatto_public_ipv4}
+
+true ${blatto_upstreams:=mn awn mul}
+true ${blatto_upstream_mn_id:=2}
+true ${blatto_upstream_awn_id:=3}
+true ${blatto_upstream_mul_id:=4}
+
+true ${blatto_v4net:=$blatto_ipv4_prefix.$blatto_vlid}
+true ${blatto_v6net:=${blatto_ipv6_prefix}${blatto_user_id}a}
+true ${blatto_wg_v4net:=$blatto_ipv4_prefix.$blatto_wg_vlid}
+true ${blatto_wg_v6net:=${blatto_ipv6_prefix}${blatto_user_id}b}
+
+true ${blatto_ipv4:=$blatto_v4net.$blatto_device_id}
+true ${blatto_ipv6:=${blatto_v6net}::${blatto_device_id}}
+true ${blatto_untr_ipv4:=$blatto_ipv4_prefix.7$blatto_user_id.$blatto_device_id}
+true ${blatto_wg_ipv4:=$blatto_wg_v4net.$blatto_device_id}
+true ${blatto_wg_ipv6:=${blatto_wg_v6net}::${blatto_device_id}}

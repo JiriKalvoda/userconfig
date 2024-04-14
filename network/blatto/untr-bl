@@ -1,0 +1,22 @@
+#!/bin/sh
+set -o xtrace
+
+. /etc/net/blatto.config
+
+ifname=untr-bl
+
+ip link add $ifname type sit remote $blatto_ipv4_prefix.70.1 local $blatto_ipv4 mode any
+ip link set $ifname up
+ip a add $blatto_untr_ipv4/32 dev $ifname
+ip route add default dev $ifname dev $ifname-$ups table 612
+
+for ups in $blatto_upstreams
+do
+	ups_id=blatto_upstream_${ups}_id
+	ups_id=${!ups_id}
+
+	ip link add $ifname-$ups type sit remote $blatto_ipv4_prefix.70.$ups_id local $blatto_ipv4 mode any
+	ip link set $ifname-$ups up
+	ip a add $blatto_untr_ipv4/32 dev $ifname-$ups
+	ip route add default dev $ifname-$ups dev $ifname-$ups table 612$ups_id
+done

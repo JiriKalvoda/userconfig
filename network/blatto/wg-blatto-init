@@ -1,0 +1,15 @@
+#!/bin/bash
+set -euo xtrace -o pipefail
+
+. /etc/net/blatto.config
+
+vlan_name=$blatto_user
+id=$blatto_device_id
+
+mkdir -p /etc/wireguard/blatto
+cd /etc/wireguard/blatto/
+[ -f psk ] || (umask 0077 && wg genpsk > psk)
+[ -f $id.key ] || wg genkey | (umask 0077 && tee $id.key) | wg pubkey > $id.pub
+
+ssh root@blatto.eu cat /etc/wireguard/$vlan_name/blattes.pub > blattes.pub
+cat psk | ssh root@blatto.eu "wg-register $vlan_name $id $(hostname) $(cat $id.pub)" < psk
