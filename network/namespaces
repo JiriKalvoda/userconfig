@@ -1,0 +1,34 @@
+#!/bin/sh
+set -o xtrace
+
+
+ipv4_prefix=10.39
+
+add_netns()
+{
+	name=$1
+	ipv4_subnet=$2
+	route_rule=$3
+	ip netns add $name
+	ip link add ve2$name type veth peer name vp2${name}
+	ip link set vp2${name} netns $name
+	ip  addr add $ipv4_prefix.$ipv4_subnet.1/24  dev ve2$name
+	ip route add $ipv4_prefix.$ipv4_subnet.0/24 dev ve2$name table 39
+	ip -n $name addr add $ipv4_prefix.$ipv4_subnet.10/24 dev vp2${name}
+	ip link set ve2$name up
+	ip -n $name link set vp2${name} up
+	ip netns exec $name ip link set dev lo up
+	ip netns exec $name ip route add default via $ipv4_prefix.$ipv4_subnet.1
+	ip-man replace_rule --iif ve2$name --priority_base 100 $route_rule
+}
+
+add_netns 2direct 0 254
+add_netns 2bl-mn 2 122
+add_netns 2bl-awn 3 123
+add_netns 2bl-mul 4 124
+
+add_netns 2untr 6 6
+add_netns 2untr-bl 61 6121
+add_netns 2untr-bl-mn 62  6122
+add_netns 2untr-bl-awn 63 6123
+add_netns 2untr-bl-mul 64 6124

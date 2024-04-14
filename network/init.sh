@@ -44,4 +44,6 @@ confln cdwifi-autologin.service /lib/systemd/system/ cr
 confln blatto-daemon.py /usr/bin/net-blatto-daemon c
 init-service net-blatto-daemon root /usr/bin/net-blatto-daemon "" "ExecReload=/bin/kill -HUP \$MAINPID"
 
+confln namespaces /etc/net/ cr
+
 install_ok
