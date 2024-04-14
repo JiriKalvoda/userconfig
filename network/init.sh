@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 9
+version 10
 need_root
 install_begin
 
@@ -13,6 +13,9 @@ confln dhcpcd-custom@.service /lib/systemd/system/ cr
 confln jk-net.rules /etc/udev/rules.d/ cr
 
 confln iwd.conf /etc/iwd/main.conf c
+
+confln ip-man /usr/bin/ c
+init-service ip-man root "/usr/bin/ip-man server" "" ""
 
 h=$(hostname)
 for i in $h/scripts/*;

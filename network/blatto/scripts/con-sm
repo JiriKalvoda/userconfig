@@ -15,11 +15,11 @@ ip route add default via $blatto_v4net.1 dev $interface metric 1000
 ip route add default via $blatto_v6net::1 dev $interface metric 1000
 
 ip route add $blatto_v4net.0/24 dev $interface metric 100 table 12
-ip route add default via $blatto_v4net.1 dev $interface metric 100 table 12
+ip route add $blatto_wholev4 via $blatto_v4net.1 dev $interface metric 100 table 12
 ip -6 route add $blatto_v6net::0/64 dev $interface metric 100 table 12
-ip -6 route add default via $blatto_v6net::1 dev $interface metric 100 table 12
+ip -6 route add $blatto_wholev6 via $blatto_v6net::1 dev $interface metric 100 table 12
 
-for ups in $blatto_upstreams
+for ups in default $blatto_upstreams
 do
 	ups_id=blatto_upstream_${ups}_id
 	ups_id=${!ups_id}

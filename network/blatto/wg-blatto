@@ -25,16 +25,21 @@ do
 	ip link del wg-blatto2$ups || true
 	ip link add wg-blatto2$ups type sit remote $blatto_wg_v4net.$ups_id local any mode any
 	ip link set wg-blatto2$ups up
-	ip route add $blatto_wg_v4net/24 dev wg-blatto table 12$ups_id metric 1100 src $blatto_wg_ipv4
-	ip route add $blatto_wg_v6net/64 dev wg-blatto table 12$ups_id metric 1100 src $blatto_wg_ipv4
+	ip route add $blatto_wg_v4net.0/24 dev wg-blatto table 12$ups_id metric 1100 src $blatto_wg_ipv4
+	ip route add $blatto_wg_v6net::0/64 dev wg-blatto table 12$ups_id metric 1100 src $blatto_wg_ipv6
 	ip route add default dev wg-blatto2$ups  table 12$ups_id metric 1100 src $blatto_wg_ipv4
 	ip route add default dev wg-blatto2$ups  table 12$ups_id metric 1100 src $blatto_wg_ipv6
 done
 
-ip route add $blatto_wg_v4net/24 dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv4
-ip route add $blatto_wg_v6net/64 dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv4
-ip route add default dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv4
-ip route add default dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv6
+ip route add $blatto_wg_v4net.0/24 dev wg-blatto table 121 metric 1100 src $blatto_wg_ipv4
+ip route add $blatto_wg_v6net::0/64 dev wg-blatto table 121 metric 1100 src $blatto_wg_ipv6
+ip route add default dev wg-blatto table 121 metric 1100 src $blatto_wg_ipv4
+ip route add default dev wg-blatto table 121 metric 1100 src $blatto_wg_ipv6
+
+ip route add $blatto_wg_v4net.0/24 dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv4
+ip route add $blatto_wg_v6net::0/64 dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv6
+ip route add $blatto_wholev4 dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv4
+ip route add $blatto_wholev6 dev wg-blatto table 12 metric 1100 src $blatto_wg_ipv6
 
 mkdir /run/wg-blatto/
 echo $adopt > /run/wg-blatto/adopt
@@ -46,8 +51,11 @@ then
 	ip addr add $blatto_ipv4/32 dev wg-blatto metric 1000
 	ip addr add $blatto_ipv6/128 dev wg-blatto metric 1000
 
-	ip route add default dev wg-blatto table 12 metric 1000 src $blatto_ipv4
-	ip route add default dev wg-blatto table 12 metric 1000 src $blatto_ipv6
+	ip route add $blatto_wholev4 dev wg-blatto table 12 metric 1000 src $blatto_ipv4
+	ip route add $blatto_wholev6 dev wg-blatto table 12 metric 1000 src $blatto_ipv6
+
+	ip route add default dev wg-blatto table 121 metric 1000 src $blatto_ipv4
+	ip route add default dev wg-blatto table 121 metric 1000 src $blatto_ipv6
 
 	for ups in $blatto_upstreams
 	do
@@ -59,5 +67,5 @@ then
 fi
 
 # HACK
-ip addr del $blatto_Wg_ipv4/24 dev wg-blatto metric 1100
-ip addr add $blatto_Wg_ipv4/24 dev wg-blatto metric 1100
+ip addr del $blatto_wg_ipv4/24 dev wg-blatto metric 1100
+ip addr add $blatto_wg_ipv4/24 dev wg-blatto metric 1100

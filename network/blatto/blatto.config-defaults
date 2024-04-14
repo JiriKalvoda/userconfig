@@ -12,6 +12,7 @@ true ${blatto_wg_port:=120$blatto_wg_vlid}
 true ${blatto_wg_ip:=$blatto_public_ipv4}
 
 true ${blatto_upstreams:=mn awn mul}
+true ${blatto_upstream_default_id:=1}
 true ${blatto_upstream_mn_id:=2}
 true ${blatto_upstream_awn_id:=3}
 true ${blatto_upstream_mul_id:=4}
@@ -26,3 +27,6 @@ true ${blatto_ipv6:=${blatto_v6net}::${blatto_device_id}}
 true ${blatto_untr_ipv4:=$blatto_ipv4_prefix.7$blatto_user_id.$blatto_device_id}
 true ${blatto_wg_ipv4:=$blatto_wg_v4net.$blatto_device_id}
 true ${blatto_wg_ipv6:=${blatto_wg_v6net}::${blatto_device_id}}
+
+true ${blatto_wholev4:=$blatto_ipv4_prefix.0.0/16}
+true ${blatto_wholev6:=${blatto_ipv6_prefix}00::0/56}

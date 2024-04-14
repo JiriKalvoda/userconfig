@@ -1,0 +1,433 @@
+#!/bin/python3
+import subprocess
+import sys, os, pathlib
+import argparse
+import time
+import json
+from dataclasses import dataclass
+import functools
+from typing import Optional, Any
+import traceback
+
+########################
+# Global configuration #
+########################
+
+socket_path = '/run/ip-man-socket'
+
+
+force=False
+no_daemon=False
+verbose=1 # daemon is verbose
+
+is_daemon = False
+if __name__ == "__main__":
+    if len(sys.argv)>=2 and sys.argv[1]=="server":
+        is_daemon = True
+
+
+########################
+# Utils                #
+########################
+
+class S():
+    '''
+    Class for nice formated long text area.
+
+    time.Use S-"""
+        Text
+        """
+
+    It will remove all tailing and leading empty lines.
+    Then it will remove as many posiible leading spaces
+    from each lines (from each the same number of spaces).
+    '''
+    def __sub__(_, a):
+        lines = a.split("\n")
+        while len(lines) and lines[0].strip() == "":
+            lines.pop(0)
+        while len(lines) and lines[-1].strip() == "":
+            lines.pop(-1)
+
+        def space_count(s):
+            r = 0
+            while r < len(s) and s[r]==' ':
+                r += 1
+            return r
+
+        to_remove = min(space_count(l) for l in lines if l.strip() != "")
+        return "\n".join("" if len(l) < to_remove else l[to_remove:] for l in lines)
+S=S()
+
+def escape_sh(*arg):
+    return " ".join("'" + s.replace("'", "'\"'\"'") + "'" for s in arg)
+
+def r(*arg, check=None, stdin=None):
+    if check is None:
+        check = not force
+    if verbose: print(">", " ".join(arg))
+    if stdin is None:
+        subprocess.run(arg, check=check)
+    else:
+        subprocess.run(arg, check=check, input=stdin)
+
+def nft(rules):
+    if verbose: print("\n".join("@ "+i for i in rules.split("\n")))
+    subprocess.run(["nft", rules], check=not force)
+
+
+
+def get_spec(f):
+    import inspect
+    if 'spec' not in f.__dict__:
+        f.spec = inspect.getfullargspec(f)
+    return f.spec
+
+def internal_cmd(f):
+    return cmd(f, internal=True)
+def cmd(f, internal=False):
+    if f is None: return f
+    import inspect
+    spec = get_spec(f)
+    (subcommands_internal if internal else subcommands)[f.__name__] = f
+    f.parser = (subparsers_internal if internal else subparsers).add_parser(f.__name__)
+    # print()
+    # print(f)
+    #fprint(spec)
+    def process_arg(name, has_default, default):
+        annotation = spec.annotations.get(name, None)
+        if annotation in [str, int, float]:
+            f.parser.add_argument(
+                ("--" if has_default else "")+arg,
+                type=annotation,
+            )
+        if annotation in [list[str], list[int], list[float]]:
+            f.parser.add_argument(
+                ("--" if has_default else "")+arg,
+                type=annotation.__args__[0],
+                action="append",
+            )
+        if annotation in [bool]:
+            if has_default and default is True:
+                f.parser.add_argument(
+                    "--no_"+arg,
+                    action="store_false",
+                    dest=arg,
+                    default=True,
+                )
+            else:
+                f.parser.add_argument(
+                    "--"+arg,
+                    action="store_true",
+                )
+
+    for i, arg in enumerate(spec.args):
+        has_default = spec.defaults is not None and i >= len(spec.args) - len(spec.defaults)
+        default = None
+        if has_default:
+            default = spec.defaults[i - len(spec.args) + len(spec.defaults)]
+        process_arg(arg, has_default, default)
+
+    for i, arg in enumerate(spec.kwonlyargs):
+        default = spec.kwonlydefaults[arg]
+        process_arg(arg, True, default)
+
+    if spec.varargs is not None:
+        arg = spec.varargs
+        annotation = spec.annotations.get(arg, None)
+        f.parser.add_argument(
+            arg,
+            type=str, nargs=argparse.REMAINDER,
+        )
+
+    return f
+@dataclass
+class Ucred:
+    pid: int
+    uid: int
+    gid: int
+
+def my_ucred():
+    return Ucred(os.getpid(), os.getuid(), os.getgid())
+
+def recvall(sock):
+    BUFF_SIZE = 4096
+    data = bytearray()
+    while True:
+        packet = sock.recv(BUFF_SIZE)
+        if len(packet) == 0:
+            break
+        data.extend(packet)
+    return data
+
+
+daemon_funcs = {}
+
+def ask_server(in_struct):
+    import socket
+    connection = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    for i in range(100):
+        try:
+            connection.connect(socket_path)
+        except ConnectionRefusedError:
+            time.sleep(0.1)
+            continue
+        break
+    else:
+            connection.connect(socket_path)
+
+    if verbose: print("ASK", in_struct)
+    in_data = json.dumps(in_struct).encode('utf-8')
+    connection.sendall(in_data)
+    connection.shutdown(socket.SHUT_WR)
+    out_data = recvall(connection)
+    out_struct = json.loads(out_data)
+    if verbose: print("->", out_struct)
+    return out_struct
+
+def daemon(root_only=False):
+    def ll(f):
+        spec = get_spec(f)
+        assert spec.args[0] == 'ucred'
+        spec = spec._replace(args=spec.args[1:])
+
+        if root_only:
+            @functools.wraps(f)
+            def l(ucred, *arg, **kvarg):
+                assert ucred.uid == 0
+                f(ucred, *arg, **kvarg)
+            l.spec = get_spec(f)
+            daemon_funcs[f.__name__] = l
+        else:
+            daemon_funcs[f.__name__] = f
+
+        if is_daemon:
+            return f
+
+        # TODO validate types
+        if root_only and my_ucred().uid != 0:
+            return None
+        @functools.wraps(f)
+        def l(*arg, **kvarg):
+            if no_daemon:
+                return f(my_ucred(), *arg, **kvarg)
+            r = ask_server({"fname":f.__name__, "arg": arg, "kvarg": kvarg})
+            if "exception" in r:
+                print(r["exception"], file=sys.stderr)
+                exit(1)
+            return r["return"]
+
+        l.spec = spec
+        return l
+    return ll
+
+########################
+# Argparser            #
+########################
+
+parser = argparse.ArgumentParser()
+
+
+subparsers = parser.add_subparsers(help="commands", dest="subcommand")
+subcommands = {}
+
+parser_internal = subparsers.add_parser("internal")
+subparsers_internal = parser_internal.add_subparsers(help="internal_commands", dest="subcommand_internal")
+subcommands_internal = {}
+
+parser.add_argument("-f", "--force", action='store_true')
+parser.add_argument("-s", "--socket", type=str)
+parser.add_argument("-v", "--verbose", action='count')
+parser.add_argument("-D", "--no-daemon", action='store_true')
+
+def run_args(args):
+    import inspect
+    if verbose: print(args)
+    if not args.subcommand:
+        parser.print_help()
+        return
+    if args.subcommand == "internal":
+        if not args.subcommand_internal:
+            parser_internal.print_help()
+            return
+        f = subcommands_internal[args.subcommand_internal]
+    else:
+        f = subcommands[args.subcommand]
+    spec = get_spec(f)
+    f_kvarg = {}
+    f_arg = []
+
+    def process_arg(name, has_default, default):
+        if has_default and args.__dict__[name] is None:
+            return
+        val = args.__dict__[name]
+        annotation = spec.annotations.get(name, None)
+        if has_default:
+            if args.__dict__[name] is not None:
+                f_kvarg[name] = val
+        else:
+            f_arg.append(val)
+
+    for i, arg in enumerate(spec.args):
+        has_default = spec.defaults is not None and i >= len(spec.args) - len(spec.defaults)
+        default = None
+        if has_default:
+            default = spec.defaults[i - len(spec.args) + len(spec.defaults)]
+        process_arg(arg, has_default, default)
+
+    for i, arg in enumerate(spec.kwonlyargs):
+        default = spec.kwonlydefaults[arg]
+        process_arg(arg, True, default)
+
+    if spec.varargs is not None:
+        arg = spec.varargs
+        annotation = spec.annotations.get(arg, None)
+        if annotation == tuple[str, ...]:
+            f_arg += args.__dict__[arg]
+
+    if verbose: print(f_arg, f_kvarg)
+    r = f(*f_arg, **f_kvarg)
+    if r is not None:
+        if isinstance(r, tuple) or isinstance(r, list):
+            for i in r:
+                print(i)
+        else:
+            print(r)
+
+###################
+# LOGIC            #
+###################
+
+def ip(*args, check=True):
+    args = list(args)
+    if args[0] in [6, -6]:
+        args[0] = "-6"
+    if args[0] in [4, -4]:
+        args[0] = "-4"
+    for i, v in enumerate(args):
+        if type(v) == int:
+            args[i] = str(v)
+    print(args)
+    r = subprocess.run(["ip", "-j", *args], stdout=subprocess.PIPE, encoding="utf-8", check=check)
+    return json.loads(r.stdout) if r.stdout else None
+
+def inet(*args, **kvargs):
+    return ip(-4, *args, **kvargs), ip(-6, *args, **kvargs)
+
+@cmd
+@daemon(root_only=True)
+def init(ucred):
+    for p in [10001, 10012, 10038]:
+        inet("rule", "del", "priority", p, check=False)
+    ip("rule", "add", "priority",   10001, "to", "95.85.217.30", "dport", "12061", "goto", 32766)
+    inet("rule", "add", "priority", 10012, "table", 12)
+    inet("rule", "add", "priority", 10038, "table", 38)
+
+def find_empty_priority(base, used, range_size=10):
+    while True:
+        if all(i not in used for i in range(base, base + range_size)):
+            return base
+        base += range_size
+@cmd
+@daemon(root_only=True)
+def replace_rule(ucred, *tables: tuple[str, ...], priority_base: int = 20000,  iif: str = None, blackhole: bool = False, v6: bool = True):
+    before = inet("rule")
+    priority = find_empty_priority(priority_base, {r["priority"] for x in before for r in x })
+    match = []
+    if iif:
+        match += ["iif", iif]
+    assert len(tables)<=8
+    if not v6:
+        ip(-6, "rule","add", "priority", priority+0, *match, "blackhole")
+    for i, table in enumerate(tables):
+        inet("rule", "add", "priority", priority+i+1, *match, "table", table)
+    if blackhole:
+        inet("rule", "add", "priority", priority+9, *match, "blackhole")
+    for ipv, rlist in zip([4,6], before):
+        for r in rlist:
+            if iif:
+                if "iif" in r and iif == r["iif"]:
+                    ip(ipv, "rule", "del", "priority", r["priority"])
+            if not iif:
+                if r["priority"] not in [0, 10001, 10012, 10038, 32766, 32767] and "iif" not in r and "dst" not in r:
+                    ip(ipv, "rule", "del", "priority", r["priority"])
+
+
+
+###################
+# MAIN            #
+###################
+
+def main_daemon():
+    import socket
+    import struct
+    try:
+        os.unlink(socket_path)
+    except OSError:
+        if os.path.exists(socket_path):
+            raise
+    server = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    server.bind(socket_path)
+    os.chmod(socket_path, 0o777)
+
+
+    for arg in sys.argv[2:]:
+        p = subprocess.Popen([sys.argv[0], *arg.split(" ")])
+
+    try:
+        while True:
+            server.listen(1)
+            print('Server is listening for incoming connections...')
+            connection, client_address = server.accept()
+            print('Connection from', str(connection), connection, client_address)
+            _ucred = struct.Struct("=iII")
+            pid, uid, gid = _ucred.unpack(connection.getsockopt(socket.SOL_SOCKET, socket.SO_PEERCRED, _ucred.size))
+            ucred = Ucred(pid, uid, gid)
+
+            in_data = recvall(connection)
+            in_struct = json.loads(in_data)
+            print("IN", in_struct)
+            f = daemon_funcs[in_struct["fname"]]
+            try:
+                res = f(ucred, *in_struct["arg"], **in_struct["kvarg"])
+            except Exception as e:
+                traceback.print_exception(e)
+                out_struct = {'exception': str(type(e))}
+            else:
+                out_struct = {'return': res}
+            print("OUT", out_struct)
+            out_data = json.dumps(out_struct).encode('utf-8')
+            sys.stdout.flush()
+            sys.stderr.flush()
+            try:
+                connection.sendall(out_data)
+            except Exception as e:
+                traceback.print_exception(e)
+            try:
+                connection.close()
+            except Exception as e:
+                traceback.print_exception(e)
+    finally:
+        os.unlink(socket_path)
+    exit(1)
+
+def main():
+    args = parser.parse_args()
+
+    global verbose
+    verbose  = args.verbose
+    global no_daemon
+    no_daemon = args.no_daemon
+    force = args.force
+    if args.socket is not None:
+        socket_path = args.socket
+
+    run_args(args)
+
+
+
+if __name__ == "__main__":
+    if is_daemon:
+        main_daemon()
+    else:
+        main()

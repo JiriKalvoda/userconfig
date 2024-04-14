@@ -8,7 +8,8 @@ ifname=untr-bl
 ip link add $ifname type sit remote $blatto_ipv4_prefix.70.1 local $blatto_ipv4 mode any
 ip link set $ifname up
 ip a add $blatto_untr_ipv4/32 dev $ifname
-ip route add default dev $ifname dev $ifname-$ups table 612
+ip route add default dev $ifname dev $ifname table 6121
+ip route add default dev $ifname dev $ifname table 6
 
 for ups in $blatto_upstreams
 do
