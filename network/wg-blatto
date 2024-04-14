@@ -56,16 +56,6 @@ done
 
 cat <<AMEN
 
-for ipv in 4 6
-do
-	for tind in 12 12{2,3,4} 612 612{2,3,4}
-	do
-		\$do_route_flush && ip -\$ipv route flush table \$tind
-		ip -\$ipv rule add fwmark \$tind table \$tind priority \$tind
-	done
-	ip -\$ipv rule add fwmark 6 table 612 priority 32666
-done
-
 ip route add default via $v4net.1 dev wg-blatto table 12 metric 1100
 ip route add default via $v6net::1 dev wg-blatto table 12 metric 1100
 
