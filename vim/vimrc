@@ -577,7 +577,7 @@ endfunction
 
 function ListCharsDefault()
 	se list
-	set listchars=tab:>-,trail:·,nbsp:~
+	set listchars=tab:>-,trail:_,nbsp:~
 	syntax on
 endfunction
 
