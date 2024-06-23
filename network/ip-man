@@ -172,6 +172,9 @@ def ask_server(in_struct):
         except ConnectionRefusedError:
             time.sleep(0.1)
             continue
+        except FileNotFoundError:
+            time.sleep(0.1)
+            continue
         break
     else:
             connection.connect(socket_path)
