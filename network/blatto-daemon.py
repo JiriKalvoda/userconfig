@@ -61,6 +61,8 @@ while True:
     blatto = False
     blatto_wg = False
     for i in ipa:
+        if i["ifname"].startswith("qemu") or i["ifname"].startswith("ve22"):
+            continue
         if i["operstate"] in ["UP", "UNKNOWN"]:
             out = {
                     "addr": [format_ip(ip) for ip in sort_ips(i["addr_info"])],
