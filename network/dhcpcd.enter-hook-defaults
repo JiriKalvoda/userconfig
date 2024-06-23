@@ -35,7 +35,7 @@ then
 	mtu 1340
 	if [ "$reason" == BOUND ]
 	then
-		CDWIFI_IFACE=$interface CDWIFI_CURL="direct curl" cdwifi-autologin
+		CDWIFI_IFACE=$interface CDWIFI_CURL="ip netns exec 2direct curl"" cdwifi-autologin
 	fi
 fi
 if [ "$ifssid" == Onboard-WiFi ]
