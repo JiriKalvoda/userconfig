@@ -21,3 +21,4 @@ if !empty(expand(glob("~/.config/nvim/plugins_conf.vim")))
 	so ~/.config/nvim/plugins_conf.vim
 endif
 
+colorscheme industry
