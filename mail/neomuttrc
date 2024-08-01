@@ -118,8 +118,9 @@ alternates ^jirikalvoda@kam\.mff\.cuni\.cz$ \
            ^.*@jk\.fnuk\.eu$ \
            ^jk@fnuk\.eu$ \
            ^jk\+.*@fnuk\.eu$ \
-           ^jk--.*@fnuk\.eu$
+           ^jk--.*@fnuk\.eu$ \
+           \
+           ^.*@jk\.blatto\.eu$ \
+           ^jk@blatto\.eu$ \
 
 
-
-send2-hook '~f ^.*@kalvodj\\.nswi106\\.cz$' 'set smtp_url = "smtp://127.0.0.1:1465"'
