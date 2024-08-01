@@ -114,8 +114,9 @@ xkb_symbols "ucw" {
     // This layout is usually used as the second group,
     // it contains accented characters only, no 'latin' set.
     // 2008 by Milan Vancura <mvancura@suse.cz>
+    // 2024 by Jiří Kalvoda <jirikalvoda@ucw.cz>
 
-    name[Group1]= "Czech (UCW layout, accented letters only)";
+    name[Group1]= "Czech (UCW-JK layout, accented letters only)";
 
     key <AB01> { [zcaron,      Zcaron      ] };
     key <AB02> { [ssharp                   ] };
@@ -156,8 +157,8 @@ xkb_symbols "ucw" {
     key <AC10> { [ doublelowquotemark, singlelowquotemark ] };
     // ' => dvojite uvozovky nahore ceske, " => jednoduche uvozovky nahore
     key <AC11> { [ leftdoublequotemark, leftsinglequotemark ] };
-    // to uplne vpravo pred enterem v prostredni rade => zaskrtnuto, nesplneno
-    key <AC12> { [ U2713, U2717 ] }; // CHECK MARK, BALLOT X
+    // to uplne vpravo pred enterem v prostredni rade => paragraf
+    key <AC12> { [ section ] }; // CHECK MARK, BALLOT X
     // space => nedelitelna mezera, shift+space => kratka mezera
     key <SPCE> { [ nobreakspace, thinspace ] };
     // . => trojtecka (vypustka)
@@ -166,26 +167,24 @@ xkb_symbols "ucw" {
     key <AB10> { [ U2022, U25E6 ] }; // BULLET, WHITE BULLET
     // ` => stupen, skoro rovna se
     key <TLDE> { [ U02DA, U2248 ] }; // RING ABOVE, ALMOST EQUAL TO
-    // 1 => znak odstavce, shift+1 => trademark
-    key <AE01> { [ section, trademark ] };
-    // 2 => registrovana znacka, shift+2 => copyright
-    key <AE02> { [ registered, copyright ] };
-    // 3 => PI, Tau
-    key <AE03> { [ Greek_pi, Greek_tau ] };
-    // 4 => euro, section sign
-    key <AE04> { [ EuroSign, U00A7 ] };
+    // 1 => liška
+    key <AE01> { [  U1F98A ] };
+    // 2 =>
+    key <AE02> { [ Greek_pi ] };
+    // 3 => :cat:, pi
+    key <AE03> { [ U1F431, Greek_pi ] };
+    // 4, $ => :cat2:, euro
+    key <AE04> { [ U1F408, EuroSign ] };
     // 5 => lambda, italic lambda
     key <AE05> { [ U03BB, U0001D706 ] }; // GREEK SMALL LETTER LAMDA, MATHEMATICAL ITALIC SMALL LAMDA
-    // 6 => negace
-    key <AE06> { [ U00AC, U2191 ] }; // NOT SIGN
+    // 6 => , tau
+    key <AE06> { [ Greek_tau , Greek_tau ] }; // NOT SIGN
     // 7 => white heart, black heart, heavy black heart
     key <AE07> { [ U2661, U2665, U2764 ] };
-    // 8 => znak nekonecno
-    key <AE08> { [ infinity ] };
-    // 9 => smajl :-), :-P
-    key <AE09> { [ U1F603, U1F60B ] };
-    // 0 => smajl :-(, :-/
-    key <AE10> { [ U1F623, U1F615 ] };
+    // 8+9+0 => medvěd (na tři části)
+    key <AE08> { [ U1F43B ] };
+    key <AE09> { [ U200D ] };
+    key <AE10> { [ U2744 ] };
     // - => kratka pomlcka (ceska "pulctvercikova"), _ => dlouha
     key <AE11> { [ endash, emdash ] };
     // = => nerovna se, + => plus minus
