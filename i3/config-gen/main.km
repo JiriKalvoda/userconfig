@@ -200,7 +200,9 @@ with ADD_MODIFICATOR(SUPER):
 
         M(K_B, cmd_set_xkbmap)
         M(K_H, ROOT_MODE_AND(CMD("root bluetoothctl connect 11:11:22:37:1D:8D")))
-        M(K_H(SHIFT), ROOT_MODE_AND(CMD("terminal -e root bluetoothctl")))
+        M(K_H(SHIFT), ROOT_MODE_AND(CMD("root bluetoothctl connect F4:4E:FC:D0:AB:31")))
+        M(K_H(CTRL), ROOT_MODE_AND(CMD("root bluetoothctl connect 41:42:D5:ED:CE:32")))
+        M(K_H(CTRL|SHIFT), ROOT_MODE_AND(CMD("terminal -e root bluetoothctl")))
         M(K_Y, ROOT_MODE_AND(CMD("amixer")))
 
         M(K_O, CMD("osdc --output=display -- \"$(wifi on)\""))
