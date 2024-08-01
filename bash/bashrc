@@ -667,3 +667,6 @@ ranger-cd() {
 	rm -f $F
 }
 
+sss(){
+	ssh-keyscan localhost | ssh-keygen -l -f - | grep "$1"
+}
