@@ -285,6 +285,13 @@ with ADD_MODIFICATOR(SUPER):
     # VM
     M(K_N, CMD("vm terminal_ssh []"))
     M(K_F(SHIFT), CMD("vm resize_wayland []"))
+    M(K_P(SHIFT), CMD("vm pause []"))
+    M(K_P(CTRL), CMD("vm continue []"))
+
+    # JR
+    I3_DIRECT("""
+    for_window [title="PID realtime "] floating enable
+    """)
 
 
 if "sway" in ARGS and "vncserver" in ARGS:
