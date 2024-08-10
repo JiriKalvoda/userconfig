@@ -1,0 +1,3 @@
+
+- partprobe
+- kpartx -d
