@@ -670,3 +670,8 @@ ranger-cd() {
 sss(){
 	ssh-keyscan localhost | ssh-keygen -l -f - | grep "$1"
 }
+
+if [[ "$SSH_CONNECTION" != "" ]]
+then
+	echo ssh connection: "$SSH_CONNECTION"
+fi
