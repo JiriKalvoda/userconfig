@@ -178,13 +178,15 @@ install_config_load(){
 		echo -e "${Red}No install config, creating${None}"
 		(
 			echo "ic_version=0"
-			echo "ic_name=$USER@$(hostname)"
+			echo "ic_name=$([[ "$(pwd)" == /etc/* ]] &&  echo SYS || echo "$USER")@$(hostname)"
 			echo "ic_push='ssh jirikalvoda@ucw.cz'"
 			echo "ic_pull='movingssh -xd $USER@$(hostname)'"
 			echo "ic_userconfig_path='$(cd $USERCONFIG_ROOT ; pwd)'"
+			echo "ic_sysconfig='$([[ "$(pwd)" == /etc/* ]] &&  echo true || echo false)'"
 		) > $install_config_path
 		vim $install_config_path || exit 1
 	fi
+	ic_sysconfig=false
 	. $install_config_path
 }
 
@@ -194,8 +196,17 @@ reln(){
 }
 
 install_begin(){
+	is_sysconfig=${is_sysconfig:-false}
 	default_version
 	install_config_load
+	if $ic_sysconfig && ! $is_sysconfig
+	then
+		err "This script should be called only from userconfig"
+	fi
+	if ! $ic_sysconfig && $is_sysconfig
+	then
+		err "This script should be called only from sysconfig"
+	fi
 	if [[ "$install_name" ==  "" ]]
 	then
 		install_name=$(pwd)/$(basename $0)
