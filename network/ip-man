@@ -354,7 +354,7 @@ def replace_rule(ucred, *tables: tuple[str, ...], priority_base: int = 20000,  i
                 if "iif" in r and iif == r["iif"]:
                     ip(ipv, "rule", "del", "priority", r["priority"])
             if not iif:
-                if r["priority"] not in [0, 10001, 10012, 10038, 10039, 32766, 32767] and "iif" not in r and "dst" not in r:
+                if r["priority"] not in [0, 10001, 10012, 10038, 10039, 10254, 32766, 32767] and "iif" not in r and "dst" not in r:
                     ip(ipv, "rule", "del", "priority", r["priority"])
 
 
