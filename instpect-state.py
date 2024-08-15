@@ -32,6 +32,12 @@ def current_version(name):
     p = subprocess.run([name_to_path(name), "-v"], encoding="utf-8", check=True, stdout=subprocess.PIPE)
     return p.stdout.strip()
 
+@functools.cache
+def is_sysconfig(name):
+    if name_to_path(name) is None: return None
+    p = subprocess.run([name_to_path(name), "-t"], encoding="utf-8", check=True, stdout=subprocess.PIPE)
+    return p.stdout.strip() == 'sysconfig'
+
 def read(path):
     try:
         with open(path) as f:
@@ -99,6 +105,8 @@ def load_state_dir(state_dir=pathlib.Path("state")):
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--server', '-s', action='store_true')
+parser.add_argument('--filter-devices', '-f')
+parser.add_argument('--filter-scripts', '-F')
 
 args = parser.parse_args()
 
@@ -106,18 +114,26 @@ args = parser.parse_args()
 if args.server:
     devices = []
     p = pathlib.Path("../userconfig_state")
+    if args.filter_devices:
+        filter_devices = eval("lambda u, m: "+args.filter_devices)
+    else:
+        filter_devices = None
     for i in p.iterdir():
         device = i.name
-        #print(device)
-        devices.append((device, load_state_dir(i/"state")))
+        if not filter_devices or filter_devices(*device.split("@")):
+            devices.append((device, load_state_dir(i/"state")))
     devices.sort(key=lambda x: list(reversed(x[0].split("@"))))
     all_names = set()
     for name, i in devices:
         for j in i:
-            all_names.add(j)
+            if i[j].last():
+                all_names.add(j)
+    if args.filter_scripts:
+        f = eval("lambda x: "+args.filter_scripts)
+        all_names = {x for x in all_names if f(x)}
     all_names = list(all_names)
     all_names.sort()
-    table = [[name, current_version(name)] + [i[name].short() if name in i else "." for  dev_name, i in devices] for name in all_names]
+    table = [[name, current_version(name)] + [i[name].short() if name in i and i[name].last() else "." for  dev_name, i in devices] for name in all_names]
     head_mach = ["", "v"]
     head_user = ["", "" ]
     for name, i in devices:

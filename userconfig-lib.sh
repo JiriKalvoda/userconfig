@@ -273,3 +273,18 @@ then
 		exit 0
 	}
 fi
+if [[ $1 == -t ]]
+then
+	install_begin(){
+		if ${is_sysconfig:-false}
+		then
+			echo sysconfig
+		else
+			echo userconfig
+		fi
+		exit 0
+	}
+	need_root(){
+		true
+	}
+fi
