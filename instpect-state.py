@@ -59,7 +59,10 @@ class Installation:
 
     @functools.cache
     def last(self):
-        l = (self.dir/"last").readlink()
+        try:
+            l = (self.dir/"last").readlink()
+        except FileNotFoundError:
+            return None
         return Log(self.state_dir, self.name, l)
 
     @functools.cache
@@ -125,5 +128,5 @@ if args.server:
     print(tabulate.tabulate(head+table))
 else:
     local = load_state_dir()
-    table = [[name, name_to_path(name), local[name].last().args, current_version(name), local[name].last_ok().version,  local[name].short(), local[name].last().date] for name in sorted(local)]
+    table = [[name, name_to_path(name), local[name].last().args, current_version(name), local[name].last_ok().version,  local[name].short(), local[name].last().date] for name in sorted(local) if local[name].last()]
     print(tabulate.tabulate([["Name", "Path","args", "cv", "iv", "state", "date"], tabulate.SEPARATING_LINE]+table))
