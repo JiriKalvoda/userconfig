@@ -195,6 +195,19 @@ reln(){
 	ln -sr $1 $2 || err reln faild
 }
 
+clean_userinstall(){
+	if [[ -e ~/userconfig/state/$install_name/last ]]
+	then
+		echo -e "${Blue}Removing userconfig installation${None}"
+		rm ~/userconfig/state/$install_name/last
+		rm ~/userconfig/state/$install_name/last_ok
+		bash <<AMEN
+			cd ~/userconfig
+			. userconfig-lib.sh
+			install_try_push
+AMEN
+	fi
+}
 install_begin(){
 	is_sysconfig=${is_sysconfig:-false}
 	default_version

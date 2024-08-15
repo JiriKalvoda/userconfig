@@ -2,10 +2,11 @@
 cd "$(dirname "$0")"
 . ../../userconfig-lib.sh
 version 0
-need_root
+is_sysconfig=true
 install_begin
+clean_userinstall
 
-confln blatto.config-defaults /etc/net/ cr
+confln blatto.config-defaults /etc/net/ r
 
 if ! [[ -f /etc/net/blatto.config ]]
 then
@@ -34,12 +35,12 @@ done
 if $(bash -c '. /etc/net/blatto.config; echo $blatto_wg')
 then
 	r ./wg-blatto-init
-	confln wg-blatto /etc/net/ cr
-	confln wg-blatto-fix-egypt /etc/net/ cr
+	confln wg-blatto /etc/net/ r
+	confln wg-blatto-fix-egypt /etc/net/ r
 fi
 
-confln untr-bl /etc/net/ cr
+confln untr-bl /etc/net/ r
 
-confln scripts/con-sm /etc/net/ cr
+confln scripts/con-sm /etc/net/ r
 
 install_ok
