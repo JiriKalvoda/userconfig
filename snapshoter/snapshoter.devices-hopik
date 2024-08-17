@@ -11,3 +11,49 @@ case "$device" in
 esac
 
 fi
+
+if [[ "$TARGET" == rpi0 ]]
+then
+
+snapdrive=/dev/disk/by-uuid/319df3ef-4495-41b4-9635-968f2d374fcc
+autosnapdrive=/dev/disk/by-uuid/2285d44c-d0dd-4de7-afbd-e1bc001dacaf
+case "$device" in
+  test)
+		from=/tmp/testsnap
+    ;;
+  rpi[0-7])
+	    exclude_aux=true
+		fromdir=/
+  		ms root@$device
+	  ;;
+  arch | external | arzen)
+		fromdir=/
+  		ms root@$device
+    ;;
+  hopik)
+		from=/
+	;;
+  phone)
+		fromdir="'/data/data/com.termux/'"
+		exclude_mnt=false
+		exclude_aux=false
+		exclude_fs=false
+		exclude_mountdir=false
+		excludedir_homes="'/files/home'"
+		ms root@$device
+    ;;
+	hluk)
+		exclude_aux=false
+		fromdir=/
+		ms root@$device
+	;;
+	blattes)
+		fromdir=/
+		ssh root@$device.blatto.eu
+	;;
+	jug9-stratosphere)
+		fromdir=/
+		ssh root@jug9-stratosphere
+esac
+
+fi
