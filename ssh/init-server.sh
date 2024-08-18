@@ -5,6 +5,6 @@ version 0
 is_sysconfig=true
 install_begin
 
-confln sshd_config /etc/ssh
+confln sshd_config /etc/ssh/
 
 install_ok
