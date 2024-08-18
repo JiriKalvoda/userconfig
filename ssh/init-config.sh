@@ -2,6 +2,7 @@
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
 
+version 1
 install_begin
 
 . $USERCONFIG_ROOT/blach/import_blach.sh
