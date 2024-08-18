@@ -299,7 +299,8 @@ sysp(){
 
 ######################### movingssh
 ms(){
-	movingssh "$@"
+	echo movingssh is depricated
+	return 1
 }
 complete -F _movingssh ms
 
