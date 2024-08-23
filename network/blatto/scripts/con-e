@@ -1,0 +1,34 @@
+#!/bin/sh
+set -o xtrace
+
+. /etc/net/blatto.config
+
+interface=e
+
+echo R | socat unix:/run/conntrack_hack -
+ip link set $interface up
+ip addres add $blatto_ipv4/24 dev $interface
+ip addres add $blatto_ipv6/64 dev $interface
+ip route add $blatto_ipv4_prefix.0.0/16 via $blatto_v4net.1 dev $interface metric 1000
+ip route add ${blatto_ipv6_prefix}00::0/56 via $blatto_v6net::1 dev wg-blatto metric 1000
+ip route add default via $blatto_v4net.1 dev $interface metric 1000
+ip route add default via $blatto_v6net::1 dev $interface metric 1000
+
+ip route add $blatto_v4net.0/24 dev $interface metric 100 table 12
+ip route add $blatto_wholev4 via $blatto_v4net.1 dev $interface metric 100 table 12
+ip -6 route add $blatto_v6net::0/64 dev $interface metric 100 table 12
+ip -6 route add $blatto_wholev6 via $blatto_v6net::1 dev $interface metric 100 table 12
+
+for ups in default $blatto_upstreams
+do
+	ups_id=blatto_upstream_${ups}_id
+	ups_id=${!ups_id}
+	ip route add $blatto_v4net.0/24 dev $interface metric 100 table 12$ups_id
+	ip route add default via $blatto_v4net.$ups_id dev $interface metric 100 table 12$ups_id
+	ip -6 route add $blatto_v6net::0/64 dev $interface metric 100 table 12$ups_id
+	ip -6 route add default via $blatto_v6net::$ups_id dev $interface metric 100 table 12$ups_id
+done
+
+(echo domain jk.blatto.eu;  echo nameserver 10.12.11.1 ) | resolvconf -a $interface
+
+systemctl reload net-blatto-daemon
