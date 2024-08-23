@@ -14,9 +14,10 @@ catuniq()
 		do
 			num=999
 			name="$( echo "$line" | cut -d' ' -f4)"
+			date="$( echo "$line" | cut -d' ' -f6)"
 			user="$( echo "$name" | cut -d'@' -f1)"
 			host="$( echo "$name" | cut -d'@' -f2)"
-			echo $user $host $num >/dev/stderr
+			echo $user $host $num $date >/dev/stderr
 			[[ $host == arch ]] && num=001
 			[[ $host == arzen ]] && num=002
 			[[ $host == hopik ]] && num=003
@@ -29,8 +30,11 @@ catuniq()
 			[[ $host == "kam" ]] && num=601
 			[[ $host == "gimli" ]] && num=602
 			[[ $host == "ucw" ]] && num=611
-			echo -n $num ""
-			echo "$line"
+			if [[ $date > 2024-08-01 ]]
+			then
+				echo -n $num ""
+				echo "$line"
+			fi
 		done
 	)| sort | cut -d' ' -f2-
 }
