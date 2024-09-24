@@ -46,3 +46,7 @@ if [ "$ifssid" == OEBB ]
 then
 	mtu 1340
 fi
+if [ "$ifssid" == JMK_WiFi ]
+then
+	mtu 1340
+fi
