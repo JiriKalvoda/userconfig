@@ -84,7 +84,7 @@ $lineWantedBy
 EOF
 
 
-systemctl $systemctlUserArg disable $name
+# systemctl $systemctlUserArg disable $name
 
 
 if $installToUser

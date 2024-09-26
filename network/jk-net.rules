@@ -16,6 +16,10 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="40:1a:58:9d:75:d
 # opler monitor
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="b0:4f:13:d2:2d:4b",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="opler"
 
+# selen
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="a8:1e:84:b9:67:be",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="e"
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="22:c9:d3:45:3a:3c",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="w"
+
 # samsung-monitor: configuration and wifi on/off
 ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start net-config@con-sm"
 ACTION=="add", SUBSYSTEM=="net",    ENV{ID_NET_NAME_MAC}=="enx5444a32b41e2", RUN+="/usr/bin/systemctl start set-wifi-and-flush-neigh@off"

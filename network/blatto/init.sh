@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../../userconfig-lib.sh
-version 0
+version 1
 is_sysconfig=true
 install_begin
 clean_userinstall
@@ -42,5 +42,6 @@ fi
 confln untr-bl /etc/net/ r
 
 confln scripts/con-sm /etc/net/ r
+confln scripts/con-e /etc/net/ r
 
 install_ok

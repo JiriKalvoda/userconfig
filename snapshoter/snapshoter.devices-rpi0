@@ -12,11 +12,11 @@ case "$device" in
   rpi[1-7])
 	    exclude_aux=true
 		fromdir=/
-  		ms root@$device
+  		ssh root@$device
 	  ;;
   arch | external | arzen | hopik)
 		fromdir=/
-  		ms root@$device
+  		ssh root@$device--l-w
     ;;
   phone)
 		fromdir="'/data/data/com.termux/'"
@@ -25,18 +25,15 @@ case "$device" in
 		exclude_fs=false
 		exclude_mountdir=false
 		excludedir_homes="'/files/home'"
-		ms root@$device
+		ssh root@$device
     ;;
 	hluk)
 		exclude_aux=false
 		fromdir=/
-		ms root@$device
+		ssh root@$device
 	;;
 	blattes)
 		fromdir=/
-		ssh root@$device.blatto.eu
+		ssh root@$device
 	;;
-	jug9-stratosphere)
-		fromdir=/
-		ssh root@jug9-stratosphere
 esac
