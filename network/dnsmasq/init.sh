@@ -6,8 +6,8 @@ is_sysconfig=true
 install_begin
 
 
-#confln resolv.conf /etc/ c
-#confln resolvconf.conf /etc/ cr
+confln resolv.conf /etc/
+confln resolvconf.conf /etc/
 confln dns.conf /etc/dnsmasq/
 confln dns-in-2direct.conf /etc/dnsmasq/
 confln dns-dnssec-in-2direct.conf /etc/dnsmasq/
