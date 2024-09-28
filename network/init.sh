@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 12
+version 13
 is_sysconfig=true
 install_begin
 clean_userinstall
@@ -27,12 +27,20 @@ do
 	fi
 done
 
-[ -f $h/dhcpcd.conf ] && confln $h/dhcpcd.conf /etc/ cr
+if [ -f $h/dhcpcd.conf ]
+then
+	confln $h/dhcpcd.conf /etc/
+else
+	confln dhcpcd.conf /etc/
+fi
+
+confln dhcpcd.enter-hook-defaults /etc/ r
+confln dhcpcd.enter-hook-defs /etc/ r
 if [ -f $h/dhcpcd.enter-hook ]
 then
-	confln dhcpcd.enter-hook-defaults /etc/ r
-	confln dhcpcd.enter-hook-defs /etc/ r
 	confln $h/dhcpcd.enter-hook /etc/ r
+else
+	confln dhcpcd.enter-hook /etc/ r
 fi
 
 r udevadm control --reload-rules

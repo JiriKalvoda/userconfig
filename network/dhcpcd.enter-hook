@@ -1,0 +1,20 @@
+#!/bin/sh
+
+. /etc/dhcpcd.enter-hook-defs
+
+if [ "$interface" = w ]
+then
+	. /etc/dhcpcd.enter-hook-defaults
+
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix sleep start
+		sleep 0.5
+		echo $msg_prefix sleep end
+	fi
+fi
+
+if [ "$reason" = BOUND ] || [ "$reason" = NOCARRIER ]
+then
+	systemctl reload net-blatto-daemon
+fi

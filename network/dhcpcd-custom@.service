@@ -6,7 +6,7 @@ Before=network.target
 [Service]
 Type=exec
 PIDFile=/run/dhcpcd/%I.pid
-ExecStart=/usr/bin/dhcpcd -B %I
+ExecStart=dhcpcd -B %I
 Restart=always
 RestartSec=2
 
