@@ -169,8 +169,8 @@ xkb_symbols "ucw" {
     key <TLDE> { [ U02DA, U2248 ] }; // RING ABOVE, ALMOST EQUAL TO
     // 1 => liška
     key <AE01> { [  U1F98A ] };
-    // 2 =>
-    key <AE02> { [ Greek_pi ] };
+    // 2 => Bell
+    key <AE02> { [ U1F514 ] };
     // 3 => :cat:, pi
     key <AE03> { [ U1F431, Greek_pi ] };
     // 4, $ => :cat2:, euro
