@@ -50,4 +50,4 @@ if args.subparser == 'i3status':
 if args.subparser == 'log':
     print(args.job)
     with open(filename, 'a') as f:
-        f.write(f"{datetime.datetime.now().isoformat()}\t{args.job}\t\n")
+        f.write(f"{datetime.datetime.now().astimezone().isoformat()}\t{args.job}\t\n")
