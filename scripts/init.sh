@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 1
+version 2
 install_begin
 
 confln mw2md.sh ~/bin/mw2md
@@ -12,5 +12,6 @@ confln pub ~/bin/
 confln vzt.sh ~/bin/vzt
 
 confln sfs.py ~/bin/ E
+confln unicode-normalize.py ~/bin/ E
 
 install_ok
