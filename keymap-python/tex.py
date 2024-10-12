@@ -99,6 +99,9 @@ def x(self):
 @action_implement("EXIT_PROG")
 def f(self):
     return g["CONFIRM_CMD"]("i3-msg exit", "Do you really want to EXIT i3?")
+@action_serialize("SHOW_STATUSBAR")
+def f(self):
+    return p(*COLOR_EDIT_WM, f"Show statusbar")
 
 #@action_serialize("POWEROFF")
 def x(self):
