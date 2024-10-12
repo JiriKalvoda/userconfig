@@ -271,11 +271,11 @@ with ADD_MODIFICATOR(SUPER):
     M(K_V(SHIFT), release_action=CMD('xdotool keyup super shift ctrl alt; xdotool type --clearmodifiers "$(date +%Y-%m-%d)"'))
 
     if not is_vm:
-        with M(K_T(SHIFT), GO_MODE(STD_MODE("TABLE-jug9/1"))).action.mode:
-            table_all_keys("jug9", "1")
+        #with M(K_T(SHIFT), GO_MODE(STD_MODE("TABLE-jug9/1"))).action.mode:
+            #table_all_keys("jug9", "1")
             
-        with M(K_B, GO_MODE(STD_MODE("LED-jug9/1"))).action.mode:
-            LOAD("led-jug9-1.km")
+        with M(K_B, GO_MODE(STD_MODE("LED-blatto/1"))).action.mode:
+            LOAD("led-blatto-1.km")
 
     #Better xdg-open
     I3_DIRECT("""
