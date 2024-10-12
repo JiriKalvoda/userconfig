@@ -39,3 +39,4 @@ nvram set dhcp_staticlist="\
 # 4{0..5} - LAPTOP-S52DC5T
 # 4{8,9} - AL phone
 
+# 99 - TP link AP/switch
