@@ -2,8 +2,13 @@
 set -euo pipefail
 
 tmp=$(mktemp --suffix=pdf)
+echo "$tmp"
 pages=`qpdf --show-npages  "$1" || true`;
-if [ $pages -eq 2 ]; then
+if [ $pages -eq 1 ]; then
+		echo -e " ** [PsPdfTool]\tBuilding booklet (from $pages pages) as landscape split document"
+	paperjam 'select{1, 1} rotate(90) nup(2,1, paper=a4) rotate(-90)' "$1" "$tmp"
+	lp -o Duplex=DuplexTumble -o XROutputMode=HighResolution "$tmp" "${@:2}"
+elif [ $pages -eq 2 ]; then
 		echo -e " ** [PsPdfTool]\tBuilding booklet (from $pages pages) as landscape split document"
 	paperjam 'select{1, 2: rotate(180), 1: rotate(180), 2} rotate(90) nup(2,1, paper=a4) rotate(-90)' "$1" "$tmp"
 	lp -o Duplex=DuplexTumble -o XROutputMode=HighResolution "$tmp" "${@:2}"
