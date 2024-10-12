@@ -33,4 +33,8 @@ else:
     subprocess.run(["sshfs", *follow_symlinks_args, "-C", param+":/", mountpoint], check=True)
 
     remote_home = subprocess.run(["ssh", param, "pwd"], stdout=subprocess.PIPE).stdout.decode().strip()
+    try:
+        os.remove(mountpoint+"~")
+    except FileNotFoundError:
+        pass
     subprocess.run(["ln", "-sr", mountpoint+remote_home, mountpoint+"~"])
