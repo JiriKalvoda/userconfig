@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 1
+version 2
 is_sysconfig=true
 install_begin
 clean_userinstall

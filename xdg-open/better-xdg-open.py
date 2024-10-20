@@ -208,6 +208,13 @@ def copy(arg, do_exit=True):
         exit(p.returncode)
     return p
 
+def copy_content(arg, do_exit=True):
+    with open(arg, "rb") as f:
+        p = subprocess.run(["xclip", "-i", "-selection", "clipboard"], stdin=f)
+    if do_exit:
+        exit(p.returncode)
+    return p
+
 def back_default():
     m_win._app_list.setCurrentItem(None)
 
@@ -226,7 +233,7 @@ class BetterLabel(QLabel):
     def mousePressEvent(self, event):
         global copyed_label
         copy(self.text(), do_exit=False)
-        if copyed_label:
+        if copy_label:
             copyed_label.setStyleSheet("color: #000000")
         self.setStyleSheet("color: #990000")
         copyed_label = self
@@ -267,6 +274,7 @@ class MainWindow(QWidget):
 
         
         self._lay.addWidget(self.new_button('_copy', "&copy"))
+        self._lay.addWidget(self.new_button('_copy_content', "&Copy content"))
         self._lay.addWidget(self.new_button('_vim', "&edit with vim"))
         self._lay.addWidget(self.new_button('_bash', "&bash"))
         
@@ -336,6 +344,10 @@ class MainWindow(QWidget):
     @pyqtSlot(bool)
     def _copy_clicked(self, x):
         copy(absolute_file or arg)
+
+    @pyqtSlot(bool)
+    def _copy_content_clicked(self, x):
+        copy_content(absolute_file or arg)
 
     @pyqtSlot(bool)
     def _vim_clicked(self, x):
@@ -415,7 +427,10 @@ class MainWindow(QWidget):
         if key == ord("B"):
             open_bash()
         if key == ord("C"):
-            copy(arg)
+            if mod == SHIFT:
+                copy_content(arg)
+            else:
+                copy(arg)
         if key == TAB:
             open_browser()
         if key == ord("W"):
