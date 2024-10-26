@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 from main import *
 
+g["TARGET"] = "cpp"
+
 def str_expand(cmd):
     s = cmd.replace('"', '\\"')
     return f'"{s}"'
