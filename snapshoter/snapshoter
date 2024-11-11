@@ -40,6 +40,7 @@ usingSSH=false
 
 exclude_mnt=true
 exclude_aux=true
+exclude_arch_cache=true
 exclude_key=true
 exclude_fs=true
 exclude_cache=true
@@ -195,6 +196,10 @@ $exclude_fs && echo >> "$excludefile" "/tmp"
 $exclude_fs && echo >> "$excludefile" "/snap"
 $exclude_mnt && echo >> "$excludefile" "/mnt"
 $exclude_aux &&  echo >> "$excludefile" "/aux"
+$exclude_arch_cache &&  echo >> "$excludefile" "/var/cache/pacman/pkg"
+$exclude_arch_cache &&  echo >> "$excludefile" "/var/cache/aur/.cache"
+$exclude_arch_cache &&  echo >> "$excludefile" "/var/cache/aur/.gradle"
+$exclude_arch_cache &&  echo >> "$excludefile" "/var/cache/aur/.cargo"
 for h_it in $excludedir_homes
 do
 	h="${h_it:1:-1}"
