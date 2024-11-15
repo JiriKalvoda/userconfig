@@ -2,7 +2,7 @@
 
 import subprocess
 import argparse
-import os
+import sys, os
 from pathlib import Path
 
 parser = argparse.ArgumentParser()
@@ -28,9 +28,18 @@ else:
     except FileNotFoundError:
         pass
 
+    server_mountpoint = "/"
+
+    try:
+        import blachlib.core
+        namespace, m, rest = blachlib.core.find_by_name(param)
+        server_mountpoint = m.sshfs_mountpoint
+    except Exception as e:
+        print(f"Loading blach configuration faield: {e}", file=sys.stderr)
+
     os.mkdir(mountpoint)
     follow_symlinks_args = ["-o", "follow_symlinks"]
-    subprocess.run(["sshfs", *follow_symlinks_args, "-C", param+":/", mountpoint], check=True)
+    subprocess.run(["sshfs", *follow_symlinks_args, "-C", param+":"+server_mountpoint, mountpoint], check=True)
 
     remote_home = subprocess.run(["ssh", param, "pwd"], stdout=subprocess.PIPE).stdout.decode().strip()
     try:
