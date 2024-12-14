@@ -1,0 +1,21 @@
+server {
+	listen       80 default_server;
+	listen       [::]:80 default_server;
+
+	include /etc/nginx/default_host;
+}
+
+server {
+	listen       443 default_server ssl;
+	listen       [::]:443 default_server ssl;
+
+	ssl_certificate     /etc/tls-certs/blatto/live/chain.pem;
+	ssl_certificate_key /etc/tls-certs/blatto/live/domain.key;
+
+	#ssl_client_certificate /etc/nginx/blattes_client.crt;
+	#ssl_verify_client on;
+
+
+	include /etc/nginx/default_host;
+
+}

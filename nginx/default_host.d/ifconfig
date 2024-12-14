@@ -1,0 +1,3 @@
+location = /ifconfig {
+        include /etc/nginx/snippets/ifconfig.conf;
+}
