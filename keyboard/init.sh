@@ -8,6 +8,6 @@ clean_userinstall
 
 confln cz /usr/share/X11/xkb/symbols/cz c
 
-confln keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf
+confln keyboard.conf /etc/X11/xorg.conf.d/00-keyboard.conf d
 
 install_ok
