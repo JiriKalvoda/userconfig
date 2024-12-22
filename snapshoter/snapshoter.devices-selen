@@ -1,0 +1,34 @@
+#!/bin/bash
+snapdrive=/dev/Terraria/x-snapshot
+case "$device" in
+  rpi[0-7])
+	    exclude_aux=true
+		fromdir=/
+  		ssh root@$device
+	  ;;
+  arch | external | arzen | hopik)
+		fromdir=/
+  		ssh root@$device
+    ;;
+  phone)
+		fromdir="'/data/data/com.termux/'"
+		exclude_mnt=false
+		exclude_aux=false
+		exclude_fs=false
+		exclude_mountdir=false
+		excludedir_homes="'/files/home'"
+		ms root@$device
+    ;;
+	hluk)
+		exclude_aux=false
+		fromdir=/
+		ms root@$device
+	;;
+	blattes)
+		fromdir=/
+		ssh root@$device.blatto.eu
+	;;
+	jug9-stratosphere)
+		fromdir=/
+		ssh root@jug9-stratosphere
+esac
