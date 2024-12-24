@@ -10,7 +10,11 @@ install_begin
 tmpf=$(mktemp)
 r -b "$blach/nftables/gen_jk_clients.py > $tmpf"
 confln $tmpf /etc/nftables.conf c
-r nft -f /etc/nftables.conf
 rm $tmpf
+r nft -f /etc/nftables.conf
+r systemctl enable nftables
+
+confln sysctl.conf /etc/sysctl.d/10-net.conf r
+
 
 install_ok
