@@ -101,6 +101,8 @@ M(K_PlayPause3, CMD("playerctl play-pause"))
 M(K_Next, CMD("playerctl play-pause"))
 
 with ADD_MODIFICATOR(SUPER):
+    M(K_Y, CMD("/aux/jiri/samet-camera/link vkds2024"))
+    M(K_Y(SHIFT), CMD("/aux/jiri/samet-camera/link vkds2024 u"))
 
     ################ Standard workspaces ################
     for i in range(13):
@@ -276,6 +278,8 @@ with ADD_MODIFICATOR(SUPER):
             
         with M(K_B, GO_MODE(STD_MODE("LED-blatto/1"))).action.mode:
             LOAD("led-blatto-1.km")
+        with M(K_B(SHIFT), GO_MODE(STD_MODE("LED-blatto/sp"))).action.mode:
+            LOAD("led-blatto-sp.km")
 
     #Better xdg-open
     I3_DIRECT("""
