@@ -10,7 +10,7 @@ ip link set $interface up
 ip addres add $blatto_ipv4/24 dev $interface
 ip addres add $blatto_ipv6/64 dev $interface
 ip route add $blatto_ipv4_prefix.0.0/16 via $blatto_v4net.1 dev $interface metric 1000
-ip route add ${blatto_ipv6_prefix}00::0/56 via $blatto_v6net::1 dev wg-blatto metric 1000
+ip route add ${blatto_ipv6_prefix}00::0/56 via $blatto_v6net::1 dev $interface metric 1000
 ip route add default via $blatto_v4net.1 dev $interface metric 1000
 ip route add default via $blatto_v6net::1 dev $interface metric 1000
 
