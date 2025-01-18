@@ -16,12 +16,15 @@ dirname = param.split('--')[0]
 mountpoint = os.environ['HOME']+"/m/"+dirname
 
 if args.umount:
+    rcode = 0
     if Path(mountpoint).exists():
-        subprocess.run(["umount", mountpoint], check=True)
+        p = subprocess.run(["umount", mountpoint], check=False)
         os.rmdir(mountpoint)
+        rcode = p.returncode
     for x in os.listdir(os.environ['HOME']+"/m/"):
         if x.startswith(dirname):
             os.remove(os.environ['HOME']+"/m/"+x)
+    exit(rcode)
 else:
     try:
         os.rmdir(mountpoint)
