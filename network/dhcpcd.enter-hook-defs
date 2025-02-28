@@ -54,3 +54,40 @@ route(){
 		ip -4 route del $@
 	fi
 }
+
+address(){
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix add ip address: $@
+		ip address add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip address: $@
+		ip address del $@
+	fi
+}
+route6_CARRIER(){
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix add ip route: $@
+		ip -6 route add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip route: $@
+		ip -6 route del $@
+	fi
+}
+route_CARRIER(){
+	if [ "$reason" == CARRIER ]
+	then
+		echo $msg_prefix add ip route: $@
+		ip -4 route add $@
+	fi
+	if [ "$reason" == NOCARRIER ]
+	then
+		echo $msg_prefix del ip route: $@
+		ip -4 route del $@
+	fi
+}

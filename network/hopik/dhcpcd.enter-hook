@@ -18,3 +18,14 @@ if [ "$reason" == BOUND ] || [ "$reason" == NOCARRIER ]
 then
 	systemctl reload net-blatto-daemon
 fi
+
+
+if [ "$ifssid" == derivace ]
+then
+	echo DERIVACE
+	address 10.12.132.22/24 dev $interface
+	address 2a01:510:d504:7532::22/64 dev $interface
+
+	route_CARRIER 10.12.132.0/24 dev $interface metric 300 table 12
+	route6_CARRIER 2a01:510:d504:7532::0/64 dev $interface metric 300 table 12
+fi
