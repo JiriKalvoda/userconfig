@@ -45,3 +45,7 @@ if [ "$ifssid" == JMK_WiFi ]
 then
 	mtu 1340
 fi
+if [ "$ifssid" == Kalvodovi ] || [ "$ifssid" == Kalvodovi_5G ]
+then
+	mtu 1340
+fi
