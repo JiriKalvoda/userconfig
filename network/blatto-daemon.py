@@ -47,13 +47,13 @@ while True:
 
     def is_blatto(i):
         for ip in i["addr_info"]:
-            if any(ip["local"].startswith(f"2a01:510:d504:75{i}a:") for i in range(0, 10)):
+            if any(ip["local"].startswith(f"2a01:b380:3000:18{i}a:") for i in range(0, 10)):
                 return True
         return False
 
     def is_blatto_wg(i):
         for ip in i["addr_info"]:
-            if any(ip["local"].startswith(f"2a01:510:d504:75{i}b:") for i in range(0, 10)):
+            if any(ip["local"].startswith(f"2a01:b380:3000:18{i}b:") for i in range(0, 10)):
                 return True
         return False
 
@@ -81,6 +81,6 @@ while True:
                 w = iwc[i["ifname"]]
                 out["essid"] = w["essid"]
             interfaces[i["ifname"]] = out
-    send({"blatto-wg": blatto_wg, "blatto": blatto, "interfaces": interfaces}, "2a01:510:d504:751a::1" if blatto else "2a01:510:d504:751b::1")
+    send({"blatto-wg": blatto_wg, "blatto": blatto, "interfaces": interfaces}, "2a01:b380:3000:181a::1" if blatto else "2a01:b380:3000:181b::1")
     p("DONE")
     signal.sigtimedwait([signal.SIGHUP], 10)
