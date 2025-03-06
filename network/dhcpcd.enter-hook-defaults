@@ -1,4 +1,6 @@
 
+blattto_ipv6_prefix=2a01:b380:3000:18
+#blattto_ipv6_prefix=2a01:510:d504:75
 if [ "$ifssid" ==  MS-KAM-GUESTS ]
 then
 	# conntrack_hack
@@ -11,18 +13,18 @@ then
 
 	route 10.12.11.0/24 dev $interface metric 300 table 12
 	route 10.12.0.0/16 via 10.12.11.1 dev $interface metric 300 table 12
-	route6 2a01:510:d504:751a::0/64 dev $interface metric 300 table 12
-	route6 2a01:510:d504:7500::0/56 via 2a01:510:d504:751a::1 dev $interface metric 300 table 12
+	route6 ${blattto_ipv6_prefix}1a::0/64 dev $interface metric 300 table 12
+	route6 ${blattto_ipv6_prefix}00::0/56 via ${blattto_ipv6_prefix}1a::1 dev $interface metric 300 table 12
 
 	for i in 1 2 3 4
 	do
 		route 10.12.11.0/24 dev $interface metric 300 table 12$i
 		route default via 10.12.11.$i dev $interface metric 300 table 12$i
-		route6 2a01:510:d504:751a::0/64 dev $interface metric 300 table 12$i
-		route6 default via 2a01:510:d504:751a::$i dev $interface metric 300 table 12$i
+		route6 ${blattto_ipv6_prefix}1a::0/64 dev $interface metric 300 table 12$i
+		route6 default via ${blattto_ipv6_prefix}1a::$i dev $interface metric 300 table 12$i
 	done
 
-	route6 default via 2a01:510:d504:751a::1 dev $interface metric 3004
+	route6 default via ${blattto_ipv6_prefix}1a::1 dev $interface metric 3004
 fi
 
 if [ "$ifssid" == CDWiFi ]

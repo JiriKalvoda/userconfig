@@ -149,10 +149,19 @@ pinb(){
 	ping blatto.eu "$@"
 }
 pinb4(){
-	ping 95.85.217.30 "$@"
+	ping 188.75.189.192 "$@"
 }
 pinb6(){
-	ping 2a01:510:d504:75a0::1 "$@"
+	ping 2a01:b380:3000:18a0::1 "$@"
+}
+pinu(){
+	ping ucw.cz "$@"
+}
+pinu4(){
+	ping 46.255.230.98 "$@"
+}
+pinu6(){
+	ping 2a00:da80:fff0:2::2 "$@"
 }
 
 

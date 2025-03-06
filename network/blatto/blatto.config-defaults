@@ -2,9 +2,9 @@ set -u
 true ${blatto_wg:=false}
 true ${blatto_wg_adopt:=false}
 
-true ${blatto_ipv6_prefix:=2a01:510:d504:75}
+true ${blatto_ipv6_prefix:=2a01:b380:3000:18}
 true ${blatto_ipv4_prefix:=10.12}
-true ${blatto_public_ipv4:=95.85.217.30}
+true ${blatto_public_ipv4:=188.75.189.192}
 
 true ${blatto_vlid:=1$blatto_user_id}
 true ${blatto_wg_vlid:=6$blatto_user_id}
