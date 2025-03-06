@@ -515,7 +515,7 @@ fi
 ######################### configuration by connection types
 if [ "$SSH_CONNECTION" != "" ];
 then 
-	if [[ "$SSH_CLIENT" = "10.12."* ]] || [[ "$SSH_CLIENT" = 2a01:510:d504:75* ]]
+	if [[ "$SSH_CLIENT" = "10.12."* ]] || [[ "$SSH_CLIENT" = 2a01:b380:3000:18* ]]
 	then
 		prompt_color_user=96
 	elif [[ "$SSH_CLIENT" = "10.13.12.2"* ]]
