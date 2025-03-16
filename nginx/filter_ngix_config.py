@@ -29,7 +29,12 @@ def setup_overlay():
 	lower_dir = "/"
 
 	# Přepnutí do nového filesystem namespace
-	os.unshare(os.CLONE_NEWNS)
+	try:
+		os_unshare = os.unshare
+	except AttributeError:
+		unshare(CLONE_NEWNS)
+	else:
+		os.unshare(os.CLONE_NEWNS)
 
 	# Nastavení private mount propagace
 	subprocess.run(["mount", "--make-rprivate", "/"], check=True)
