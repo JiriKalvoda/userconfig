@@ -322,7 +322,7 @@ def inet(*args, **kvargs):
 def init(ucred):
     for p in [10001, 10012, 10038, 10039, 10254]:
         inet("rule", "del", "priority", p, check=False)
-    ip("rule", "add", "priority",   10001, "to", "95.85.217.30", "dport", "12061", "goto", 32766)
+    ip("rule", "add", "priority",   10001, "to", "188.75.189.192", "dport", "12061", "goto", 32766)
     inet("rule", "add", "priority", 10012, "table", 12)
     inet("rule", "add", "priority", 10038, "table", 38)
     inet("rule", "add", "priority", 10039, "table", 39)
