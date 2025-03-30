@@ -1,8 +1,8 @@
 include /etc/nginx/default_host_checked.d/*;
 
 location / {
-    root   /usr/share/nginx/html;
-    index  index.html index.htm;
+    root   /srv/http/default;
+    index  index.html;
 
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {

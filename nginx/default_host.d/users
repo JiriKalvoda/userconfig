@@ -1,0 +1,10 @@
+location ~ ^/~([^/]+)(/.*)?$ {
+    alias /home/$1/WWW/$2;
+    index index.html;
+    autoindex on;
+
+    # Block all hidden files (starting with .) in all subdirectories
+    location ~ /.*\/\..* {
+        deny all;
+    }
+}
