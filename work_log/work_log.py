@@ -58,6 +58,7 @@ if args.subparser == 'log':
 
 if args.subparser == 'stats':
     by_days = {}
+    by_months = {}
 
     def divide_per_days(activity, topic, from_time, to_time):
         for d in [from_time.date() + timedelta(days=x) for x in range(10)]:
@@ -68,6 +69,10 @@ if args.subparser == 'stats':
             if t-f:
                 by_days.setdefault(d, {}).setdefault(activity, {}).setdefault(topic, timedelta())
                 by_days[d][activity][topic] += t-f
+
+                month = d.strftime("%Y-%m")
+                by_months.setdefault(month, {}).setdefault(activity, {}).setdefault(topic, timedelta())
+                by_months[month][activity][topic] += t-f
 
     with open(filename, 'r') as f:
         data = [l.split('\t') for l in f.read().split('\n') if l]
@@ -90,6 +95,14 @@ if args.subparser == 'stats':
                 print()
 
 
+
+        for month, x in by_months.items():
+            print(f"Month {month}:")
+            for k, v in x.items():
+                print(k, sum(v.values(), start=timedelta()))
+
+        print()
+        print("Total:")
         for k, v in total_time.items():
             print(k, v)
 
