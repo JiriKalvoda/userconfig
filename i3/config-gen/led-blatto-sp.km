@@ -3,7 +3,7 @@ LOAD_LIB("led-cmddef.km")
 
 with add_led_prefix("blatto/sp"):
     m_base_keys("")
-    m_led_light(K_1, "zachod")
-    m_led_light(K_Q, "koupelna")
-    m_led_light(K_A, "kuchyn")
-    m_led_light(K_Z, "chodba")
+    m_led_light(K_1, "koupelna")
+    m_led_light(K_Q, "kuchyn")
+    m_led_light(K_A, "chodba")
+    m_led_light(K_Z, "zachod")
