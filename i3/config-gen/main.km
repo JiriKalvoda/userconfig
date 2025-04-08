@@ -201,9 +201,10 @@ with ADD_MODIFICATOR(SUPER):
         bind_osd_enable(KEY(4, 5), "display1")
 
         M(K_B, cmd_set_xkbmap)
-        M(K_H, ROOT_MODE_AND(CMD("root bluetoothctl connect 11:11:22:37:1D:8D")))
-        M(K_H(SHIFT), ROOT_MODE_AND(CMD("root bluetoothctl connect F4:4E:FC:D0:AB:31")))
-        M(K_H(CTRL), ROOT_MODE_AND(CMD("root bluetoothctl connect 41:42:D5:ED:CE:32")))
+        M(K_H, ROOT_MODE_AND(CMD("root bluetoothctl connect 1C:6E:4C:A9:24:E6"))) # MAJOR IV
+        M(K_H(SHIFT), ROOT_MODE_AND(CMD("root bluetoothctl connect F4:4E:FC:D0:AB:31"))) # Joy 3
+        M(K_H(CTRL), ROOT_MODE_AND(CMD("root bluetoothctl connect 11:11:22:37:1D:8D"))) # Joy 2
+        # M(K_H(CTRL), ROOT_MODE_AND(CMD("root bluetoothctl connect 41:42:D5:ED:CE:32"))) # P47
         M(K_H(CTRL|SHIFT), ROOT_MODE_AND(CMD("terminal -e root bluetoothctl")))
         M(K_Y, ROOT_MODE_AND(CMD("amixer")))
 
