@@ -1,0 +1,14 @@
+#!/bin/sh
+
+while true
+do
+nft_len=$(nft list ruleset | wc -c)
+	echo length of nft: $nft_len
+	if [ "$nft_len" -gt 1000 ]
+	then
+		exit 0
+	fi
+	sleep 1
+done
+
+
