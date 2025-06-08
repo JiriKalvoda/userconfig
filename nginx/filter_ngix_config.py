@@ -99,4 +99,8 @@ for dp in dirs:
 				print(f"Enabling {dp.source/f}")
 			else:
 				os.remove(dp.target/f)
-				print(f"Disabling {dp.source/f}")
+				print(f"Disabeling {dp.source/f} – config is not working.")
+	for f in os.listdir(dp.target):
+		if f not in dp.output:
+			os.remove(dp.target/f)
+			print(f"Disabeling {dp.source/f} – config is not present in source directory.")
