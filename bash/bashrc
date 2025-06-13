@@ -242,10 +242,10 @@ rsa(){
 
 ######################### git
 gic(){
-	git commit "$@"
+	git commit -v "$@"
 }
 gica(){
-	git commit --amend "$@"
+	git commit --amend -v "$@"
 }
 gis(){
 	git status "$@"
@@ -260,16 +260,16 @@ gia(){
 	git add "$@"
 }
 giac(){
-	git add "$@"; git commit;
+	git add "$@"; git commit -v;
 }
 giaac(){
-	git add . "$@"; git commit;
+	git add . "$@"; git commit -v;
 }
 giaca(){
-	git add "$@"; git commit --amend;
+	git add "$@"; git commit -v --amend;
 }
 giaaca(){
-	git add . "$@"; git commit --amend;
+	git add . "$@"; git commit -v --amend;
 }
 gip(){
 	git pull "$@"; git push "$@";
