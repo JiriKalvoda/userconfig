@@ -72,6 +72,16 @@ delete()
 		/usr/bin/time rm -r $i
 	done
 }
+delete_with_mv()
+{
+	for i in "$@"
+	do
+		i_moved="${i/#$snapdir\/$device\/ok\//$snapdir\/$device\/working\/}"
+		mv "$i" "$i_moved"
+		delete "$i_moved"
+	done
+}
+
 
 . ~/snapshoter.devices
 
@@ -141,7 +151,7 @@ then
 	then
 		err 0 EXIT
 	fi
-	delete $data
+	delete_with_mv $data
 	do_clean
 	exit 0
 fi
