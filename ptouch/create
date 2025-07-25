@@ -1,0 +1,5 @@
+#!/bin/bash
+
+name=${1:-a}
+
+luatex $name && pdftoppm $name.pdf -png $name -mono -r 169

@@ -1,0 +1,109 @@
+%\input ltluatex.tex
+%\input luatex85.sty
+\input ucwmac2.tex
+%\ucwmodule{luaofs}
+\ucwmodule{verb}
+
+\def\settextsize#1{}
+
+\hoffset=-1in
+\voffset=-1in
+
+\parindent=0pt
+\hsize=2cm
+\pdfpagewidth=0cm
+\vsize=18mm
+\pdfpageheight=18mm
+
+\nopagenumbers
+
+
+\output={%
+  \pdfpagewidth=\wd255
+  \plainoutput
+}
+
+
+\def\label#1{
+\setbox0=\vbox to 18mm{
+#1
+}
+\hsize=\wd0
+\box0
+\eject
+}
+
+\settextsize{12}
+
+%\setfonts[LMSans/]
+
+\def\sizedbox#1{%
+\def\toboxsize{}%
+\setbox0=\vbox to 18mm{%
+#1%
+}%
+\hsize=\wd0%
+\def\toboxsize{to \hsize}%
+\vbox to 18mm{%
+#1%
+}%
+}
+
+\newdimen\a
+\def\sizedhbox#1#2#3#4{
+	\a=#2\relax
+	\advance\a by #3\relax
+	\hbox{\raise -#3 \vbox to \a{%
+		\hbox #1{%
+			\vrule height #2 depth #3 width0pt\relax%
+			%\vrule depth 0pt\relax%
+			%\vrule height 0pt\relax%
+			%\hskip -0.8pt
+			#4%
+		}%
+		\vskip 0cm plus 0.00001cm minus 0.00001cm % fix rounding errors and disable spacing algorithm
+	}}%
+}
+\def\novskip{\hrule height 0pt}
+
+\newdimen\b
+\b=0.25mm
+\newdimen\c
+\c=0.1mm
+\def\fontsizedhbox#1#2#3{%
+	\sizedhbox{#1}{#2\b}{#2\c}{{\settextsize{#2}#3}}%
+}%
+
+
+\def\machineOneMacs#1#2#3#4#5{%
+	\machine{#1}{#2}{#3}{#4}{#5}{}%
+}
+\font\fhuge=cmtt12 at 32pt
+\def\machine#1#2#3#4#5#6{
+\label{\sizedbox{
+	\vfill
+	\sizedhbox{}{0.8cm}{0.25cm}{%
+		{\settextsize{32}\fhuge#1}%
+		\vbox{%
+			\fontsizedhbox{}{18}{\font\tempfont=cmtt12 at 18pt\tempfont#2}%
+			\novskip
+			\fontsizedhbox{}{8}{\font\tempfont=cmtt10 at 8pt\tempfont#3}%
+		}%
+	}%
+	\novskip
+	\sizedhbox{\toboxsize}{0.30cm}{0.01cm}{%
+		\hfil%
+		\font\tempfont=cmtt10 at 8pt\tempfont#4%
+		\hfil%
+	}%
+	\vfill
+	\novskip
+	 \sizedhbox{\toboxsize}{0.20cm}{0.01cm}{\hfil\settextsize{8}#5 \hfil}%
+	#6%
+	\vfill%
+}}%
+}
+
+
+\machineOneMacs{\font\mainfont=cmtt10 at 12pt \mainfont apzahrada}{}{.o.fnuk.eu}{10.12.134.245}{}
+\bye

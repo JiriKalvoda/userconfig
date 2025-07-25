@@ -1,0 +1,185 @@
+\input ltluatex.tex
+\input luatex85.sty
+\input ucwmac2.tex
+\ucwmodule{luaofs}
+\ucwmodule{verb}
+
+\hoffset=-1in
+\voffset=-1in
+
+\parindent=0pt
+\hsize=2cm
+\pdfpagewidth=0cm
+\vsize=18mm
+\pdfpageheight=18mm
+
+\nopagenumbers
+
+
+\output={%
+ \message{AAA  \the\wd255}
+  \pdfpagewidth=\wd255
+  \plainoutput
+}
+
+
+\def\label#1{
+\setbox0=\vbox to 18mm{
+#1
+}
+\hsize=\wd0
+\box0
+\eject
+}
+
+\settextsize{12}
+
+\setfonts[LMSans/]
+
+\def\sizedbox#1{%
+\def\toboxsize{}%
+\setbox0=\vbox to 18mm{%
+#1%
+}%
+\hsize=\wd0%
+\def\toboxsize{to \hsize}%
+\vbox to 18mm{%
+#1%
+}%
+}
+
+\newdimen\a
+\def\sizedhbox#1#2#3#4{
+	\a=#2\relax
+	\advance\a by #3\relax
+	\hbox{\raise -#3 \vbox to \a{%
+		\hbox #1{%
+			\vrule height #2 depth #3 width0pt\relax%
+			%\vrule depth 0pt\relax%
+			%\vrule height 0pt\relax%
+			%\hskip -0.8pt
+			#4%
+		}%
+		\vskip 0cm plus 0.00001cm minus 0.00001cm % fix rounding errors and disable spacing algorithm
+	}}%
+}
+\def\novskip{\hrule height 0pt}
+
+
+\def\machineOneMacs#1#2#3#4#5{%
+	\machine{#1}{#2}{#3}{#4}{#5}{}%
+}
+\def\machineTwoMacs#1#2#3#4#5#6{%
+	\machine{#1}{#2}{#3}{#4}{#5}{%
+		\novskip%
+		\vfill%
+		\sizedhbox{\toboxsize}{0.20cm}{0.01cm}{\hfil\settextsize{8}#6 \hfil}%
+	}%
+}
+\def\machine#1#2#3#4#5#6{
+\label{\sizedbox{
+	\vfill
+	\sizedhbox{}{0.8cm}{0.25cm}{%
+		{\settextsize{32}#1}%
+		\vbox{%
+			\fontsizedhbox{}{18}{#2}%
+			\novskip
+			\fontsizedhbox{}{8}{#3}%
+		}%
+	}%
+	\novskip
+	\sizedhbox{\toboxsize}{0.30cm}{0.01cm}{%
+		\hfil%
+		#4%
+		%\vbox{
+		%	\sizedhbox{}{0.13cm}{0.01cm}{\settextsize{4}2a01:b380:3000:18}
+		%	\novskip
+		%	\sizedhbox{}{0.17cm}{0.01cm}{\settextsize{8}1a::42}
+		%}%
+		\hfil%
+	}%
+	\vfill
+	\novskip
+	 \sizedhbox{\toboxsize}{0.20cm}{0.01cm}{\hfil\settextsize{8}#5 \hfil}%
+	#6%
+	\vfill%
+}}%
+}
+
+\def\machineold{
+\label{\sizedbox{
+	\vfill
+	\sizedhbox{}{0.8cm}{0.25cm}{%
+		{\settextsize{32}selen}%
+		\vbox{%
+			\sizedhbox{}{0.45cm}{0.15cm}{\settextsize{18}.jk}%
+			\novskip
+			\sizedhbox{}{0.20cm}{0.1cm}{\settextsize{8}.blatto.eu}%
+		}%
+	}%
+	\novskip
+	\sizedhbox{\toboxsize}{0.30cm}{0.01cm}{%
+		\hfil%
+		10.12.11.42%
+		%\vbox{
+		%	\sizedhbox{}{0.13cm}{0.01cm}{\settextsize{4}2a01:b380:3000:18}
+		%	\novskip
+		%	\sizedhbox{}{0.17cm}{0.01cm}{\settextsize{8}1a::42}
+		%}%
+		\hfil%
+	}%
+	\novskip\vfill%
+	\sizedhbox{\toboxsize}{0.20cm}{0.01cm}{\hfil\settextsize{8}2a01:b380:3000:181a::42\hfil}%
+	\vfill
+}}%
+}
+
+
+\newdimen\b
+\b=0.25mm
+\newdimen\c
+\c=0.1mm
+\def\fontsizedhbox#1#2#3{%
+	\sizedhbox{#1}{#2\b}{#2\c}{{\settextsize{#2}#3}}%
+}%
+
+\def\labelUTP
+{
+\label{%
+	\sizedhbox{}{1.7cm}{0.1cm}{%
+		\sizedbox{%
+		\fontsizedhbox{\toboxsize}{32}{JK}\novskip%
+		\fontsizedhbox{\toboxsize}{10}{UTP}\novskip%
+		\fontsizedhbox{\toboxsize}{10}{}%
+		}%
+		\vrule%
+		\hskip 0.7cm%
+		\vrule%
+		\hskip 0.7cm%
+		\vrule%
+		\sizedbox{%
+		\fontsizedhbox{\toboxsize}{32}{\hfill JK}\novskip%
+		\fontsizedhbox{\toboxsize}{10}{\hfill UTP}\novskip%
+		\fontsizedhbox{\toboxsize}{10}{\hfill}%
+		}%
+	}%
+}
+}
+
+%\machine{aruba-ap-1}{}{.lan}{192.168.42.11}{B4:5D:50:C4:50:D2}{}
+%\machine{aruba-ap-2}{}{.lan}{192.168.42.12}{B4:5D:50:C4:54:9C}{}
+%\machine{aruba-ap-3}{}{.lan}{192.168.42.13}{B4:5D:50:C4:50:76}{}
+%\machine{aruba-ap-4}{}{.lan}{192.168.42.14}{B4:5D:50:C4:4F:44}{}
+%\machineOneMacs{hopik}{.jk}{.blatto.eu}{10.12.11.22\hskip 0.2cm 1a::22}{w: 40:1A:58:9D:75:D8}
+%\machineOneMacs{arzen}{.jk}{.blatto.eu}{10.12.11.21\hskip 0.2cm 1a::22}{w: 40:1A:58:9D:75:D8}
+%\machineTwoMacs{hopik}{.jk}{.blatto.eu}{10.12.11.22\hskip 0.2cm 1a::22}{w: 40:1A:58:9D:75:D8}{sm: 54:44:A3:2B:41:E2}
+
+%\labelUTP
+
+%\label{\sizedbox{\vfil\fontsizedhbox{\toboxsize}{28}{100 Mb/s POE}\fontsizedhbox{\toboxsize}{20}{pasivní 24V}\vfil}}
+%\label{\sizedbox{\vfil\fontsizedhbox{\toboxsize}{28}{$100\, \rm Mb/s$ POE}\fontsizedhbox{\toboxsize}{18}{\hfill pasivní 24V\hfill}\vfil}}
+\label{\sizedbox{\hbox{}\vfil\fontsizedhbox{\toboxsize}{20}{\hfil POE1,2,3,4\hfil}\vfil\fontsizedhbox{\toboxsize}{20}{\hfil DiskStation\hfil}\vfil}}
+`
+
+
+\bye
