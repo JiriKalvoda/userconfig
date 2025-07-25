@@ -304,6 +304,7 @@ with ADD_MODIFICATOR(SUPER):
     with M(K_W(SHIFT), GO_MODE(STD_MODE("work_log"))).action.mode:
         M(K_T, ROOT_MODE_AND(CMD("work_log log test")))
         M(K_M, ROOT_MODE_AND(CMD("work_log log mp")))
+        M(K_I, ROOT_MODE_AND(CMD("work_log log itr")))
         M(K_K, ROOT_MODE_AND(CMD("work_log log mff/kg1")))
 
 
