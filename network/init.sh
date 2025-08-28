@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 13
+version 14
 is_sysconfig=true
 install_begin
 clean_userinstall
@@ -54,5 +54,16 @@ confln blatto-daemon.py /usr/bin/net-blatto-daemon
 init-service net-blatto-daemon root /usr/bin/net-blatto-daemon "" "ExecReload=/bin/kill -HUP \$MAINPID"
 
 confln namespaces /etc/net/ r
+
+
+gcc change_ns.c -o /usr/bin/net_direct -DTARGET_NAMESPACE=\"2direct\"
+r chmod 4755 /usr/bin/net_direct
+for x in 2{,untr-}bl{,-mul,-awn,-mn} 2untr
+do
+	gcc change_ns.c -o /usr/bin/net_$x -DTARGET_NAMESPACE=\"$x\"
+	r chmod 4755 /usr/bin/net_$x
+done
+
+
 
 install_ok
