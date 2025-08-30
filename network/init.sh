@@ -56,12 +56,20 @@ init-service net-blatto-daemon root /usr/bin/net-blatto-daemon "" "ExecReload=/b
 confln namespaces /etc/net/ r
 
 
-gcc change_ns.c -o /usr/bin/net_direct -DTARGET_NAMESPACE=\"2direct\"
-r chmod 4755 /usr/bin/net_direct
+add_permitions()
+{
+	#r setcap 'cap_sys_admin,cap_net_raw+ep' $1
+	r setcap 'cap_sys_admin+ep' $1
+	#r setcap 'cap_net_raw+ep' $1
+	true
+}
+
+gcc change_ns.c -o /usr/bin/net_direct -DTARGET_NAMESPACE=\"2direct\" -lcap
+add_permitions /usr/bin/net_direct
 for x in 2{,untr-}bl{,-mul,-awn,-mn} 2untr
 do
-	gcc change_ns.c -o /usr/bin/net_$x -DTARGET_NAMESPACE=\"$x\"
-	r chmod 4755 /usr/bin/net_$x
+	gcc change_ns.c -o /usr/bin/net_$x -DTARGET_NAMESPACE=\"$x\" -lcap
+	add_permitions /usr/bin/net_$x
 done
 
 
