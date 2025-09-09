@@ -167,7 +167,8 @@ r()
 }
 
 install_try_push(){
-	$USERCONFIG_ROOT/state_push.sh
+	# $USERCONFIG_ROOT/state_push.sh
+	true
 }
 
 install_config_load(){
