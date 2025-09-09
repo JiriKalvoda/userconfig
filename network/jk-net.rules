@@ -5,6 +5,7 @@ SUBSYSTEM=="net", ACTION=="remove", RUN+="/usr/bin/resolvconf -d %k"
 
 #samet
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="02:3c:0e:6b:1a:7f",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="usb*", NAME="samet"
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="02:3c:0e:6b:1a:7f",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="usb*", RUN+="/usr/bin/systemctl start net-config@con-samet"
 
 # orico usb-c hub
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="00:e0:4c:42:03:39",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="orico"

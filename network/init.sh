@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 14
+version 15
 is_sysconfig=true
 install_begin
 clean_userinstall
