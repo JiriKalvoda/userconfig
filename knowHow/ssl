@@ -1,0 +1,27 @@
+# Init authority and server
+openssl genpkey -algorithm RSA -out ca.key -pkeyopt rsa_keygen_bits:4096
+
+openssl req -new -x509 -days 3650 -key ca.key -out ca.crt -pkeyopt rsa_keygen_bits:4096
+
+#  openssl genpkey -algorithm RSA -out server.key -pkeyopt rsa_keygen_bits:4096
+
+
+# Android client
+openssl genpkey -algorithm RSA -out client_samet.key
+openssl req -new -key client_samet.key -out client_samet.crs -subj "/C=US/ST=CA/O=JK/CN=client_samet"
+
+openssl x509 -req -days 365 -in client_samet.crs -CA ca.crt -CAkey ca.key -CAcreateserial -out client_samet.crt
+
+openssl pkcs12 -export -out client_samet.p12 -inkey client_samet.key -in client_samet.crt -certfile ca.crt -legacy
+
+
+
+openssl genpkey -algorithm RSA -out client_arzen.key
+openssl req -new -key client_arzen.key -out client_arzen.crs -subj "/C=US/ST=CA/O=JK/CN=client_arzen"
+
+openssl x509 -req -days 365 -in client_arzen.crs -CA ca.crt -CAkey ca.key -CAcreateserial -out client_arzen.crt
+
+openssl pkcs12 -export -out client_arzen.p12 -inkey client_arzen.key -in client_arzen.crt -certfile ca.crt -legacy
+
+
+
