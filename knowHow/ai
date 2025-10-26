@@ -1,0 +1,48 @@
+jirikalvoda
+Jaký softwarový stack používáš aktuáľně na přístup k umělé inteligenci? Měl jsem pocit, že jsi nedávno mluvil o tom, že se svým aktuálním řešením nejsi spokojený, a pak jsem už nezaznamenal, jestli jsi to nějak zlepšil.
+F.
+VSCode + VSCode-neovim + Cline / Roo-Code + OpenRouter
+Jsem středně spokojený
+Slyšel jsem spoustu chvály na CLI nástroje typu Claude Code / Gemini CLI, ale moc se mi nelíbí vazba na jeden model
+jirikalvoda
+To používáš i pro běžné chatování nebo jen pro kódění?
+F.
+Kódění
+Na chatování mám LibreChat
+Se kterým jsem skoro spokojený, až na to, že neumí uploadovat PDF
+To je největší painpoint
+Ale image input umí
+Na PDF si většinou otevřu webový openrouter
+Je to všechno přes API, platí se podle tokenů
+Tj chat je essentially free, protože toho prostě tolik nakecat nezvládneš
+U kódění se silnějšími modely už to může být znát
+Na chat + kódění se Sonnetem obvykle spotřebuju tak 10-20$ / měsíc (tedy spíš méně než předplatné, které nemám)
+Na intenzivnější kódění s Opusem už se to nasčítá, ale toho většinu platí zaměstnavatel
+F.
+Na chatování mám LibreChat
+Výhody: jedno rozhraní pro všechny modely, lokální historie
+Se znalostními/encyklopedickými/vysvětlovacími dotazy jsem zkonvergoval z 80% k Gemini 2.5 Pro, přijde mi, že většinou dává nejlepší odpovědi
+Na kódění obvykle Claude Sonnet/Opus dle obtížnosti
+občas (pokud mám pocit, že bottleneck je víc znalosti než agency) zkusím taky G2.5Pro
+Claude očividně vyniká v agency (schopnost následovat instrukce a udržet nit při delším tasku)
+GPT moc nepoužívám, z OpenAI asi nejzajímavější je o3 [Pro] (dnes asi nahrazení GPT5-Thinking [Pro]) a DeepResearch pro tasky, které vyžadují agentické hledání na webu a/nebo opravdu obrovské množství přemýšlení.... prostě velké kladivo
+jirikalvoda
+Díky za hezký souhrn.
+image.png
+Proč po mne chce OpenRoter adresu? Resp. jak tam dobíjet peníze?
+jirikalvoda
+Aha, ono je nějak jedno, co tam napíšu
+F.
+Jo, je jedno, co tam napíšeš
+Já jsem dobíjel normálně kartou, ale rád bych přišel na to, jak použít to jejich crypto
+A taky, jak jsem říkal, na ITR věci můžeš dostat náš token
+F.
+Also of note: Gemini je jeden z mála modelů, který je ochoten aspoň občas s tebou nesouhlasit, říct ti, že se pleteš / děláš špatný předpoklad / tvůj nápad je špatný (ale taky jen někdy). To se může občas hodit.
+Celekově má takovou víc "atuistic scientist" povahu, i když teď o něco méně než první verze (která už bohužel není dostupná)
+F.
+Jo ještě librechat je fajn v tom, že umí forkovat konverzace
+Ale UI nic moc
+Dlouho přemýšlím o tom, že bych si napsal nějakého klienta, který bude mít UI trochu jako threaded mail klient
+Protože to je dost často to, co bych potřeboval
+Na začátku mám nějaký hlavní kontext a pak se doptávám na dílčí věci, které jsou relativně nezávislé
+Takže nepotřebuju mít v kontextu všechny (čímž šetřím jak cenu, tak pozornost modelu)
