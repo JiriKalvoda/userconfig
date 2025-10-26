@@ -20,7 +20,7 @@ add_netns()
 	ip netns exec $name ip route add default via $ipv4_prefix.$ipv4_subnet.1
 	ip route add $ipv4_prefix.$ipv4_subnet.0/24 dev ve2$name table 39
 	ip-man replace_rule --iif ve2$name --priority_base 100 $route_rule
-	ip netns exec $name echo 0 2147483647 > /proc/sys/net/ipv4/ping_group_range
+	ip netns exec $name sh -c 'echo 0 2147483647 > /proc/sys/net/ipv4/ping_group_range'
 }
 
 add_netns 2direct 0 254
