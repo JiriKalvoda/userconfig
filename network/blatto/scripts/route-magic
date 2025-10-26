@@ -1,0 +1,5 @@
+#!/bin/sh
+set -uex
+
+ip-man init
+ip-man replace_rule 121
