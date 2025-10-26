@@ -340,7 +340,7 @@ please(){
 
 ######################### python
 p(){
-	bpython "$@"
+	ipython "$@"
 }
 p3(){
 	python3 "$@"
