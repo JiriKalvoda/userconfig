@@ -706,3 +706,15 @@ no_blackscreen()
 	xset -dpms
 	xset s off
 }
+
+
+
+
+
+export PICO_SDK_PATH=$HOME/dev/pico-sdk/
+
+
+mp(){
+	cd ~/mp/
+	. init.sh
+}
