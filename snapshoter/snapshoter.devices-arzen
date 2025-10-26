@@ -8,6 +8,11 @@ snapdrive="/dev/mapper/terapeut-snapshot"
 case "$device" in
   arzen)
 		from=/
+	;;
+  arch | external | hopik)
+		fromdir=/
+  		ssh root@$device
+    ;;
 esac
 
 else
