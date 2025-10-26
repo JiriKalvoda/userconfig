@@ -8,7 +8,7 @@ lua <<AMEN
 			pylsp = {
 				plugins = {
 					pycodestyle = {
-						enabled = true,
+						enabled = false,
 						-- see ~/.config/pycodestyle
 					},
 					pylsp_mypy = {

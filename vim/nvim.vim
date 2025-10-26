@@ -18,7 +18,10 @@ if exists('g:started_by_firenvim')
 endif
 
 if !empty(expand(glob("~/.config/nvim/plugins_conf.vim")))
-	so ~/.config/nvim/plugins_conf.vim
+	if exists('g:vscode')
+	else
+		so ~/.config/nvim/plugins_conf.vim
+	endif
 endif
 
 colorscheme industry
