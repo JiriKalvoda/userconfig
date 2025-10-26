@@ -1,5 +1,5 @@
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIfC7N6IBEZxKe64komM0NFA72QEpvJlEClXJkyHCIKc jirikalvoda@ucw.cz jiri,root@arzen normal 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGIS0wDbJXczlC20Dtfs28L+e1XYS0rQ/JEZYuzG/zHc jirikalvoda@ucw.cz jiri,root@hopik normal 2024-08-23
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINjV0MQs5bULBnFv270ZUKpz+97Rg60Iuy/J1/i5rckG jirikalvoda@ucw.cz jiri,root@hopik normal 2025-10-26
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILibFPhIiZwL2T7FeC2NU+oR4yZA1pwyTbXf8EsXgoEl jirikalvoda@ucw.cz jiri,root@samet normal 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGPQN/GgKI7PFGtLcMBmzS7mWjchRwqIDshfGnt38PiN jirikalvoda@ucw.cz jiri,root@external normal 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMGH7DPXqrWkRfyNp1hnYgaz2vGNPJA2Lt9rEly5Hk2C jirikalvoda@ucw.cz jiri,root@rpi* normal 2024-08-23
@@ -10,7 +10,7 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHv7GMlwbDroxv69UBQdKZ0sJbBQN9KCKGGXTxDIqhAv
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICJkiyth/3HC45AXIdIJfyos6GnVKPnMx4lFSH+tlxh3 jirikalvoda@ucw.cz jiri,root@selen normal 2024-08-23
 
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE7O5+AVU+w73PQSWXa9xCj1B8qCRLLj2glm3B4J8eYq jirikalvoda@ucw.cz jiri,root@arzen secret 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAMtlwGckWcSn1Y/HUZUJBJyp2KgYbfFLhQNotw5jH6f jirikalvoda@ucw.cz jiri,root@hopik secret 2024-08-23
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAII1mG+mq7Wrqta+MWu6b6Xymm3iV7A33Xd1To2O/2DfP jirikalvoda@ucw.cz jiri,root@hopik secret 2025-10-26
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAQAsbQDcXiHbqAJVCPqkKt4MY/6WdpBIiavn6cLiBKP jirikalvoda@ucw.cz jiri,root@samet secret 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICIcc6XaEa6NPdWgLOB4ya24kxvwPbcudKyEb3JxHncO jirikalvoda@ucw.cz jiri,root@external secret 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFXCVrXlKNZYt9VtVzFXXjl0hbI6Pbuo85gpLxYclk4r jirikalvoda@ucw.cz jiri,root@rpi* secret 2024-08-23

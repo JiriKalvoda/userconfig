@@ -1,5 +1,5 @@
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIfC7N6IBEZxKe64komM0NFA72QEpvJlEClXJkyHCIKc jirikalvoda@ucw.cz jiri,root@arzen normal 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGIS0wDbJXczlC20Dtfs28L+e1XYS0rQ/JEZYuzG/zHc jirikalvoda@ucw.cz jiri,root@hopik normal 2024-08-23
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINjV0MQs5bULBnFv270ZUKpz+97Rg60Iuy/J1/i5rckG jirikalvoda@ucw.cz jiri,root@hopik normal 2025-10-26
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILibFPhIiZwL2T7FeC2NU+oR4yZA1pwyTbXf8EsXgoEl jirikalvoda@ucw.cz jiri,root@samet normal 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGPQN/GgKI7PFGtLcMBmzS7mWjchRwqIDshfGnt38PiN jirikalvoda@ucw.cz jiri,root@external normal 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMGH7DPXqrWkRfyNp1hnYgaz2vGNPJA2Lt9rEly5Hk2C jirikalvoda@ucw.cz jiri,root@rpi* normal 2024-08-23
