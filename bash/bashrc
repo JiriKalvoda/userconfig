@@ -691,6 +691,10 @@ sss(){
 	ssh-keyscan localhost | ssh-keygen -l -f - | grep "$1"
 }
 
+ssa(){
+	eval "$(ssh-agent | tee /dev/stderr)"
+}
+
 if [[ "$SSH_CONNECTION" != "" ]]
 then
 	echo ssh connection: "$SSH_CONNECTION"
