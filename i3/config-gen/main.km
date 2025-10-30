@@ -228,12 +228,12 @@ with ADD_MODIFICATOR(SUPER):
     M(K_D(SHIFT), CMD("dmenu_run"))
 
     # web
-    M(K_C, CMD(ALTERNATIVES("chromium", "google-chrome", "firefox")))
-    M(K_C(SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --incognito"))
-    M(K_C(CTRL|SHIFT), CMD(f"{ALTERNATIVES('chromium', 'google-chrome')} --user-data-dir=$(mktemp -d)"))
+    M(K_C, CMD(ALTERNATIVES("chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled", "google-chrome", "firefox")))
+    M(K_C(SHIFT), CMD(f"{ALTERNATIVES('chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled', 'google-chrome')} --incognito"))
+    M(K_C(CTRL|SHIFT), CMD(f"{ALTERNATIVES('chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled', 'google-chrome')} --user-data-dir=$(mktemp -d)"))
     M(K_C(CTRL), CMD("firefox"))
 
-    M(K_A(CTRL), CMD("chromium  --new-window https://slovnik.seznam.cz/"))
+    M(K_A(CTRL), CMD("chromium  --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled --new-window https://slovnik.seznam.cz/"))
 
     # Tea timer
     I3_DIRECT("""
