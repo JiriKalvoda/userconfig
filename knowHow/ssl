@@ -16,12 +16,13 @@ openssl pkcs12 -export -out client_samet.p12 -inkey client_samet.key -in client_
 
 
 
-openssl genpkey -algorithm RSA -out client_arzen.key
-openssl req -new -key client_arzen.key -out client_arzen.crs -subj "/C=US/ST=CA/O=JK/CN=client_arzen"
+client=hopik
+openssl genpkey -algorithm RSA -out client_$client.key
+openssl req -new -key client_$client.key -out client_$client.crs -subj "/C=US/ST=CA/O=JK/CN=client_$client"
 
-openssl x509 -req -days 365 -in client_arzen.crs -CA ca.crt -CAkey ca.key -CAcreateserial -out client_arzen.crt
+openssl x509 -req -days 365 -in client_$client.crs -CA ca.crt -CAkey ca.key -CAcreateserial -out client_$client.crt
 
-openssl pkcs12 -export -out client_arzen.p12 -inkey client_arzen.key -in client_arzen.crt -certfile ca.crt -legacy
+openssl pkcs12 -export -out client_$client.p12 -inkey client_$client.key -in client_$client.crt -certfile ca.crt -legacy
 
 
 
