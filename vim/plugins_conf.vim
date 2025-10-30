@@ -1,24 +1,24 @@
 
 " Language server
-lua <<AMEN
-	require'lspconfig'.pylsp.setup{
-		log_level = vim.lsp.protocol.MessageType.Log,
-		-- message_level = vim.lsp.protocol.MessageType.Error,
-		settings = {
-			pylsp = {
-				plugins = {
-					pycodestyle = {
-						enabled = false,
-						-- see ~/.config/pycodestyle
-					},
-					pylsp_mypy = {
-						enabled = true,
-					},
-				},
-			}
-		},
-	}
-AMEN
+" lua <<AMEN
+" 	vim.lsp.config.pylsp.setup{
+" 		log_level = vim.lsp.protocol.MessageType.Log,
+" 		-- message_level = vim.lsp.protocol.MessageType.Error,
+" 		settings = {
+" 			pylsp = {
+" 				plugins = {
+" 					pycodestyle = {
+" 						enabled = false,
+" 						-- see ~/.config/pycodestyle
+" 					},
+" 					pylsp_mypy = {
+" 						enabled = true,
+" 					},
+" 				},
+" 			}
+" 		},
+" 	}
+" AMEN
 
 highlight LspDiagnosticsDefaultError ctermfg=red
 highlight LspDiagnosticsDefaultWarning ctermfg=yellow
@@ -89,10 +89,10 @@ lua <<EOF
     })
   })
   -- Setup lspconfig.
-  local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
-  require('lspconfig')['pylsp'].setup {
-    capabilities = capabilities
-  }
+  -- local capabilities = require('cmp_nvim_lsp').default_capabilities(vim.lsp.protocol.make_client_capabilities())
+  -- require('lspconfig')['pylsp'].setup {
+  --   capabilities = capabilities
+  -- }
 EOF
 " inoremap <silent> <A-Tab> <Cmd>lua require('cmp').complete()<CR>
 
