@@ -1,0 +1,39 @@
+{
+    "workbench.colorTheme": "Default High Contrast",
+    "roo-cline.vsCodeLmModelSelector": {},
+    "vscode-neovim.ctrlKeysForInsertMode": [
+        "a",
+        "c",
+        "d",
+        "h",
+        "j",
+        "m",
+        "o",
+        "r",
+        "t",
+        "u",
+        "w",
+        "n",
+        "p"
+    ],
+    "vscode-neovim.revealCursorScrollLine": true,
+    "vscode-neovim.completion.behavior": "inline",
+    "lean4.alwaysAskBeforeInstallingLeanVersions": true,
+    "extensions.experimental.affinity": {
+        "asvetliakov.vscode-neovim": 1
+    },
+    "git.openRepositoryInParentFolders": "never",
+    "roo-cline.allowedCommands": [
+        "git log",
+        "git diff",
+        "git show"
+    ],
+    "roo-cline.deniedCommands": [],
+    "vscode-neovim.compositeKeys": {},
+    "editor.quickSuggestions": {
+        "other": "off",
+        "comments": "off",
+        "strings": "off"
+    },
+    "editor.autoClosingBrackets": "never"
+}
