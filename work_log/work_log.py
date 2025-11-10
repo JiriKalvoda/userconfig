@@ -34,6 +34,7 @@ parser_a = subparsers.add_parser('log')
 parser_a.add_argument('job', default='', nargs="?")
 
 parser_a = subparsers.add_parser('stats')
+parser_a.add_argument('--activity', '-a')
 
 
 args = parser.parse_args()
@@ -56,6 +57,10 @@ if args.subparser == 'log':
     with open(filename, 'a') as f:
         f.write(f"{datetime.now().astimezone().isoformat()}\t{args.job}\t\n")
 
+def activity_filter(activity):
+    if args.activity:
+        return args.activity == activity
+    return True
 if args.subparser == 'stats':
     by_days = {}
     by_months = {}
@@ -80,16 +85,16 @@ if args.subparser == 'stats':
         topics = {}
         for x, y in zip(data, data[1:]):
             activity = x[1]
-            if len(x) >= 2 and x[2]:
+            if len(x) >= 3 and x[2]:
                 topics[x[1]] = x[2]
-            if activity:
+            if activity and activity_filter(activity):
                 divide_per_days(activity, topics.get(activity, "__default__"), datetime.fromisoformat(x[0]), datetime.fromisoformat(y[0]))
                 t = datetime.fromisoformat(y[0]) - datetime.fromisoformat(x[0])
                 total_time.setdefault(activity, timedelta())
                 total_time[activity] += t
         for d, x in by_days.items():
             for activity, y in x.items():
-                print(d, activity)
+                print(f"{d} {activity} ({sum(y.values(), start=timedelta())}):")
                 for topic, time in y.items():
                     print(topic, time)
                 print()
