@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+from blach.core import PodmanContainer, blatto_ipv6_network, blatto_ipv4_network
+import blach.blatto
+import netconflib
+from netconflib import *
+from pathlib import Path
+
+import time
+
+
+# netconflib.wait_nft()
+
+
+def add_namespace(netns):
+    print(netns)
+    name = netns.name
+    netns_name = netns.netns_name
+    network  = netw = netns.network
+    v6 = True
+
+    ip("netns", "add", netns_name)
+    ip("-n", netns_name, "link", "set", "lo", "up")
+
+    nft_filename = f"/etc/nftables-namespaces/{netns_name}.conf"
+    Path("/etc/nftables-namespaces/").mkdir(exist_ok=True)
+    with open(nft_filename, "w") as f:
+        p = r("/etc/blach/nftables/gen_jk_container.py", f"{netns.module}-{netns.name}", stdout=f)
+        if p.returncode:
+            print(f"{netns_name}: nft generation error, exiting!")
+            return
+
+    p = r("ip", "netns", "exec", netns_name, "nft", "-f", nft_filename)
+    if p.returncode:
+        print(f"{netns_name}: nft load error, exiting!")
+        return
+
+    p = r("ip", "netns", "exec", netns_name, "nft", "list", "ruleset", stdout=subprocess.PIPE, check=True)
+    print(p.stdout)
+    if len(p.stdout) < 100:
+        print(f"{netns_name}: No nft, exiting!")
+        return
+
+
+    parrent_interface = network.name
+    interface = parrent_interface+"-"+netns_name
+
+    ip("link", "add", "link", parrent_interface, "name", interface, "type", "vlan", "id", netns.id)
+    ip("link", "set", interface, "netns", netns_name)
+    in_ns_interface = "blatto"
+    ip("-n", netns_name, "link", "set", "dev", interface, "name", in_ns_interface)
+    ip("-n", netns_name, "link", "set", "dev", in_ns_interface, "up")
+    ip("-n", netns_name, "addr", "add", "10.87.72.10/24", "dev", in_ns_interface)
+
+    ipv4 = f"{netw.ipv4_prefix}.{netns.id}"
+    ip("-n", netns_name,"addr", "add", f"{ipv4}/32", "dev", in_ns_interface)
+    ip("-n", netns_name,"route", "add", f"{blach.blatto.ipv4_prefix}.0.0/16", "via","10.87.72.1", "dev", in_ns_interface, "src", ipv4)
+    ip("-n", netns_name,"route", "add", f"default", "via","10.87.72.1", "dev", in_ns_interface, "src", ipv4)
+
+    ipv6 = f"{netw.ipv6_prefix}:{netns.id}:0000::1"
+    ip("-n", netns_name,"address", "add", f"{netw.ipv6_prefix}:{netns.id}:f000::10/{netw.v6size+16+4}", "dev", in_ns_interface)
+    ip("-n", netns_name,"address", "add", f"{ipv6}/128", "dev", in_ns_interface)
+    time.sleep(0.1)
+    ip("-n", netns_name,"route", "add", f"{blach.blatto.ipv6_prefix}00::/56", "via", f"{netw.ipv6_prefix}:{m.id}:f000::1", "dev", in_ns_interface, "src", ipv6)
+    #ip("-n", netns_name,"route", "add", f"default", "via", f"{netw.ipv6_prefix}:{m.id}:f000::1", "dev", in_ns_interface, "src", ipv6)
+
+
+   # ip("link", "add", f"ve2{netns_name}", "type", "veth", "peer", "name", f"ve2{netns_name}P")
+   # ip("link", "set", f"ve2{netns_name}P", "netns", netns_name)
+
+   # ip("addr", "add", f"{network.ipv4_prefix}.1/24",  "dev", f"veth2{name}")
+   # ip("-n", name, "addr", "add", f"{network.ipv4_prefix}.10/24",  "dev", f"veth2{name}P")
+   # if v6:
+   #     ip("addr", "add", f"{network.ipv6_prefix}::1/80",  "dev", f"veth2{name}")
+   #     ip("-n", name, "addr", "add", f"{network.ipv6_prefix}::10/80",  "dev", f"veth2{name}P")
+   # ip("link", "set", f"veth2{name}", "up")
+   # ip("-n", name, "link", "set", f"veth2{name}P", "up")
+   # ip("-n", name, "route", "add", blatto_ipv4_network, "via", f"{network.ipv4_prefix}.1")
+   # ip("-n", name, "route", "add", "default", "via", f"{network.ipv4_prefix}.1")
+   # if v6:
+   #     ip("-n", name, "route", "add", blatto_ipv6_network, "via", network.ipv6_prefix+"::1")
+
+   # if netns.full_ipv6_route:
+   #     ip("-n", name, "route", "add", "default", "via", network.ipv6_prefix+"::1")
+
+   # for s in netns.init_scripts:
+   #     s(netns)
+
+def add_vlan_for_virtualization(netw):
+    interface=netw.name
+    print()
+    print(f"Doing {netw} as virtualization network")
+    print(flush=True)
+    ip("link", "add", "link", "e", "name", interface, "type", "vlan", "id", netw.id)
+    ip("link", "set", "dev", interface, "up")
+
+
+import blach.jk
+virt_network = blach.jk.network_jk_virtual
+add_vlan_for_virtualization(virt_network)
+for m in blach.jk.machines.values():
+    print(m)
+    if isinstance(m, PodmanContainer):
+        add_namespace(m)
