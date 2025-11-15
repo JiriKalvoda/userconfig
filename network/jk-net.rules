@@ -38,3 +38,6 @@ SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="b0:4f:13:d2:2d:4
 # selen
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="a8:1e:84:b9:67:be",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="e"
 SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="22:c9:d3:45:3a:3c",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="wlan*", NAME="w"
+
+#teplo
+SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="fc:34:97:ba:a4:cb",ATTR{dev_id}=="0x0", ATTR{type}=="1", KERNEL=="eth*", NAME="e"

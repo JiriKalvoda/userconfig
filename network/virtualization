@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-from blach.core import PodmanContainer, blatto_ipv6_network, blatto_ipv4_network
+from blach.core import NetnsContainer, blatto_ipv6_network, blatto_ipv4_network
 import blach.blatto
 import netconflib
 from netconflib import *
 from pathlib import Path
+
+import importlib
 
 import time
 
@@ -94,10 +96,15 @@ def add_vlan_for_virtualization(netw):
     ip("link", "set", "dev", interface, "up")
 
 
-import blach.jk
-virt_network = blach.jk.network_jk_virtual
-add_vlan_for_virtualization(virt_network)
-for m in blach.jk.machines.values():
-    print(m)
-    if isinstance(m, PodmanContainer):
-        add_namespace(m)
+import blach.me
+print(blach.me.me)
+print(blach.me.me.virtualization_networks)
+for virt_network in blach.me.me.virtualization_networks:
+    add_vlan_for_virtualization(virt_network)
+    for mod_name in virt_network.machine_modules:
+        mod = importlib.import_module(f"blach.{mod_name}")
+        for m in mod.machines.values():
+            print(m)
+            if isinstance(m,NetnsContainer):
+                if m.host == blach.me.me:
+                    add_namespace(m)
