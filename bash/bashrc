@@ -164,8 +164,9 @@ pinu6(){
 	ping 2a00:da80:fff0:2::2 "$@"
 }
 pinull(){
-	ping ff02::1%w -c 1 -W1
-	ip ne | grep  '\bw\b'
+	intrface=${1:w}
+	ping ff02::1%$intrface -c 1 -W1
+	ip ne | grep  '\b'$intrface'\b'
 }
 
 
