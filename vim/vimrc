@@ -354,7 +354,7 @@ function! Run(isVimRun,input)
 		execute "AddExec ghci ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "python"
 		w
-		execute "AddExec bpython ".NameAll()." ".RunArg()." ".a:input
+		execute "AddExec ipython ".NameAll()." ".RunArg()." ".a:input
 	elseif s == "python3"
 		w
 		execute "AddExec python3 ".NameAll()." ".RunArg()." ".a:input
