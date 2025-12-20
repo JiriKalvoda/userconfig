@@ -1,0 +1,12 @@
+[Unit]
+Description=Podman compose %i
+After=network.target
+
+[Service]
+ExecStart=podman-compose --project-name pc_%i -f /root/podman/%i.yaml up
+ExecStop=podman-compose  --project-name pc_%i -f /root/podman/%i.yaml stop
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
