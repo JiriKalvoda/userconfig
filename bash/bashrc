@@ -719,3 +719,9 @@ mp(){
 	cd ~/mp/
 	. init.sh
 }
+
+pc()
+{
+	name="$1"
+	podman-compose --project-name "pc_$name" -f "/root/podman/$name.yaml" "${@:2}"
+}
