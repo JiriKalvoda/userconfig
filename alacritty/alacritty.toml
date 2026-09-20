@@ -763,6 +763,12 @@ action = "ScrollLineDown"
 key = "Down"
 mods = "Shift|Control"
 
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\n"
+# For claude code
+
 [mouse]
 hide_when_typing = false
 
