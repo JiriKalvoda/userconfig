@@ -327,6 +327,11 @@ ms(){
 }
 complete -F _movingssh ms
 
+sshtmp()
+{
+	ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null "$@"
+}
+
 ######################### gpg
 bye(){
 	gpg-connect-agent reloadagent /bye
