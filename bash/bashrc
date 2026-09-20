@@ -734,9 +734,9 @@ export ITR_KICAD_LIB=/home/jiri/itr/kicad-components
 export KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
 export BLATTO_KICAD_LIB=/home/jiri/dev/blattoboard
 
-mp(){
-	cd ~/mp/
-	. init.sh
+
+itr(){
+	. ~/itr/init.sh
 }
 
 pc()
