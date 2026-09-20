@@ -169,6 +169,15 @@ pinull(){
 	ip ne | grep  '\b'$intrface'\b'
 }
 
+pin(){
+	pingtui \
+		10.12.1.1,label=bv4 \
+		2a01:b380:3000:18a0::1,label=bv6 \
+		_gateway@@net_direct,label=gateway \
+		8.8.8.8@net_direct,label=8@direct \
+
+}
+
 
 ######################### mkdir, cd
 mcd(){
