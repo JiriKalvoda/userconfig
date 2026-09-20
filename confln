@@ -9,6 +9,12 @@ None="\e[0m"
 
 date=${CONFLN_DATE:-$(date +%Y-%m-%d--%H-%M-%S)}
 
+noninteractive()
+{
+	# USERCONFIG_NONINTERACTIVE=1: never prompt, take defaults
+	[[ "${USERCONFIG_NONINTERACTIVE:-}" != "" ]]
+}
+
 
 from="$1"
 to="$2"
@@ -85,6 +91,7 @@ then
 		exit 0
 	fi
 	in=""
+	noninteractive && in=y && echo -n " (noninteractive: overwrite)"
 	while [[ "$in" != y ]] && [[ "$in" != n ]]
 	do
 		echo -n -e "$Yellow File exist! Overwrite?(y/n/d)$None"
@@ -112,6 +119,7 @@ fi
 if [[ ! -d "$(dirname "$to" )" ]]
 then
 	in=""
+	noninteractive && in=y
 	while [[ "$in" != y ]] && [[ "$in" != n ]]
 	do
 		echo -n -e "$Magenta Directory not exist! Create?(y/n)$None"

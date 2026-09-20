@@ -7,6 +7,13 @@ None="\e[0m"
 
 export CONFLN_DATE=${CONFLN_DATE:-$(date +%Y-%m-%d--%H-%M-%S)}
 
+noninteractive()
+{
+	# USERCONFIG_NONINTERACTIVE=1: never prompt, take defaults
+	# (image builds, unattended installs)
+	[[ "${USERCONFIG_NONINTERACTIVE:-}" != "" ]]
+}
+
 if [[ "$USERCONFIG_ROOT" == "" ]]
 then
 	USERCONFIG_ROOT=$(git rev-parse --show-toplevel)
@@ -112,7 +119,7 @@ r()
 		echo
 	fi
 
-	if $confirm
+	if $confirm && ! noninteractive
 	then
 		in=""
 		while [[ "$in" != y ]]
@@ -185,7 +192,7 @@ install_config_load(){
 			echo "ic_userconfig_path='$(cd $USERCONFIG_ROOT ; pwd)'"
 			echo "ic_sysconfig='$([[ "$(pwd)" == /etc/* ]] &&  echo true || echo false)'"
 		) > $install_config_path
-		vim $install_config_path || exit 1
+		noninteractive || vim $install_config_path || exit 1
 	fi
 	ic_sysconfig=false
 	. $install_config_path
