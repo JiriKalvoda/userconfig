@@ -1,5 +1,9 @@
-#include<bits/stdc++.h>
 #include<unistd.h>
+#include<cstdio>
+#include<cstring>
+#include<ctime>
+#include<cstdlib>
+#include <cassert>
 using namespace std;
 #ifdef DEB
 #define D if(1)
