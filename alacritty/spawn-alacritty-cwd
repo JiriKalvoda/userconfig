@@ -84,9 +84,10 @@ then
 		#echo "$sshCom" > ~/.tmpSSH
 		sshCom="${sshCom::3} -o SendEnv=LC_CD ${sshCom:3}"
 		while IFS= read -rd '' var; do export "$var"; done </proc/$ssh/environ
+		ssh_cwd="$(echo -e "${ssh_cwd}" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 		#export LC_CD="$ssh_cwd"
 		#echo alacritty --working-directory $SHELL_CWD -e bash -i -c "LC_CD=$ssh_cwd $sshCom"
-		alacritty --working-directory $SHELL_CWD -e bash -c "LC_CD=$ssh_cwd $sshCom"
+		LC_CD="$ssh_cwd" alacritty --working-directory $SHELL_CWD -e bash -c "$sshCom"
 	fi
 else
 	alacritty
