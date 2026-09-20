@@ -727,7 +727,12 @@ no_blackscreen()
 
 
 export PICO_SDK_PATH=$HOME/dev/pico-sdk/
+export  picotool_DIR=$HOME/dev/picotool/installed/picotool/
 
+export KICAD9_SYMBOL_DIR=/usr/share/kicad/symbols/
+export ITR_KICAD_LIB=/home/jiri/itr/kicad-components
+export KICAD_SYMBOL_DIR=/usr/share/kicad/symbols
+export BLATTO_KICAD_LIB=/home/jiri/dev/blattoboard
 
 mp(){
 	cd ~/mp/
