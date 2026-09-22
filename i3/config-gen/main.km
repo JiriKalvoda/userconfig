@@ -45,6 +45,7 @@ cmd_set_xkbmap = CMD("setxkbmap us,cz -variant ,ucw -option '' -option grp:caps_
 EXEC_ON_STARTUP(cmd_set_xkbmap)
 if not is_vm:
     EXEC_ON_STARTUP(CMD("sleep 2; osdd-run & sleep 1;osdc --color=red START"))
+    EXEC_ON_STARTUP(CMD("/usr/lib/xdg-desktop-portal-gtk"))
     EXEC_ON_STARTUP(CMD("/usr/bin/gnome-keyring-deamon --start --components=secrets"))
     EXEC_ON_STARTUP(CMD("numlockx on"))
     EXEC_ON_STARTUP(TERMINAL(CMD("m-daemon")))
