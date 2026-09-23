@@ -1,0 +1,96 @@
+
+partial alphanumeric_keys alternate_group
+xkb_symbols "ucw" {
+
+    // This layout is usually used as the second group,
+    // it contains accented characters only, no 'latin' set.
+    // 2008 by Milan Vancura <mvancura@suse.cz>
+    // 2024 by Jiří Kalvoda <jirikalvoda@ucw.cz>
+
+    name[Group1]= "Czech (UCW-JK layout, accented letters only)";
+
+    key <AB01> { [zcaron,      Zcaron      ] };
+    key <AB02> { [ssharp                   ] };
+    key <AB03> { [ccaron,      Ccaron      ] };
+    key <AB04> { [ccedilla,    Ccedilla    ] };
+    key <AB05> { [ntilde,      Ntilde      ] };
+    key <AB06> { [ncaron,      Ncaron      ] };
+    key <AB07> { [lacute,      Lacute      ] };
+
+    key <AC01> { [aacute,      Aacute      ] };
+    key <AC02> { [scaron,      Scaron      ] };
+    key <AC03> { [dcaron,      Dcaron      ] };
+    key <AC04> { [ediaeresis,  Ediaeresis  ] };
+    key <AC05> { [racute,      Racute      ] };
+    key <AC06> { [uacute,      Uacute      ] };
+    key <AC07> { [udiaeresis,  Udiaeresis  ] };
+    key <AC08> { [ocircumflex, Ocircumflex ] };
+    key <AC09> { [lcaron,      Lcaron      ] };
+
+    key <AD01> { [adiaeresis,  Adiaeresis  ] };
+    key <AD02> { [ecaron,      Ecaron      ] };
+    key <AD03> { [eacute,      Eacute      ] };
+    key <AD04> { [rcaron,      Rcaron      ] };
+    key <AD05> { [tcaron,      Tcaron      ] };
+    key <AD06> { [yacute,      Yacute      ] };
+    key <AD07> { [uring,       Uring       ] };
+    key <AD08> { [iacute,      Iacute      ] };
+    key <AD09> { [oacute,      Oacute      ] };
+    key <AD10> { [odiaeresis,  Odiaeresis  ] };
+
+
+    // =========================================================
+    // ZACATEK MEHO ROZSIRENI UCW KLAVESNICE
+    // Vsechny popisky vzhledem k anglicke klavesnici!
+    // mapovani: /usr/include/xkbcommon/xkbcommon-keysyms.h
+
+    // ; => dvojite uvozovky dole ceske, : => jednoduche uvozovky dole
+    key <AC10> { [ doublelowquotemark, singlelowquotemark ] };
+    // ' => dvojite uvozovky nahore ceske, " => jednoduche uvozovky nahore
+    key <AC11> { [ leftdoublequotemark, leftsinglequotemark ] };
+    // to uplne vpravo pred enterem v prostredni rade => paragraf
+    key <AC12> { [ section ] }; // CHECK MARK, BALLOT X
+    // space => nedelitelna mezera, shift+space => kratka mezera
+    key <SPCE> { [ nobreakspace, thinspace ] };
+    // . => trojtecka (vypustka)
+    key <AB09> { [ ellipsis ] };
+    // / => puntik, ? => prazdny puntik
+    key <AB10> { [ U2022, U25E6 ] }; // BULLET, WHITE BULLET
+    // ` => stupen, skoro rovna se
+    key <TLDE> { [ U02DA, U2248 ] }; // RING ABOVE, ALMOST EQUAL TO
+    // 1 => liška
+    key <AE01> { [  U1F98A ] };
+    // 2 => Bell
+    key <AE02> { [ U1F514 ] };
+    // 3 => :cat:, pi
+    key <AE03> { [ U1F431, Greek_pi ] };
+    // 4, $ => :cat2:, euro
+    key <AE04> { [ U1F408, EuroSign ] };
+    // 5 => lambda, italic lambda
+    key <AE05> { [ U03BB, U0001D706 ] }; // GREEK SMALL LETTER LAMDA, MATHEMATICAL ITALIC SMALL LAMDA
+    // 6 => , tau
+    key <AE06> { [ Greek_tau , Greek_tau ] }; // NOT SIGN
+    // 7 => white heart, black heart, heavy black heart
+    key <AE07> { [ U2661, U2665, U2764 ] };
+    // 8+9+0 => medvěd (na tři části)
+    key <AE08> { [ U1F43B ] };
+    key <AE09> { [ U200D ] };
+    key <AE10> { [ U2744 ] };
+    // - => kratka pomlcka (ceska "pulctvercikova"), _ => dlouha
+    key <AE11> { [ endash, emdash ] };
+    // = => nerovna se, + => plus minus
+    key <AE12> { [ notequal, plusminus ] };
+    // ] => bocni uvozovky dvojite prave, } => jednoduche prave
+    key <AD11> { [ guillemotright, U203A ] }; //anglequoright
+    // [ => bocni uvozovky dvojite leve, { => jednoduche leve
+    key <AD12> { [ guillemotleft, U2039 ] }; //anglequoleft
+
+    // Sipky se chovaji jako PgUp/PgDown a Home/End.
+    key <UP> { [ Prior ] };
+    key <DOWN> { [ Next ] };
+    key <LEFT> { [ Home ] };
+    key <RGHT> { [ End ] };
+
+    // KONEC MEHO ROZSIRENI
+    // =========================================================
+};

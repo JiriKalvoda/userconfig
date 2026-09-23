@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  UCW Edit layout — companion to UCW Czech (QWERTY).
+  Provides full editing, navigation, clipboard, formatting, and function keys.
+  Switch back to UCW Czech via switch_backward or switch_text on bottom row.
+  Switch to other layers via bottom row swipes (numeric, emoji, clipboard, greekmath).
+-->
+<keyboard name="UCW Edit" script="latin" bottom_row="false">
+
+  <!-- Row 1: Function keys. f10-f12 on f9 swipes. -->
+  <row height="0.8">
+    <key c="esc" n="scroll_lock"/>
+    <key c="f1"/>
+    <key c="f2"/>
+    <key c="f3"/>
+    <key c="f4"/>
+    <key c="f5"/>
+    <key c="f6"/>
+    <key c="f7"/>
+    <key c="f8"/>
+    <key c="f9" e="f10" se="f11" ne="f12"/>
+  </row>
+
+  <!-- Row 2: Clipboard & formatting.
+       Macros: Bold=ctrl+b, Italic=ctrl+i, Underline=ctrl+u, Strike=ctrl+shift+x, Search=ctrl+f.
+       pasteAsPlainText on paste swipe, shareText on copy swipe. -->
+  <row>
+    <key c="selectAll" ne="&#x1F50D;:ctrl,f"/>
+    <key c="cut"/>
+    <key c="copy" ne="shareText"/>
+    <key c="paste" se="pasteAsPlainText"/>
+    <key c="undo"/>
+    <key c="redo"/>
+    <key c="&#x1D5D5;:ctrl,b"/>
+    <key c="&#x1D610;:ctrl,i"/>
+    <key c="U&#x0332;:ctrl,u"/>
+    <key c="S&#x0336;:ctrl,shift,x"/>
+  </row>
+
+  <!-- Row 3: Navigation (9 keys + 0.5 shift = 9.5, same indent as ASDFGHJKL row).
+       Cursor slider on s swipes. Word-jump macros on outer swipes.
+       Selection macros (shift+arrow) on nw/ne swipes. -->
+  <row>
+    <key shift="0.5" c="home" n="&#x21E4;:ctrl,home" s="cursor_left"/>
+    <key c="left" w="&#x2190;W:ctrl,left" nw="&#x21E0;:shift,left" s="cursor_left"/>
+    <key c="up" n="page_up" nw="&#x21E1;:shift,up" s="cursor_up"/>
+    <key c="down" n="cursor_down" s="page_down" sw="&#x21E3;:shift,down"/>
+    <key c="right" e="&#x2192;W:ctrl,right" ne="&#x21E2;:shift,right" s="cursor_right"/>
+    <key c="end" n="&#x21E5;:ctrl,end" s="cursor_right"/>
+    <key c="page_up"/>
+    <key c="page_down"/>
+    <key c="insert"/>
+  </row>
+
+  <!-- Row 4: Edit actions (1.5 + 7×1.0 + 1.5 = 10.0).
+       Backspace/delete with word-delete on swipes.
+       insert, tab, compose, literal newline, voice, enter. -->
+  <row>
+    <key width="1.5" c="shift" ne="capslock"/>
+    <key c="backspace" w="delete_word"/>
+    <key c="delete" e="forward_delete_word"/>
+    <key c="insert"/>
+    <key c="tab" s="\\t"/>
+    <key c="compose"/>
+    <key c="\\n" s="nbsp" sw="nnbsp"/>
+    <key c="voice_typing"/>
+    <key width="1.5" c="enter" n="action" se="esc"/>
+  </row>
+
+  <!-- Bottom row (9×1.0 + 1×2.0 = 10.0, height=0.95).
+       All layout switches: switch_text, switch_forward, switch_backward,
+       plus swipes to numeric, emoji, clipboard, greekmath, change_method. -->
+  <row height="0.95">
+    <key width="1.0" c="ctrl"/>
+    <key width="1.0" c="alt" s="meta"/>
+    <key width="1.0" c="fn"/>
+    <key width="1.0" c="switch_text" n="switch_greekmath"/>
+    <key width="2.0" c="space" n="change_method" e="zwj" w="zwnj"/>
+    <key width="1.0" c="switch_backward" n="switch_numeric" s="switch_emoji"/>
+    <key width="1.0" c="switch_forward" n="switch_clipboard"/>
+    <key width="1.0" c="config" s="change_method"/>
+    <key width="1.0" c="change_method_prev" n="voice_typing_chooser"/>
+  </row>
+
+</keyboard>

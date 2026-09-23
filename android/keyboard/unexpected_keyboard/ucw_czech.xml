@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  US QWERTY + UCW Czech overlay.
+  Converted from Keyboard Designer file "260409 Keyboard Data.json" (design "UCW").
+
+  n (up)   = uppercase letter / shifted digit symbol
+  s (down) = Czech/diacritic accent
+  Other directions = popup chars from designer, preferring center-ward / upward swipes
+  Fn layer = designer's "Special characters" mode (via modmap)
+  Switch to UCW Edit layout via compose key ne swipe
+-->
+<keyboard name="UCW Czech (QWERTY)" script="latin" embedded_number_row="true" bottom_row="false">
+
+  <modmap>
+    <!-- Fn layer = designer's "Special characters" mode -->
+    <fn a="q" b="@"/>
+    <fn a="w" b="'"/>
+    <fn a="e" b="~"/>
+    <fn a="r" b="°"/>
+    <fn a="t" b="€"/>
+    <fn a="y" b="="/>
+    <fn a="u" b="_"/>
+    <fn a="i" b="#"/>
+    <fn a="o" b="%"/>
+    <fn a="p" b="thx"/>
+    <fn a="a" b="["/>
+    <fn a="s" b="]"/>
+    <fn a="d" b="{"/>
+    <fn a="f" b="}"/>
+    <fn a="g" b="("/>
+    <fn a="h" b=")"/>
+    <fn a="j" b="/"/>
+    <fn a="k" b="\\"/>
+    <fn a="l" b="*"/>
+    <fn a="z" b="&lt;"/>
+    <fn a="x" b="&gt;"/>
+    <fn a="c" b="|"/>
+    <fn a="v" b="+"/>
+    <fn a="b" b="-"/>
+    <fn a="n" b=";"/>
+    <fn a="m" b=":"/>
+  </modmap>
+
+  <!-- Number row. n=shifted symbol, popups distributed to free swipe dirs.
+       F-keys from designer popups placed on nw (center-up for right keys) / sw (left keys). -->
+  <row>
+    <key c="1" n="!" ne="~" e="°" se="`" sw="f1" s="&#x1F98A;" w="&#x2248;" nw="&#x02DA;"/>
+    <key c="2" n="@" ne="f2" s="&#x1F514;"/>
+    <key c="3" n="#" ne="f3" s="&#x1F431;" w="&#x03C0;"/>
+    <key c="4" n="$" ne="f4" s="&#x1F408;" w="&#x20AC;"/>
+    <key c="5" n="%" ne="f5" s="&#x03BB;"/>
+    <key c="6" n="^" nw="f6" s="&#x03C4;"/>
+    <key c="7" n="&amp;" nw="f7" s="&#x2661;" e="&#x2665;" se="&#x2764;"/>
+    <key c="8" n="*" nw="f8" s="&#x1F43B;"/>
+    <key c="9" n="(" s="undo" w="[" sw="{" nw="f9" e="zwj" ne="&#x2039;" se="&#x00AB;"/>
+    <key c="0" n=")" s="redo" nw="]" w="}" sw="f10" se="f11" ne="f12" e="&#x2744;"/>
+  </row>
+
+  <!-- QWERTYUIOP. n=uppercase, s=Czech accent, popups on free dirs (center-ward preferred). -->
+  <row>
+    <key c="q" n="Q" s="ä" ne="tab" se="loc esc"/>
+    <key c="w" n="W" s="ě"/>
+    <key c="e" n="E" s="é" ne="€" se="ë"/>
+    <key c="r" n="R" s="ř" ne="ŕ" sw="-"/>
+    <key c="t" n="T" s="ť"/>
+    <key c="y" n="Y" s="ý" nw="\\"/>
+    <key c="u" n="U" s="ů" nw="ú" sw="ü"/>
+    <key c="i" n="I" s="í" nw=":"/>
+    <key c="o" n="O" s="ó" nw="ö" sw="ô"/>
+    <key c="p" n="P" s="ö" w="-" sw="_" nw="&#8211;" se="&#x2014;"/>
+  </row>
+
+  <!-- ASDFGHJKL. n=uppercase, s=Czech accent, popups on free dirs. -->
+  <row>
+    <key shift="0.5" c="a" n="A" s="á" ne="ä"/>
+    <key c="s" n="S" s="š" ne="§" se="ß"/>
+    <key c="d" n="D" s="ď"/>
+    <key c="f" n="F" s="ë"/>
+    <key c="g" n="G" s="ŕ"/>
+    <key c="h" n="H" s="ú" nw="=" sw="+" ne="&#x2260;" se="&#x00B1;"/>
+    <key c="j" n="J" s="ü" nw=";" sw=":" ne="&#x201A;"/>
+    <key c="k" n="K" s="ô" nw="&#x2018;" w="&quot;" sw="&#x201E;" se="&#x201C;" ne="`" e="&#x00BB;"/>
+    <key c="l" n="L" s="ľ" nw="&#x013A;" w="\\" sw="|"/>
+  </row>
+
+  <!-- Shift + ZXCVBNM + backspace. n=uppercase, s=Czech accent, popups distributed. -->
+  <row>
+    <key width="1.5" c="shift" ne="capslock"/>
+    <key c="z" n="Z" s="ž"/>
+    <key c="x" n="X" s="ß"/>
+    <key c="c" n="C" s="č" e="copy" ne="ç"/>
+    <key c="v" n="V" s="ç" e="paste" ne="&lt;"/>
+    <key c="b" n="B" s="ñ" ne="\?" sw="/" nw="&gt;"/>
+    <key c="n" n="N" s="ň" nw="ñ"/>
+    <key c="m" n="M" s="&#x013A;" nw="/" ne="'"/>
+    <key width="1.5" c="backspace" w="delete_word" ne="delete" e="forward_delete_word"/>
+  </row>
+
+  <!-- Custom bottom row. Widths: 1+1+1+1+1+2+1+2 = 10.
+       Compose ne=switch_forward to cycle to UCW Edit layout. -->
+  <row height="0.95">
+    <key width="1.0" c="ctrl"/>
+    <key width="1.0" c="switch_clipboard"/>
+    <key width="1.0" c="compose" n="up" s="down" w="left" e="right" nw="insert" ne="switch_forward"/>
+    <key width="1.0" c="switch_numeric" se="switch_emoji"/>
+    <key width="1.0" c="," n="!"/>
+    <key width="2.0" c="space" n="change_method" w="nbsp" sw="nnbsp"/>
+    <key width="1.0" c="." n="\?" w="&#x2026;" ne="&#x2022;" se="&#x25E6;" nw="&#x203A;"/>
+    <key width="2.0" c="enter" n="action" s="\\n" se="esc"/>
+  </row>
+
+</keyboard>
