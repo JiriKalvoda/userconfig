@@ -35,5 +35,10 @@
         "comments": "off",
         "strings": "off"
     },
-    "editor.autoClosingBrackets": "never"
+    "editor.autoClosingBrackets": "never",
+    "diffEditor.hideUnchangedRegions.enabled": true,
+    "[markdown]": {
+        "diffEditor.ignoreTrimWhitespace": false
+    },
+    "roo-cline.debug": false
 }
