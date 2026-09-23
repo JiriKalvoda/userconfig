@@ -13,7 +13,9 @@ d = Path("/".join(__file__.split("/")[:-1]))
 pixels_per_mm = 128/18
 print_head_pixels = 128
 
-HEIGHT = 120
+HEIGHT18 = 120
+HEIGHT12 = 76
+HEIGHT = HEIGHT18
 
 inf = float("inf")
 
@@ -91,12 +93,14 @@ def to_size(img, width, height=HEIGHT):
 
     return new_image
 
-def label(img):
+def label12(img):
+    return label(img, height=HEIGHT12)
+def label(img, height=HEIGHT):
     min_width = 140
 
     print(f"Original size  {img.width}x{img.height} pt = {img.width//pixels_per_mm/10}x{img.height//pixels_per_mm/10} cm")
 
-    img = to_size(img, (min_width, inf), HEIGHT)
+    img = to_size(hbox(img, hskip(2)), (min_width, inf), height)
     assert img.height <= HEIGHT, img.height
     print(f"Printing label {img.width}x{img.height} pt = {img.width//pixels_per_mm/10}x{img.height//pixels_per_mm/10} cm")
 
@@ -339,6 +343,11 @@ def utp_label(left, right=None):
 
 def jk():
     return text('JK', 110)
+def jk12():
+    return text('JK', 75)
+
+def majetek_jk():
+    return vbox(text("majetek", 30), text('JK', 80))
 
 # label(vbox(
 #        text("Krmení pro Bell"),
