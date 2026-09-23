@@ -79,6 +79,7 @@ class Ping:
     detail: str = ""               # plný popis negativní odpovědi
     ttl: int | None = None         # u DNS: zbývající platnost odpovědi (s)
     created: float = 0.0           # čas odeslání (monotonic)
+    wall: float = 0.0              # čas odeslání (wall clock, pro sloupec HH:MM:SS)
 
 
 @dataclass
@@ -292,7 +293,7 @@ async def one_ping(host: Host, seq: int, state: "dict | None" = None,
     err = await host.prober.prepare(min(max_wait, itv))
     if err is not None or (state and state["quit"]):
         return
-    p = Ping(seq=seq, status=PENDING, created=time.monotonic())
+    p = Ping(seq=seq, status=PENDING, created=time.monotonic(), wall=time.time())
     host.add(p)                    # pending buňka až v okamžiku odeslání
     _notify(state, "send", host, p)
 
@@ -899,8 +900,12 @@ async def resolver_task(host: Host, probe: IcmpProbe, interval: float,
 
     while not state["quit"]:
         if static_ip:
-            # překlad není potřeba, ale reverzní lookup děláme i tak
+            # překlad není potřeba, ale reverzní lookup děláme i tak;
+            # když se cílová IP nedostane do hlavičky (vlastní label nebo
+            # remote přes @@), ukaž ji aspoň v resolve řádku
             seq = max(1, state.get("seq", 0))
+            if host.label != probe.ip:
+                _set_note(state, host, seq, "resolve", probe.ip)
             _set_note(state, host, seq, "reverse", "…")
             asyncio.create_task(_reverse_task(host, probe.ip, seq, state))
             await _next_round()
@@ -1144,13 +1149,32 @@ _PARAM_KEYS = {
 }
 
 
-def _parse_params(head: str, spec: str) -> tuple[str, dict, str]:
-    """Oddělí z cílové části per-host parametry: `cíl,k=v,k=v…`.
+def _strip_trailing_params(spec: str) -> tuple[str, list[str]]:
+    """Odloupne z KONCE specifikace per-host parametry `,k=v` (za transportem).
+    Umožní tak psát parametry i na konec: `_gateway@@cmd,label=gw`. Odzobává
+    odzadu, dokud poslední čárkou oddělený úsek je `známý-klíč=hodnota`.
+    Vrací (spec bez koncových parametrů, [úseky k=v v původním pořadí])."""
+    trailing: list[str] = []
+    while (idx := spec.rfind(",")) >= 0:
+        seg = spec[idx + 1:]
+        k, eq, _v = seg.partition("=")
+        if not eq or _PARAM_KEYS.get(k) is None:
+            break
+        trailing.append(seg)
+        spec = spec[:idx]
+    trailing.reverse()
+    return spec, trailing
+
+
+def _parse_params(head: str, spec: str,
+                  extra: "list[str] | None" = None) -> tuple[str, dict, str]:
+    """Oddělí z cílové části per-host parametry: `cíl,k=v,k=v…`. `extra` jsou
+    další úseky `k=v` posbírané z konce specifikace (za transportem).
     Vrací (čistý cíl, {kanonický klíč: hodnota}, ",k=v,…" pro remote)."""
     parts = head.split(",")
     kv: dict = {}
     kept = []
-    for part in parts[1:]:
+    for part in parts[1:] + list(extra or []):
         k, eq, v = part.partition("=")
         if not eq:
             raise ValueError(f"parametr {part!r} nemá tvar klíč=hodnota "
@@ -1187,8 +1211,11 @@ def parse_spec(spec: str) -> Host:
       dns:name@1.2.3.4:53        DNS test proti konkrétnímu serveru
       dns:name@1.2.3.4@ssh gw    DNS test proti serveru, spuštěný remote
     """
-    head, sep, rest = spec.partition("@")
-    head, kv, params_str = _parse_params(head, spec)   # cíl,k=v,… per-host
+    # per-host parametry ,k=v smí být u cíle (před prvním @) i na konci
+    # specifikace (za transportem) — posbíráme je z obou míst
+    body, tail_params = _strip_trailing_params(spec)
+    head, sep, rest = body.partition("@")
+    head, kv, params_str = _parse_params(head, spec, tail_params)
     label = kv.pop("label", "") or spec
     common = dict(label=label, spec=spec, params_str=params_str, **kv)
     if head.startswith("dns:"):
@@ -1300,13 +1327,13 @@ def _apply_remote_event(obj: dict, by_rspec: dict, offset: int,
         return
     if event == "send":
         if seq not in host.pings:
-            p = Ping(seq, PENDING, created=time.monotonic())
+            p = Ping(seq, PENDING, created=time.monotonic(), wall=time.time())
             host.add(p)
             _notify(state, "send", host, p)
     elif event == "result":
         p = host.pings.get(seq)
         if p is None:
-            p = Ping(seq, PENDING, created=time.monotonic())
+            p = Ping(seq, PENDING, created=time.monotonic(), wall=time.time())
             host.add(p)
         if p.status != PENDING:
             return                                   # duplicitní výsledek
@@ -1323,7 +1350,8 @@ def _feeder_error(group: list, transport: str, why: str, state: dict) -> None:
     """Zapíše chybu spojení jako řádek do všech sloupců skupiny."""
     for h in group:
         p = Ping(h.last_ping + 1, ERROR, msg="spojení selhalo",
-                 detail=f"[{transport}] {why}"[:200], created=time.monotonic())
+                 detail=f"[{transport}] {why}"[:200], created=time.monotonic(),
+                 wall=time.time())
         h.add(p)
         h.resolve(p)
         _notify(state, "result", h, p)
@@ -1335,13 +1363,17 @@ async def remote_feeder(transport: str, group: list, args, state: dict) -> None:
     události a plní z nich lokální sloupce. Při pádu se s odstupem restartuje."""
     backoff = 2.0
     while not state["quit"]:
-        # @@ hosté: počkej na lokální překlad (hlavní proces, mimo namespace)
-        for h in group:
-            if h.local_resolve and h.prober.ip is None:
-                try:
-                    await asyncio.wait_for(h.prober.ready.wait(), timeout=10)
-                except asyncio.TimeoutError:
-                    pass
+        # @@ hosté: dej lokálnímu překladu (hlavní proces, mimo namespace)
+        # krátkou šanci doběhnout, ať je stihneme do prvního spojení. Čekáme
+        # souběžně a jen na ty, u kterých překlad ještě neselhal — cíl bez
+        # řešení (např. _gateway bez routy) nesmí blokovat ostatní; přidá se
+        # pak sám přes restart, až (pokud) se vůbec přeloží.
+        waiting = [h for h in group if h.local_resolve
+                   and h.prober.ip is None and not h.prober.fail]
+        if waiting:
+            await asyncio.wait(
+                [asyncio.create_task(h.prober.ready.wait()) for h in waiting],
+                timeout=3.0)
         # co za specifikaci pošleme remote: @@ → přeložená IP (+ per-host
         # parametry, aby platily i tam), jinak beze změny
         sent_ip = {h: h.prober.ip for h in group if h.local_resolve}
@@ -1349,6 +1381,9 @@ async def remote_feeder(transport: str, group: list, args, state: dict) -> None:
                     else h.remote_spec)
                 for h in group if not h.local_resolve or sent_ip[h] is not None}
         active = list(sent)
+        # @@ cíle, které se ještě nepřeložily → zatím je neposíláme, ale hlídáme
+        # je: až se přeloží, spojení restartujeme, aby se do něj přidaly
+        pending_at = [h for h in group if h.local_resolve and h.prober.ip is None]
         if not active:
             # lokální překlad ještě nedoběhl → nic neodesíláme a nevkládáme
             # falešné chybové pingy; důvod je vidět v note řádku z resolveru
@@ -1356,10 +1391,13 @@ async def remote_feeder(transport: str, group: list, args, state: dict) -> None:
             continue
         by_rspec = {sent[h]: h for h in active}
 
-        # offset zajišťuje návaznost seq po restartu spojení; počítá se jen ze
-        # skutečných pingů (noty z lokálních resolverů ho nesmí posouvat,
-        # jinak by celá remote skupina byla o tick pozadu)
-        offset = max(h.last_ping for h in group)
+        # offset zarovná seq remote pingů na aktuální pozici mřížky, aby dorazily
+        # na živý konec tabulky (a ne do minulosti). Maximum z pozice mřížky
+        # (state["seq"], řízené lokálními hosty) a z posledních skutečných pingů
+        # skupiny: po restartu seq plynule navazuje a při zpožděném startu
+        # (čekání na @@ překlad, výpadek spojení) se remote skupina nezobrazí
+        # posunutá o desítky ticků dozadu. Noty ho neposouvají (jen last_ping).
+        offset = max([state.get("seq", 0)] + [h.last_ping for h in group])
         cmd = (shlex.split(transport) + shlex.split(args.remote_cmd)
                + ["--json", "-i", str(args.interval), "-t", str(args.timeout),
                   "-w", str(args.max_wait), "-s", str(args.stagger),
@@ -1394,7 +1432,8 @@ async def remote_feeder(transport: str, group: list, args, state: dict) -> None:
                 # nový překlad (klávesa 'r') → restart s čerstvým překladem
                 if (state.get("rgen", 0) != gen0
                         or any(h.local_resolve and h.prober.ip != sent_ip[h]
-                               for h in active)):
+                               for h in active)
+                        or any(h.prober.ip is not None for h in pending_at)):
                     restart = True
                     proc.terminate()
                     break
@@ -1451,6 +1490,7 @@ async def engine(hosts: list[Host], args, state: dict) -> None:
 # ── vykreslování ──────────────────────────────────────────────────────────────
 
 SEQW = 7          # šířka prvního sloupce (číslo pingu / název metriky)
+TIMEW = 9         # šířka sloupce s časem odeslání packetu (HH:MM:SS)
 TIMEOUT_X = 1.0   # práh X: po tolika s bez odpovědi = timeout (a ztráta)
 MAX_WAIT = 10.0   # jak dlouho ping ještě běží a čeká na pozdní odpověď
 
@@ -1511,6 +1551,36 @@ def _kind_order(kind: str) -> int:
     return {"resolve": 0, "reverse": 1}.get(kind, 2)
 
 
+def _tick_wall(hosts: list[Host], seq: int) -> float | None:
+    """Nejstarší wall-clock čas odeslání packetu v daném ticku (nebo None,
+    když v tomto ticku žádný host nepingoval — jen noty)."""
+    best = None
+    for h in hosts:
+        p = h.pings.get(seq)
+        if p and p.wall and (best is None or p.wall < best):
+            best = p.wall
+    return best
+
+
+def _hhmmss(wall: float | None) -> str:
+    """Wall-clock čas jako HH:MM:SS (prázdné, když čas není)."""
+    return time.strftime("%H:%M:%S", time.localtime(wall)) if wall else ""
+
+
+def _date_label(wall: float | None, now_wall: float) -> str:
+    """Kompaktní datum `wall`, pokud nespadá do dneška (jinak ''). Vejde se do
+    TIMEW: 'MM-DD' ve stejném roce, jinak 'YY-MM-DD'."""
+    if not wall:
+        return ""
+    lt = time.localtime(wall)
+    tt = time.localtime(now_wall)
+    if (lt.tm_year, lt.tm_mon, lt.tm_mday) == (tt.tm_year, tt.tm_mon, tt.tm_mday):
+        return ""
+    if lt.tm_year != tt.tm_year:
+        return time.strftime("%y-%m-%d", lt)
+    return time.strftime("%m-%d", lt)
+
+
 def cell_text(p: Ping | None, colw: int, now: float,
               tx: float | None = None) -> tuple[str, int]:
     """Vrátí (text, barva) pro buňku.
@@ -1564,9 +1634,9 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
     # Pokud se to nevejde, sloupce zúžíme, aby se vešly.
     content = max(max(len(h.label), h.note_w) for h in hosts) + 1
     natural = max(9, min(28, content))
-    fit = (w - SEQW - 1) // len(hosts)
+    fit = (w - SEQW - TIMEW - 1) // len(hosts)
     colw = max(9, min(natural, fit))
-    table_w = min(w, SEQW + colw * len(hosts))
+    table_w = min(w, SEQW + TIMEW + colw * len(hosts))
     cw = colw - 1                    # užitná šířka buňky
 
     # hlavička: labely delší než buňka se lámou na dva řádky; pod jmény
@@ -1626,6 +1696,12 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
         seq -= 1
     visible = list(reversed(rows_bottom_up[scroll_off:scroll_off + nrows]))
 
+    # datum prvního (nejhořejšího) zobrazeného řádku — do hlavičky sloupce
+    # s časem, ale jen když nejstarší viditelný tick nespadá do dneška
+    first_wall = next((wt for it in visible
+                       if (wt := _tick_wall(hosts, it[1]))), None)
+    hdr_date = _date_label(first_wall, time.time())
+
     # titulek
     title = (f" TUI ping — {len(hosts)} adres · interval {state['interval']}s"
              f" · timeout {state['timeout']}s · {state.get('method', '')} ")
@@ -1640,11 +1716,15 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
                                 else curses.A_UNDERLINE)
         _put(stdscr, y, 0, ("ping" if name_last else "").rjust(SEQW), SEQW,
              attr)
-        x = SEQW
+        x = SEQW + TIMEW
         for host in hosts:
             part = host.label[row * cw:(row + 1) * cw]
             _put(stdscr, y, x, part.rjust(colw), colw, attr)
             x += colw
+    if hdr_date:                       # datum do hlavičky sloupce s časem
+        yd = 2 + hdr_rows - 1
+        dattr = curses.A_BOLD | (0 if hdr_res or hdr_rev else curses.A_UNDERLINE)
+        _put(stdscr, yd, SEQW, hdr_date.rjust(TIMEW), TIMEW, dattr)
     y = 2 + hdr_rows
     for kind_attr, show in (("last_resolve", hdr_res), ("last_reverse", hdr_rev)):
         if not show:
@@ -1653,7 +1733,7 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
         base = curses.color_pair(CYAN) | (curses.A_UNDERLINE if last else 0)
         sym = "→" if kind_attr == "last_resolve" else "←"
         _put(stdscr, y, 0, sym.rjust(SEQW), SEQW, base | curses.A_BOLD)
-        x = SEQW
+        x = SEQW + TIMEW
         for host in hosts:
             val = getattr(host, kind_attr)[:cw]
             _put(stdscr, y, x, val.rjust(colw), colw, base)
@@ -1668,7 +1748,9 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
         if item[0] == "tick":
             seq = item[1]
             _put(stdscr, y, 0, f"#{seq}".rjust(SEQW), SEQW, curses.A_DIM)
-            x = SEQW
+            _put(stdscr, y, SEQW, _hhmmss(_tick_wall(hosts, seq)).rjust(TIMEW),
+                 TIMEW, curses.A_DIM)
+            x = SEQW + TIMEW
             for host in hosts:
                 txt, color = cell_text(host.pings.get(seq), colw, now, host.tx)
                 attr = curses.color_pair(color) if color else 0
@@ -1696,7 +1778,7 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
             sym = ("→" if kind == "resolve" else "←") if part == 0 else ""
             _put(stdscr, y, 0, sym.rjust(SEQW), SEQW,
                  curses.color_pair(CYAN) | curses.A_BOLD)
-            x = SEQW
+            x = SEQW + TIMEW
             for host in hosts:
                 n = next((nn for nn in host.notes.get(seq, ())
                           if nn.kind == kind), None)
@@ -1716,7 +1798,7 @@ def draw(stdscr, hosts: list[Host], state: dict, start_ts: float) -> None:
                 break
             _put(stdscr, y, 0, label.rjust(SEQW), SEQW,
                  curses.A_BOLD | curses.A_DIM)
-            x = SEQW
+            x = SEQW + TIMEW
             for host in hosts:
                 _put(stdscr, y, x, fn(host).rjust(colw), colw,
                      curses.color_pair(colorfn(host)))
@@ -1992,8 +2074,67 @@ def print_history(hosts: list[Host]) -> None:
         print(row)
 
 
+TARGET_HELP = """\
+Specifikace cíle (dělí se vždy prvním @ zleva):
+  adresa                     lokální ICMP ping (IPv4 / IPv6 / jméno)
+  v4:jméno / v6:jméno        vynutí IPv4/IPv6 překlad jména (default: dle systému)
+  cíl^N                      pingat N-tý hop cesty k cíli (jako traceroute);
+                             hop se dohledává periodicky jako překlad
+  _gateway                   ping na default gateway (z routovací tabulky)
+  gateway:<iface>            default gateway ("via") skrz daný interface
+  if:<iface>[#n]             n-tá (default první) IP adresa interface
+  if4:<iface>[#n]:<konec>    síťový prefix n-té IPv4 adresy interface
+                             + doplněný konec (např. if4:eth0:21)
+  if6:<iface>[#n]:<konec>    totéž pro IPv6 (např. if6:wg0:10:1)
+  dns:jméno                  test DNS resolve přes systémový resolver
+  dns:jméno@server[:port]    test DNS proti konkrétnímu serveru
+  adresa@<příkaz>            remote: spustí `<příkaz> pingtui --json adresa`
+  adresa@@<příkaz>           jméno přeloží hlavní proces (mimo namespace),
+                             remote pinguje už hotovou IP; při změně překladu
+                             se remote restartuje s novou IP
+  dns:jméno@server@<příkaz>  DNS test proti serveru, spuštěný remote
+
+  Stejný @<příkaz> u více cílů = jedno sdílené spojení.
+
+Per-host parametry (čárkami hned za cílem, před prvním @):
+  cíl,i=0.2,t=2,w=5,r=30,label=doma
+    i / interval           frekvence pingu
+    t / timeout            práh timeoutu (a započítání do ztráty)
+    w / max-wait           max čekání na pozdní odpověď
+    r / resolve-interval   frekvence resolve/reverse (0 = jen ručně klávesou 'r')
+    label                  název sloupce v tabulce
+  Řádky tabulky běží na nejmenším intervalu ze všech hostů; pomalejší hosty
+  nechávají mezilehlé buňky prázdné.
+
+DNS wildcards ve jméně dotazu (expandují se per dotaz):
+  %i     sekvenční číslo dotazu
+  %5h    5 znaků hashe seq (deterministické; N volitelné)
+  %5r    5 náhodných znaků (N volitelné, výchozí 5)
+  %5c    5 znaků náhodného identifikátoru session (stejný po celý běh)
+  %%     literál %
+  Např. dns:%5r.example.com obchází DNS cache.
+
+Příklady:
+  pingtui.py 8.8.8.8 1.1.1.1 example.com
+  pingtui.py -i 2 -t 3 8.8.8.8 seznam.cz
+  pingtui.py dns:google.com 'dns:seznam.cz@10.0.0.1:53'
+  pingtui.py '8.8.8.8@ssh gw' 'dns:google.com@1.1.1.1@ssh gw'
+  pingtui.py '8.8.8.8,label=direct@@net_direct'
+
+Ovládání TUI:
+  q / Esc      konec
+  r            přeložit znovu (vč. restartu remote spojení)
+  šipky ↑/↓    posun po řádcích (jinak drží živý konec)
+  PgUp/PgDn    posun po stránkách
+  home/end     skok na okraje
+"""
+
+
 def main() -> None:
-    ap = argparse.ArgumentParser(description="TUI ping na více adres najednou.")
+    ap = argparse.ArgumentParser(
+        description="TUI ping na více adres najednou.",
+        epilog=TARGET_HELP,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("hosts", nargs="+", help="adresy k pingání")
     ap.add_argument("-i", "--interval", type=float, default=1.0,
                     help="perioda mezi pingy v sekundách (výchozí 1)")
