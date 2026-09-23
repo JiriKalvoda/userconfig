@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../userconfig-lib.sh
-version 5
+version 6
 install_begin
 
 confln mw2md.sh ~/bin/mw2md
@@ -15,6 +15,7 @@ confln vitemperature.sh ~/bin/ E
 confln sfs.py ~/bin/ E
 confln unicode-normalize.py ~/bin/ E
 confln tmpch.sh  ~/bin/ E
+confln treediff.py  ~/bin/ E
 
 confln pingtui.py  ~/bin/ E
 
