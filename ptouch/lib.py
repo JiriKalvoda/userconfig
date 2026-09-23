@@ -429,4 +429,20 @@ def majetek_jk():
 #        hbox(text("320", 75), text("g", 40))
 #))
 
+def DS18B20_label(left, right=None):
+    if not right: right=left
+    label(hbox(
+        left,
+        hskip(4),
+        black(1, HEIGHT),
+        hskip(int(6*pixels_per_mm)),
+        black(1, HEIGHT),
+        hskip(int(6*pixels_per_mm)),
+        black(1, HEIGHT),
+        hskip(4),
+        right
+    ))
+
+def DS18B20(id, name, text_size=60):
+    DS18B20_label(vbox(text(name, text_size), vskip(70- text_size), text(id, 25)))
 
