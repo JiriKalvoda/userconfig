@@ -13,6 +13,7 @@ args = parser.parse_args()
 
 param = args.target
 dirname = param.split('--')[0]
+hostname = param.split('@')[-1]
 mountpoint = os.environ['HOME']+"/m/"+dirname
 
 if args.umount:
@@ -35,7 +36,7 @@ else:
 
     try:
         import blachlib.core
-        namespace, m, rest = blachlib.core.find_by_name(param)
+        namespace, m, rest = blachlib.core.find_by_name(hostname)
         server_mountpoint = m.sshfs_mountpoint
     except Exception as e:
         print(f"Loading blach configuration faield: {e}", file=sys.stderr)
