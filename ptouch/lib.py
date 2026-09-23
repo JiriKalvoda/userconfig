@@ -152,6 +152,32 @@ def text(t, font_size=20, down=True):
     draw.text((0,up_size), t, font=font, anchor='ls')
     return image
 
+def texts(t, font_size=20, down=True, split_after=None):
+    """Like text(), but returns a list of images instead of one, ready to be
+    re-flowed with multiline() / multilinev().
+
+    Splitting: by default on every run of whitespace (word by word). If
+    split_after is given, the text is instead split after each of those
+    characters, keeping the delimiter attached to the preceding chunk
+    (e.g. split_after="," turns "a, b, c" into "a,", "b,", "c").
+
+    Each chunk is rendered with a trailing space so neighbouring chunks that
+    end up on the same line don't touch."""
+    if split_after:
+        parts, cur = [], ""
+        for ch in t:
+            cur += ch
+            if ch in split_after:
+                parts.append(cur)
+                cur = ""
+        if cur:
+            parts.append(cur)
+    else:
+        parts = t.split()
+    parts = [p.strip() for p in parts]
+    parts = [p for p in parts if p]
+    return [text(p + " ", font_size, down) for p in parts]
+
 from PIL import Image
 
 def vbox(*images, align='c'):
@@ -287,6 +313,54 @@ def multiline(data, size):
     if current:
         out.append(hbox(*current))
     return out
+
+
+def multilinev(data, max_lines, align='c', box=True, gap=0):
+    """Break a sequence of images into at most max_lines lines, choosing the
+    smallest possible line width so the result is as narrow/even as possible.
+
+    Objects keep their order (each line is a contiguous run) and are grouped
+    with hbox. By default the lines are stacked with vbox and a single image is
+    returned; pass box=False to get the raw list of per-line hboxes instead.
+    gap adds that many pixels of vertical space between the lines."""
+    data = list(data)
+    if not data:
+        return Image.new("1", (1, 1), (1)) if box else []
+    widths = [x.width for x in data]
+
+    def lines_needed(limit):
+        # greedy pack into lines of width <= limit; inf if a single item is too wide
+        count, cur = 1, 0
+        for w in widths:
+            if w > limit:
+                return inf
+            if cur and cur + w > limit:
+                count += 1
+                cur = w
+            else:
+                cur += w
+        return count
+
+    # smallest max-line-width that still keeps us within max_lines lines
+    lo, hi = max(widths), sum(widths)
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if lines_needed(mid) <= max_lines:
+            hi = mid
+        else:
+            lo = mid + 1
+
+    lines = multiline(data, lo)
+    if not box:
+        return lines
+    if gap:
+        spaced = []
+        for i, line in enumerate(lines):
+            if i:
+                spaced.append(vskip(gap))
+            spaced.append(line)
+        return vbox(*spaced, align=align)
+    return vbox(*lines, align=align)
 
 
 def net_switch(ports, port_order, port_size, big_vlans=False):
