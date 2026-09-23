@@ -6,6 +6,17 @@ import time
 from datetime import datetime, timedelta, date
 import datetime as dt
 
+RESET = '\033[0m'
+BOLD = '\033[1m'
+CYAN = '\033[36m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+MAGENTA = '\033[35m'
+BLUE = '\033[34m'
+RED = '\033[31m'
+BOLD = '\033[1m'
+NO_BOLD = '\033[21m'
+
 filename = os.environ['HOME']+'/work_log'
 
 def get_current_state():
@@ -74,6 +85,8 @@ if args.subparser == 'stats':
             if t-f:
                 by_days.setdefault(d, {}).setdefault(activity, {}).setdefault(topic, timedelta())
                 by_days[d][activity][topic] += t-f
+                if t-f > timedelta(hours=1):
+                    print(activity, topic, f"from {f} to {t} ({t-f})")
 
                 month = d.strftime("%Y-%m")
                 by_months.setdefault(month, {}).setdefault(activity, {}).setdefault(topic, timedelta())
@@ -83,6 +96,7 @@ if args.subparser == 'stats':
         data = [l.split('\t') for l in f.read().split('\n') if l]
         total_time = {}
         topics = {}
+        print("Long activities:")
         for x, y in zip(data, data[1:]):
             activity = x[1]
             if len(x) >= 3 and x[2]:
@@ -96,7 +110,10 @@ if args.subparser == 'stats':
             for activity, y in x.items():
                 print(f"{d} {activity} ({sum(y.values(), start=timedelta())}):")
                 for topic, time in y.items():
-                    print(topic, time)
+                    if time > timedelta(hours=1):
+                        print(topic, RED+str(time)+RESET)
+                    else:
+                        print(topic, time)
                 print()
 
 
