@@ -229,12 +229,12 @@ with ADD_MODIFICATOR(SUPER):
     M(K_D(SHIFT), CMD("dmenu_run"))
 
     # web
-    M(K_C, CMD(ALTERNATIVES("chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled", "google-chrome", "firefox")))
-    M(K_C(SHIFT), CMD(f"{ALTERNATIVES('chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled', 'google-chrome')} --incognito"))
-    M(K_C(CTRL|SHIFT), CMD(f"{ALTERNATIVES('chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled', 'google-chrome')} --user-data-dir=$(mktemp -d)"))
-    M(K_C(CTRL), CMD("firefox"))
+    M(K_C, CMD(ALTERNATIVES("firefox", "google-chrome", "chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled")))
+    M(K_C(SHIFT), CMD(ALTERNATIVES("firefox --private-window", "google-chrome --incognito", "chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled --incognito")))
+    M(K_C(CTRL|SHIFT), CMD(ALTERNATIVES("firefox --profile $(mktemp -d)", "google-chrome --user-data-dir=$(mktemp -d)", "chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled --user-data-dir=$(mktemp -d)")))
+    M(K_C(CTRL), CMD("chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled"))
 
-    M(K_A(CTRL), CMD("chromium  --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled --new-window https://slovnik.seznam.cz/"))
+    M(K_A(CTRL), CMD("firefox --new-window https://slovnik.seznam.cz/"))
 
     # Tea timer
     I3_DIRECT("""

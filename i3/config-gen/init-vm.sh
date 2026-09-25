@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 . ../../userconfig-lib.sh
-version 3
+version 4
 install_begin
 
 confln main.km ~/.config/i3/config-gen

@@ -6,39 +6,29 @@ then
 	exit 1
 fi
 
-echo "Running chromium in $d"
+echo "Running firefox in $d"
 echo
 
 if [[ "$TMPCH_COLOR" != "" ]]
 then
-	mkdir $d/Default
-#	cat > $d/Default/Preferences <<AMEN
-#{
-#  "extensions": {
-#    "theme": {
-#      "id": "ogpbofebdcjdefeaglkbdhoappklpblc",
-#      "pack": "$d/theme"
-#    }
-#  }
-#}
-#AMEN
-	mkdir $d/theme
-	cat > $d/theme/manifest.json <<AMEN
-{
-  "manifest_version": 3,
-  "name": "${TMPCH_THEME_NAME:-Color variant theme}",
-  "version": "1.0",
-  "description": "Color variant theme",
-  "theme": {
-    "colors": {
-      "frame": [$TMPCH_COLOR]
-    }
-  }
+	# Firefox nemá CLI ekvivalent chromium --load-extension pro téma.
+	# Rámeček/toolbar proto obarvíme přes userChrome.css v throwaway profilu.
+	# TMPCH_COLOR se očekává jako CSS rgb() argument, tj. "R,G,B" (např. "255,0,0").
+	mkdir -p "$d/chrome"
+	cat > "$d/user.js" <<AMEN
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
+AMEN
+	cat > "$d/chrome/userChrome.css" <<AMEN
+:root {
+  --toolbar-bgcolor: rgb($TMPCH_COLOR) !important;
+  --lwt-accent-color: rgb($TMPCH_COLOR) !important;
+}
+#navigator-toolbox {
+  background-color: rgb($TMPCH_COLOR) !important;
 }
 AMEN
-	color_args=--load-extension=$d/theme
 fi
 
-#timeout 1 chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled --user-data-dir="$d" "$@"
-chromium --disable-features=ExtensionManifestV2Unsupported,ExtensionManifestV2Disabled --user-data-dir="$d" $color_args "$@"
+#timeout 1 firefox --new-instance --profile "$d" "$@"
+firefox --new-instance --profile "$d" "$@"
 rm -r "$d"

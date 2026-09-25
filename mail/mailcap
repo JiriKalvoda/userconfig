@@ -10,7 +10,7 @@ application/msword; /usr/bin/xdg-open %s
 application/pdf; zathura %s &
 application/postscript; /usr/bin/xdg-open %s
 
-#text/html; mv %s %s.html && chromium --new-window %s.html 1>&- 2>&- ; copiousoutput
+#text/html; mv %s %s.html && firefox --new-window %s.html 1>&- 2>&- ; copiousoutput
 text/html; lynx -assume_charset=%{charset} -display_charset=utf-8 -dump %s; copiousoutput; nametemplate=%s.html
 
 #text/html; mv %s %s.html/usr/bin/xdg-open %s ; copiousoutput

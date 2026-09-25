@@ -254,7 +254,7 @@ bar {
 
 exec --no-startup-id synclient HorizEdgeScroll=1 VertEdgeScroll=1 VertScrollDelta=-111
 
-bindsym $mod+c exec chromium
+bindsym $mod+c exec firefox
 bindsym $mod+ctrl+z exec zathura
 bindsym $mod+Shift+comma workspace WUI;exec ~/dev/runWUI/run.sh
 bindsym $mod+comma workspace WUI

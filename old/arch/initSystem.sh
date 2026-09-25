@@ -46,7 +46,7 @@ pacman -S dunst
 pacman -S openssh sshfs
 
 # Web broser
-pacman -S chromium
+pacman -S firefox
 
 # File manager
 pacman -S nemo

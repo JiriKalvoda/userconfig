@@ -191,14 +191,14 @@ def open_vim():
 def open_browser(window=False, incognito=False, session=False):
     import tempfile
     end()
-    incognito_arg = ["--incognito"] if incognito else []
+    incognito_arg = ["--private-window"] if incognito else []
     window_arg = ["--new-window"] if window else []
-    session_arg = ["--user-data-dir="+tempfile.mkdtemp()] if session else []
+    session_arg = ["--profile", tempfile.mkdtemp()] if session else []
     if is_vm():
-        p = vm_run(["chromium", *incognito_arg, *window_arg, *session_arg, path_to_filename(arg)], gui=True)
+        p = vm_run(["firefox", *incognito_arg, *window_arg, *session_arg, path_to_filename(arg)], gui=True)
         exit(0)
     else:
-        p = subprocess.run(["chromium", *incognito_arg, *window_arg, *session_arg, arg])
+        p = subprocess.run(["firefox", *incognito_arg, *window_arg, *session_arg, arg])
         exit(p.returncode)
 
 
@@ -279,13 +279,13 @@ class MainWindow(QWidget):
         self._lay.addWidget(self.new_button('_bash', "&bash"))
         
         self._lay_browser = QHBoxLayout()
-        self._lay_browser.addWidget(self.new_button('_browser', "chromium &t&a&b"))
-        self._lay_browser.addWidget(self.new_button('_browser_w', "chromium &window"))
+        self._lay_browser.addWidget(self.new_button('_browser', "firefox &t&a&b"))
+        self._lay_browser.addWidget(self.new_button('_browser_w', "firefox &window"))
         self._lay.addLayout(self._lay_browser)
 
         self._lay_browser2 = QHBoxLayout()
-        self._lay_browser2.addWidget(self.new_button('_browser_incognito', "chromium &incognito"))
-        self._lay_browser2.addWidget(self.new_button('_browser_session', "chromium &session"))
+        self._lay_browser2.addWidget(self.new_button('_browser_incognito', "firefox &incognito"))
+        self._lay_browser2.addWidget(self.new_button('_browser_session', "firefox &session"))
         self._lay.addLayout(self._lay_browser2)
 
         self._vm = QGroupBox("&Virtual machine");
