@@ -11,3 +11,6 @@ PrintMotd no # pam does that
 Subsystem	sftp	/usr/lib/ssh/sftp-server
 
 AcceptEnv LC_*
+
+
+Include /etc/ssh/sshd_config.d/*.conf
