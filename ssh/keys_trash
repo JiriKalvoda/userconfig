@@ -1,10 +1,5 @@
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHtNkpixti8+vUFjQPa+Rn2u02/JcteftkBDP8K+gyr7 jirikalvoda@ucw.cz jiri,root@arzen trash 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEOUjPsAZy6X1/kShqinEtj9jv7CPlM9Hd/ZTw5SYBn1 jirikalvoda@ucw.cz jiri,root@hopik trash 2025-10-26
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJieCXaKmxM9lXOFEF1NKkAk6wXeRWNbjQSPQZwEMg+M jirikalvoda@ucw.cz jiri,root@samet trash 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPuufB55gbBzfsjcBABND0ltV+4McM++mUqahHH1f6zC jirikalvoda@ucw.cz jiri,root@external trash 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOeoHfJF48SY+rw+7VgLjr0vOMP6xaTjUKrZwnctMXNK jirikalvoda@ucw.cz jiri,root@rpi* trash 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMezr92DIPkvVoqHcc4qUrjAzgOg1wdoIKDA8DJLFTWU jirikalvoda@ucw.cz jiri,root@hluk trash 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJbEknFSBb5lZAKufLIcX2TrOEM7cXr/PpfPWVQ4KEsB jirikalvoda@ucw.cz jiri@teplo trash 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSyZvtBeBicDQsfcj1BzKff+OtvrWLvKuFOWJ23v3+k jirikalvoda@ucw.cz jirikalvoda@kam trash 2024-08-23
-ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKedZ0ZMvg4bJg7aohkWsPX2clGrCGCuVYPPEk+4YevK jirikalvoda@ucw.cz jirikalvoda@ucw trash 2024-08-23
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINA4g+Pj5GwmuoHDybkm57qBMVpFAD+dJ+1iee6PvsFx jirikalvoda@ucw.cz jiri,root@selen trash 2024-08-23
