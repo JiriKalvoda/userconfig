@@ -11,7 +11,7 @@ fi
 
 
 
-version 3
+version 4
 install_begin
 
 [[ -f ~/.ssh/authorized_keys ]] && cat ~/.ssh/authorized_keys > $state_run_dir/files/old_authorized_keys
