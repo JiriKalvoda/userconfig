@@ -1,0 +1,141 @@
+// Konfigurace serveru dat TripScope (tripscope-data-server run, ve
+// virtuálce služba tripscope-data; ručně příkaz tripscope-data): pravidelně
+// stahuje jízdní řády, každou novou verzi archivuje — feed i původní data
+// převáděných zdrojů; zipy rozbalené, i vnořené; každý soubor zkomprimovaný
+// zvlášť a uložený jednou, ať ho má verzí kolik chce — a zveřejní z ní
+// předzpracovaná data pro aplikaci: strom souborů (index.json, bundles/,
+// pieces/), který servíruje sshd (internal-sftp -R).
+//
+// Gramatika zdrojů je stejná jako v konfiguraci aplikace:
+//   source <jméno> <typ> { <parametry> }
+// check: jak často se zdroj zkouší (at: v kolik — ":MM" minuta v hodině,
+// "HH:MM" čas dne). Server s datem souboru (Last-Modified) se ptá
+// podmíněně a nezměněný zip nestahuje — ty stačí zkoušet každou hodinu.
+// Server bez data pošle zip pokaždé celý (nová verze se pozná až obsahem),
+// proto jen jednou denně.
+//
+// interrail a cd nejsou u zdroje GTFS: stáhne a převede je deinterrail
+// (/opt/deinterrail ve virtuálce, jeho tripscope-feed) — zdroj typu cmd,
+// parametry pod path dostane na stdin (source, places).  ggu, cisjr, czptt:
+// typy rozšíření TripScopu (gtfs-merge, jdf, czptt — program serveru musí
+// být sestaven s nimi), jména zdrojů jako v základní konfiguraci (tím ji
+// nahradí).
+//
+// Starší formáty předzpracovaných dat (formats) zatím žádné: zveřejňuje se
+// jen formát, který zná tato verze serveru.
+
+// archiv a strom pro aplikaci, oba v exportovaném adresáři: chroot účtu
+// data pro SFTP (virtuálka vm_tripscope_data v blachu, její datový disk).
+// Archiv: zstd úrovně 19 (level=); ggu jen poslední verzi — skoro celá je
+// každý den nová (zastávky přečíslované, ~150 MB) a originál CIS JŘ
+// archivují cisjr a czptt.
+archive "/data/tripscope/export/archive" {
+    latest "ggu"
+}
+publish "/data/tripscope/export/pub"
+
+timetables {
+    // data.pid.cz — nová verze denně kolem 4:10
+    timetable pid {
+        source main gtfs {
+            url "https://data.pid.cz/PID_GTFS.zip"
+            check "1h" at=":05"
+        }
+    }
+    // Spojenka — celostátní jízdní řády, nová verze denně kolem 4:40
+    timetable spojenka {
+        source main gtfs {
+            url "https://www.spojenka.cz/jrdata/jizdnirady-gtfs.zip"
+            check "1h" at=":10"
+        }
+    }
+    // KORDIS JMK — IDS JMK
+    timetable idsjmk {
+        source main gtfs {
+            url "https://kordis-jmk.cz/gtfs/gtfs.zip"
+            check "1h" at=":15"
+        }
+    }
+    // DPMLJ — MHD Liberec a Jablonec nad Nisou
+    timetable liberec {
+        source main gtfs {
+            url "https://www.dpmlj.cz/gtfs.zip"
+            check "1h" at=":20"
+        }
+    }
+    // IDS BK — regionální autobusy Bratislavského kraje
+    timetable idsbk {
+        source main gtfs {
+            url "https://transiq.xhyrom.dev/gtfs/sk/ids-bk_regional.zip"
+            check "1h" at=":25"
+        }
+    }
+    // PMDP — MHD Plzeň (server na dotaz na hlavičku neodpovídá: denně)
+    timetable plzen {
+        source main gtfs {
+            url "https://jizdnirady.pmdp.cz/jr/gtfs"
+            check "1d" at="05:30"
+        }
+    }
+    // DPMO — MHD Olomouc (bez data souboru: denně)
+    timetable olomouc {
+        source main gtfs {
+            url "https://www.dpmo.cz/doc/dpmo-olomouc-cz.zip"
+            check "1d" at="05:40"
+        }
+    }
+    // DPB — MHD Bratislava (ArcGIS, bez data souboru: denně)
+    timetable bratislava {
+        source main gtfs {
+            url "https://www.arcgis.com/sharing/rest/content/items/aba12fd2cbac4843bc7406151bc66106/data"
+            check "1d" at="05:50"
+        }
+    }
+    // GGU / JrUtil — CIS JŘ jako GTFS ve dvou zipech (autobusy a MHD,
+    // vlaky), sloučené do jednoho (feed-gtfs-merge); nová verze denně
+    // kolem 23:15, server posílá datum souborů.  V archivu jen poslední
+    // verze (archive … latest).
+    timetable ggu {
+        source "data.jr.ggu.cz" gtfs-merge {
+            part "jdf" "https://data.jr.ggu.cz/results/latest/JDF_merged_GTFS.zip"
+            part "czptt" "https://data.jr.ggu.cz/results/latest/CZPTT_GTFS.zip"
+            check "1h" at=":30"
+        }
+    }
+    // CIS JŘ — autobusy a MHD (JDF) z ftp.cisjr.cz (feed-cisjr; polohy
+    // zastávek z ostatních jízdních řádů, nejdřív ggu); kontrola: velikost
+    // a datum souborů na FTP
+    timetable cisjr {
+        source "CIS JŘ" jdf {
+            check "1h" at=":40"
+        }
+    }
+    // CIS JŘ — vlaky (zprávy CZPTT Správy železnic, feed-czptt; polohy
+    // stanic ze spojenka a ggu, km z tabulek KJŘ přes pdftotext)
+    timetable czptt {
+        source "CIS JŘ" czptt {
+            check "1h" at=":45"
+        }
+    }
+    // Rail Planner (Interrail / Eurail) — data z balíčku Android aplikace
+    // z APKPure; kontrola je jen dotaz na přesměrování (nic se nestahuje),
+    // nová verze aplikace jednou za pár týdnů (95 MB, převod asi 2 min)
+    timetable interrail {
+        source main cmd {
+            path "/opt/deinterrail/tripscope-feed"
+            source "interrail"
+            check "1d" at="04:50"
+        }
+    }
+    // Jízdní řád ČD (CHAPS) z ftp.cd.cz — kontrola: velikost a datum
+    // souborů na FTP; nový Vlak26E.tt skoro denně (45 MB, převod asi
+    // 1 min). Polohy stanic, které mapa ČD nemá, z feedu interrail.
+    timetable cd {
+        source main cmd {
+            path "/opt/deinterrail/tripscope-feed"
+            source "cd"
+            places "interrail"
+            check "1h" at=":35"
+        }
+    }
+}

@@ -1,0 +1,114 @@
+#!/bin/bash
+# The data server by hand, in its VM (blach's vm_tripscope_data):
+# tripscope-data-server's commands with this machine's configuration and
+# state, as the account tripscope; and the machine's own — the service, its
+# log, the clients' keys, the disk.
+set -u
+CONFIG=/etc/userconfig/tripscope/server_config.kdl
+STATE=/data/tripscope/state
+KEYS=/data/tripscope/authorized_keys
+SERVICE=tripscope-data
+
+usage() {
+	cat <<'EOF'
+tripscope-data – server dat Spojoskopu v této virtuálce
+
+  status [JŘ…]          stav jízdních řádů (verze, zdroje, kontroly, co běží)
+  fetch JŘ… [--source ZDROJ] [--force]
+                        stáhnout teď, archivovat a zveřejnit
+  check JŘ…|--all       zeptat se zdrojů na novější verzi
+  … a další příkazy tripscope-data-server (níže)
+
+  start|stop|restart    služba
+  service               stav služby (systemctl status)
+  log [JŘ] [-f]         deník služby (jen řádky jízdního řádu; bez -f i konec
+                        logů jeho zdrojů)
+  keys                  klíče klientů (SFTP účtu data)
+  keys add 'ssh-ed25519 AAAA… jméno'
+  keys rm ČÍSLO|TEXT    smazat klíč (číslo řádku z keys, nebo text v něm)
+  disk                  místo na datovém disku: archiv, strom, stav
+
+EOF
+	tripscope-data-server --help | sed -n '3,$p'
+}
+
+# tripscope-data-server as tripscope (from root: setpriv)
+server() {
+	if [[ $(id -un) != tripscope ]]; then
+		[[ $(id -u) == 0 ]] || { echo "tripscope-data: spusťte jako root nebo tripscope" >&2; exit 1; }
+		exec setpriv --reuid tripscope --regid tripscope --init-groups -- \
+			env HOME="$STATE" tripscope-data-server "$@" --config "$CONFIG" --state "$STATE"
+	fi
+	exec tripscope-data-server "$@" --config "$CONFIG" --state "$STATE"
+}
+
+keys() {
+	local cmd=${1:-list}
+	case $cmd in
+	list)
+		[[ -s $KEYS ]] || { echo "žádný klíč ($KEYS)"; return; }
+		local n=0 line
+		while IFS= read -r line; do
+			n=$((n + 1))
+			[[ -z $line || $line == \#* ]] && continue
+			printf '%3d  %s\n' "$n" "$(ssh-keygen -lf /dev/stdin <<<"$line" 2>/dev/null || echo "NEPLATNÝ: ${line:0:60}")"
+		done <"$KEYS"
+		;;
+	add)
+		local key=${2:?keys add 'ssh-ed25519 AAAA… jméno'}
+		ssh-keygen -lf /dev/stdin <<<"$key" >/dev/null 2>&1 || { echo "to není veřejný klíč ssh" >&2; exit 1; }
+		grep -qF "$(cut -d' ' -f2 <<<"$key")" "$KEYS" 2>/dev/null && { echo "ten klíč už tam je"; return; }
+		printf '%s\n' "$key" >>"$KEYS"
+		chmod 644 "$KEYS"
+		echo "přidán: $(ssh-keygen -lf /dev/stdin <<<"$key")"
+		;;
+	rm)
+		local what=${2:?keys rm ČÍSLO|TEXT}
+		local tmp
+		tmp=$(mktemp)
+		if [[ $what =~ ^[0-9]+$ ]]; then
+			sed "${what}d" "$KEYS" >"$tmp"
+		else
+			grep -vF -- "$what" "$KEYS" >"$tmp"
+		fi
+		echo "smazáno klíčů: $(($(wc -l <"$KEYS") - $(wc -l <"$tmp")))"
+		cat "$tmp" >"$KEYS"
+		rm -f "$tmp"
+		;;
+	*) echo "keys [list|add KLÍČ|rm ČÍSLO|TEXT]" >&2; exit 2 ;;
+	esac
+}
+
+log() {
+	local tt="" follow=""
+	for a in "$@"; do
+		case $a in
+		-f) follow=-f ;;
+		*) tt=$a ;;
+		esac
+	done
+	if [[ -z $tt ]]; then
+		exec journalctl -u "$SERVICE" -o short-iso -n 200 $follow
+	fi
+	if [[ -z $follow ]]; then
+		for f in "$STATE/feeds/$tt".*.log; do
+			[[ -e $f ]] && { echo "== $f"; tail -n 40 "$f"; }
+		done
+		echo "== služba"
+	fi
+	journalctl -u "$SERVICE" -o short-iso -n 2000 $follow | grep --line-buffered -F " $tt: "
+}
+
+case ${1:-help} in
+-h | --help | help) usage ;;
+start | stop | restart) exec systemctl "$1" "$SERVICE" ;;
+service) exec systemctl status "$SERVICE" ;;
+log) shift; log "$@" ;;
+keys) shift; keys "$@" ;;
+disk)
+	df -h /data
+	echo
+	server disk
+	;;
+*) server "$@" ;;
+esac
