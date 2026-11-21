@@ -1,0 +1,9 @@
+#!/bin/sh
+# Spustí program s libhybris EGL/GLES (Android GPU driver hostitele) místo mesy.
+#   hybris glmark2-es2-wayland
+#   HYBRIS_LD_DEBUG=1 hybris foo   # ladění bionic linkeru
+# /opt/hybris/lib plní hostitelský arch-run symlinky na /sfos/lib64 (libhybris RPM).
+export LD_LIBRARY_PATH=/opt/hybris/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
+export EGL_PLATFORM=wayland
+export HYBRIS_EGLPLATFORM=wayland
+exec "$@"

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Root shell/příkaz v kontejneru: arch-exec [cmd...]
+if [[ $# == 0 ]]; then set -- /bin/bash -l; fi
+exec crun exec -t -e TERM="${TERM:-xterm-256color}" arch "$@"

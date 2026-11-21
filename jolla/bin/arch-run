@@ -1,0 +1,55 @@
+#!/bin/bash
+# ExecStart hostitelské unity: overlay nad aktuální verzí, hybris symlinky,
+# crun v popředí. Vlastní úklid overlaye po skončení.
+set -u
+BUNDLE=/etc/arch-container
+NAME=arch
+BASE=/home/arch
+ROOT=$BASE/root
+
+ver=$(readlink "$BASE/current" 2>/dev/null) || { echo "arch-run: $BASE/current chybí (arch-fetch, arch-activate)" >&2; exit 1; }
+ver=${ver#versions/}
+LOWER=$BASE/versions/$ver/fs
+[[ -d $LOWER ]] || { echo "arch-run: $LOWER chybí" >&2; exit 1; }
+
+for i in $(seq 1 60); do
+	[[ -S /run/display/wayland-0 && -d /run/user/100000 ]] && break
+	sleep 1
+done
+[[ -S /run/display/wayland-0 ]] || echo "arch-run: /run/display/wayland-0 stále chybí, startuji bez něj" >&2
+
+# overlay per verze: lower = verze ze store (ro), upper = stav kontejneru
+mkdir -p "$ROOT" "$BASE/overlay/$ver/upper" "$BASE/overlay/$ver/work" "$BASE/home" "$BASE/hybris-lib"
+mountpoint -q "$ROOT" && umount "$ROOT"
+mount -t overlay overlay -o "lowerdir=$LOWER,upperdir=$BASE/overlay/$ver/upper,workdir=$BASE/overlay/$ver/work" "$ROOT" || exit 1
+cleanup() { umount "$ROOT" 2>/dev/null; }
+trap cleanup EXIT
+
+# domov defaultuser: persistentní, mimo overlay; kostra při prvním použití
+if [[ -z "$(ls -A "$BASE/home")" ]]; then
+	cp -a "$ROOT/etc/skel/." "$BASE/home/" 2>/dev/null
+	chown -R 100000:100000 "$BASE/home"
+fi
+
+# libhybris hostitele -> /opt/hybris/lib v kontejneru: symlinky na /sfos/lib64
+# (bind /usr/lib64 hostitele) pro každý soubor libhybris RPM; obnoveno při
+# každém startu, takže update libhybris na hostiteli se promítne sám
+tmp=$(mktemp -d "$BASE/hybris-lib.XXXXXX")
+rpm -ql libhybris libhybris-libEGL libhybris-libGLESv2 libhybris-libwayland-egl libhybris-libhardware libhybris-libsync 2>/dev/null \
+	| grep -E '^/usr/lib64/.*\.so' | while read -r f; do
+	rel=${f#/usr/lib64/}
+	mkdir -p "$tmp/$(dirname "$rel")"
+	ln -s "/sfos/lib64/$rel" "$tmp/$rel"
+done
+rm -rf "$BASE/hybris-lib"; mv "$tmp" "$BASE/hybris-lib"
+
+# DNS: hostitel (connman) přepisuje resolv.conf, bind by zastaral, tak kopírujeme
+cp -L /etc/resolv.conf "$ROOT/etc/resolv.conf" 2>/dev/null
+
+case "$(crun state "$NAME" 2>/dev/null | python3 -c 'import sys,json;print(json.load(sys.stdin)["status"])' 2>/dev/null)" in
+	running) echo "arch-run: kontejner už běží" >&2; exit 1 ;;
+	"") ;;
+	*) crun delete -f "$NAME" ;;
+esac
+
+crun run -b "$BUNDLE" "$NAME"

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Zastaví Arch kontejner: SIGRTMIN+3 (37) initu = poweroff pro systemd uvnitř.
+NAME=arch
+state() { crun state "$NAME" 2>/dev/null | python3 -c "import sys,json;d=json.load(sys.stdin);print(d['status'],d.get('pid',0))" 2>/dev/null; }
+read -r st pid <<< "$(state)"
+if [[ "$st" == running && "$pid" -gt 0 ]]; then
+	kill -37 "$pid"
+	for i in $(seq 1 30); do
+		read -r st pid <<< "$(state)"
+		[[ "$st" == running ]] || break
+		sleep 1
+	done
+fi
+[[ -z "$(state)" ]] || crun delete -f "$NAME"
+exit 0

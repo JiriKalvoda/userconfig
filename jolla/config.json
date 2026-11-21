@@ -1,0 +1,53 @@
+{
+  "ociVersion": "1.1.0",
+  "process": {
+    "terminal": false,
+    "user": { "uid": 0, "gid": 0 },
+    "args": [ "/usr/lib/systemd/systemd" ],
+    "env": [
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/bin",
+      "container=oci",
+      "TERM=xterm-256color"
+    ],
+    "cwd": "/",
+    "noNewPrivileges": false,
+    "rlimits": [ { "type": "RLIMIT_NOFILE", "hard": 524288, "soft": 524288 } ],
+    "capabilities": {
+      "bounding":    [ "CAP_CHOWN", "CAP_DAC_OVERRIDE", "CAP_DAC_READ_SEARCH", "CAP_FOWNER", "CAP_FSETID", "CAP_KILL", "CAP_SETGID", "CAP_SETUID", "CAP_SETPCAP", "CAP_LINUX_IMMUTABLE", "CAP_NET_BIND_SERVICE", "CAP_NET_BROADCAST", "CAP_NET_ADMIN", "CAP_NET_RAW", "CAP_IPC_LOCK", "CAP_IPC_OWNER", "CAP_SYS_MODULE", "CAP_SYS_RAWIO", "CAP_SYS_CHROOT", "CAP_SYS_PTRACE", "CAP_SYS_PACCT", "CAP_SYS_ADMIN", "CAP_SYS_NICE", "CAP_SYS_RESOURCE", "CAP_SYS_TIME", "CAP_SYS_TTY_CONFIG", "CAP_MKNOD", "CAP_LEASE", "CAP_AUDIT_WRITE", "CAP_AUDIT_CONTROL", "CAP_SETFCAP", "CAP_MAC_OVERRIDE", "CAP_MAC_ADMIN", "CAP_SYSLOG", "CAP_WAKE_ALARM", "CAP_BLOCK_SUSPEND", "CAP_AUDIT_READ", "CAP_PERFMON", "CAP_BPF", "CAP_CHECKPOINT_RESTORE" ],
+      "effective":   [ "CAP_CHOWN", "CAP_DAC_OVERRIDE", "CAP_DAC_READ_SEARCH", "CAP_FOWNER", "CAP_FSETID", "CAP_KILL", "CAP_SETGID", "CAP_SETUID", "CAP_SETPCAP", "CAP_LINUX_IMMUTABLE", "CAP_NET_BIND_SERVICE", "CAP_NET_BROADCAST", "CAP_NET_ADMIN", "CAP_NET_RAW", "CAP_IPC_LOCK", "CAP_IPC_OWNER", "CAP_SYS_MODULE", "CAP_SYS_RAWIO", "CAP_SYS_CHROOT", "CAP_SYS_PTRACE", "CAP_SYS_PACCT", "CAP_SYS_ADMIN", "CAP_SYS_NICE", "CAP_SYS_RESOURCE", "CAP_SYS_TIME", "CAP_SYS_TTY_CONFIG", "CAP_MKNOD", "CAP_LEASE", "CAP_AUDIT_WRITE", "CAP_AUDIT_CONTROL", "CAP_SETFCAP", "CAP_MAC_OVERRIDE", "CAP_MAC_ADMIN", "CAP_SYSLOG", "CAP_WAKE_ALARM", "CAP_BLOCK_SUSPEND", "CAP_AUDIT_READ", "CAP_PERFMON", "CAP_BPF", "CAP_CHECKPOINT_RESTORE" ],
+      "permitted":   [ "CAP_CHOWN", "CAP_DAC_OVERRIDE", "CAP_DAC_READ_SEARCH", "CAP_FOWNER", "CAP_FSETID", "CAP_KILL", "CAP_SETGID", "CAP_SETUID", "CAP_SETPCAP", "CAP_LINUX_IMMUTABLE", "CAP_NET_BIND_SERVICE", "CAP_NET_BROADCAST", "CAP_NET_ADMIN", "CAP_NET_RAW", "CAP_IPC_LOCK", "CAP_IPC_OWNER", "CAP_SYS_MODULE", "CAP_SYS_RAWIO", "CAP_SYS_CHROOT", "CAP_SYS_PTRACE", "CAP_SYS_PACCT", "CAP_SYS_ADMIN", "CAP_SYS_NICE", "CAP_SYS_RESOURCE", "CAP_SYS_TIME", "CAP_SYS_TTY_CONFIG", "CAP_MKNOD", "CAP_LEASE", "CAP_AUDIT_WRITE", "CAP_AUDIT_CONTROL", "CAP_SETFCAP", "CAP_MAC_OVERRIDE", "CAP_MAC_ADMIN", "CAP_SYSLOG", "CAP_WAKE_ALARM", "CAP_BLOCK_SUSPEND", "CAP_AUDIT_READ", "CAP_PERFMON", "CAP_BPF", "CAP_CHECKPOINT_RESTORE" ],
+      "inheritable": [ "CAP_CHOWN", "CAP_DAC_OVERRIDE", "CAP_DAC_READ_SEARCH", "CAP_FOWNER", "CAP_FSETID", "CAP_KILL", "CAP_SETGID", "CAP_SETUID", "CAP_SETPCAP", "CAP_LINUX_IMMUTABLE", "CAP_NET_BIND_SERVICE", "CAP_NET_BROADCAST", "CAP_NET_ADMIN", "CAP_NET_RAW", "CAP_IPC_LOCK", "CAP_IPC_OWNER", "CAP_SYS_MODULE", "CAP_SYS_RAWIO", "CAP_SYS_CHROOT", "CAP_SYS_PTRACE", "CAP_SYS_PACCT", "CAP_SYS_ADMIN", "CAP_SYS_NICE", "CAP_SYS_RESOURCE", "CAP_SYS_TIME", "CAP_SYS_TTY_CONFIG", "CAP_MKNOD", "CAP_LEASE", "CAP_AUDIT_WRITE", "CAP_AUDIT_CONTROL", "CAP_SETFCAP", "CAP_MAC_OVERRIDE", "CAP_MAC_ADMIN", "CAP_SYSLOG", "CAP_WAKE_ALARM", "CAP_BLOCK_SUSPEND", "CAP_AUDIT_READ", "CAP_PERFMON", "CAP_BPF", "CAP_CHECKPOINT_RESTORE" ],
+      "ambient":     [ ]
+    }
+  },
+  "root": { "path": "/home/arch/root", "readonly": false },
+  "mounts": [
+    { "destination": "/proc", "type": "proc", "source": "proc" },
+    { "destination": "/sys", "type": "bind", "source": "/sys", "options": [ "rbind", "rslave", "rw" ] },
+    { "destination": "/sys/fs/cgroup", "type": "cgroup2", "source": "cgroup2", "options": [ "nosuid", "nodev", "noexec", "relatime" ] },
+    { "destination": "/dev", "type": "bind", "source": "/dev", "options": [ "rbind", "rslave", "rw" ] },
+    { "destination": "/run", "type": "tmpfs", "source": "tmpfs", "options": [ "nosuid", "nodev", "mode=755" ] },
+    { "destination": "/run/user/100000", "type": "bind", "source": "/run/user/100000", "options": [ "rbind", "rslave", "rw" ] },
+    { "destination": "/run/display", "type": "bind", "source": "/run/display", "options": [ "rbind", "rslave", "rw" ] },
+    { "destination": "/system", "type": "bind", "source": "/system", "options": [ "rbind", "rslave", "ro" ] },
+    { "destination": "/vendor", "type": "bind", "source": "/vendor", "options": [ "rbind", "rslave", "ro" ] },
+    { "destination": "/apex", "type": "bind", "source": "/apex", "options": [ "rbind", "rslave", "ro" ] },
+    { "destination": "/usr/libexec/droid-hybris", "type": "bind", "source": "/usr/libexec/droid-hybris", "options": [ "rbind", "ro" ] },
+    { "destination": "/sfos/home", "type": "bind", "source": "/home/defaultuser", "options": [ "rbind", "rslave", "rw" ] },
+    { "destination": "/sfos/lib64", "type": "bind", "source": "/usr/lib64", "options": [ "rbind", "ro" ] },
+    { "destination": "/opt/hybris/lib", "type": "bind", "source": "/home/arch/hybris-lib", "options": [ "rbind", "ro" ] },
+    { "destination": "/home/defaultuser", "type": "bind", "source": "/home/arch/home", "options": [ "rbind", "rw" ] }
+  ],
+  "linux": {
+    "namespaces": [
+      { "type": "mount" },
+      { "type": "pid" },
+      { "type": "cgroup" }
+    ],
+    "cgroupsPath": "/system.slice/arch-container.service",
+    "rootfsPropagation": "rslave",
+    "resources": { "devices": [ { "allow": true, "access": "rwm" } ] },
+    "maskedPaths": [ ],
+    "readonlyPaths": [ ]
+  }
+}

@@ -1,0 +1,68 @@
+#!/bin/bash
+# arch-fetch [VER]   stáhne verzi kontejneru z builderu do /home/arch/versions/VER
+# arch-fetch -l      vypíše verze na builderu
+# Hardlinky přes --link-dest na už stažené verze, ověření manifestu, atomický mv.
+set -eu
+. /etc/arch-container/fetch.conf
+BASE=/home/arch
+VERS=$BASE/versions
+STAGE=$BASE/tmp
+mkdir -p "$VERS" "$STAGE"
+SRC="$BUILDER_DATA/$DEVICE"
+
+if [[ "${1:-}" == -l || $# == 0 ]]; then
+	echo "builder:"; ssh "$BUILDER" "ls -1 '$SRC'" | sed 's/^/  /'
+	echo "lokálně:"; ls -1 "$VERS" 2>/dev/null | sed 's/^/  /'
+	[[ -L $BASE/current ]] && echo "current -> $(readlink "$BASE/current")"
+	exit 0
+fi
+ver=$1
+[[ -d $VERS/$ver/fs ]] && { echo "verze $ver už je stažená"; exit 0; }
+
+LD=""
+for d in $(ls -1t "$VERS" 2>/dev/null | head -3); do
+	[[ -d $VERS/$d/fs ]] && LD="$LD --link-dest=$VERS/$d/fs"
+done
+rm -rf "$STAGE/$ver"; mkdir -p "$STAGE/$ver/fs"
+rsync -aH --numeric-ids --delete --partial --info=progress2 --timeout=120 $LD \
+	"$BUILDER:$SRC/$ver/out/fs/" "$STAGE/$ver/fs/"
+rsync -a --include='recipe*.kdl' --exclude='*' "$BUILDER:$SRC/$ver/" "$STAGE/$ver/" || true
+
+echo "ověřuji manifest..."
+python3 - "$STAGE/$ver/fs" <<'PY'
+import sys, os, stat, hashlib
+root = sys.argv[1]
+bad = 0
+seen = set()
+with open(os.path.join(root, "manifest")) as f:
+    for line in f:
+        t, mode, uid, gid, extra, path = line.rstrip("\n").split("\t")
+        p = os.path.join(root, path) if path != "." else root
+        seen.add(os.path.normpath(p))
+        try:
+            st = os.lstat(p)
+        except FileNotFoundError:
+            print("chybí", path); bad += 1; continue
+        if (stat.S_IMODE(st.st_mode) != int(mode, 8) or st.st_uid != int(uid) or st.st_gid != int(gid)):
+            print("meta", path, oct(stat.S_IMODE(st.st_mode)), st.st_uid, st.st_gid, "!=", mode, uid, gid); bad += 1
+        if t == "f":
+            if not stat.S_ISREG(st.st_mode): print("typ", path); bad += 1; continue
+            h = hashlib.sha256()
+            with open(p, "rb") as fh:
+                for chunk in iter(lambda: fh.read(1 << 20), b""): h.update(chunk)
+            if h.hexdigest() != extra: print("sha256", path); bad += 1
+        elif t == "d":
+            if not stat.S_ISDIR(st.st_mode): print("typ", path); bad += 1
+        elif t == "l":
+            if not stat.S_ISLNK(st.st_mode) or os.readlink(p) != extra: print("link", path); bad += 1
+for dp, dns, fns in os.walk(root):
+    for n in dns + fns:
+        q = os.path.normpath(os.path.join(dp, n))
+        if q not in seen and os.path.relpath(q, root) != "manifest":
+            print("navíc", os.path.relpath(q, root)); bad += 1
+if bad:
+    print(f"MANIFEST: {bad} chyb"); sys.exit(1)
+print("manifest OK")
+PY
+mv "$STAGE/$ver" "$VERS/$ver"
+echo "staženo: $VERS/$ver   (aktivace: arch-activate $ver)"

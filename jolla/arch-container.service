@@ -1,0 +1,18 @@
+[Unit]
+Description=Arch Linux container (crun)
+RequiresMountsFor=/home
+After=user@100000.service network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/arch-run
+ExecStop=/usr/local/bin/arch-stop
+Delegate=yes
+TasksMax=infinity
+KillMode=mixed
+TimeoutStopSec=45
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
