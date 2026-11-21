@@ -11,6 +11,13 @@ timetables {
         label "Interrail / Eurail (Rail Planner)"
         short-label "Interrail / Eurail"
         attribute-codes-interpretation-type "eu-rail"
+        // přímo, bez serveru dat: Rail Planner z APKPure stáhne a převede
+        // deinterrail tady (jen ručně — bez check; jen na desktopu, kde je
+        // ~/deinterrail a python3; na Androidu cmd nejde)
+        source deinterrail cmd {
+            path "/home/u/deinterrail/tripscope-feed"
+            source "interrail"
+        }
         source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
         // barvy spojů (feed je nemá): docs/FILTER.md, „Formátování“
         style {
@@ -46,6 +53,13 @@ timetables {
         label "ČD – České dráhy: jízdní řád ČD (CHAPS)"
         short-label "ČD"
         attribute-codes-interpretation-type "cz-rail"
+        // přímo, bez serveru dat: CHAPS z ftp.cd.cz stáhne a převede
+        // deinterrail tady (jen ručně; polohy stanic z feedu interrail)
+        source deinterrail cmd {
+            path "/home/u/deinterrail/tripscope-feed"
+            source "cd"
+            places "interrail"
+        }
         source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
         // barvy spojů (feed je nemá): docs/FILTER.md, „Formátování“
         style {
