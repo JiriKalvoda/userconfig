@@ -1,0 +1,62 @@
+#!/bin/bash
+# The keys of the sync server's tunnel account sync (sshd.conf: nothing but
+# ssh -W localhost:7443), in its VM (blach's vm_tripscope_sync): on the data
+# disk, edited in place — no rebuild.
+set -u
+KEYS=/data/ssh/authorized_keys
+# what a key of the account may: the tunnel to the server only (sshd.conf
+# says it for the account too)
+OPTIONS='restrict,port-forwarding,permitopen="localhost:7443",permitopen="127.0.0.1:7443",permitopen="[::1]:7443"'
+
+usage() {
+	cat <<'EOF2'
+tripscope-sync-keys – klíče tunelu k serveru synchronizace (účet sync: jen
+ssh -W localhost:7443)
+
+  [list]                klíče
+  add 'ssh-ed25519 AAAA… jméno'
+  rm ČÍSLO|TEXT         smazat klíč (číslo řádku z list, nebo text v něm)
+
+Workspace přes tunel (konfigurace aplikace, sekce sync; pin:
+  tripscope-sync-server --pin /data/tripscope-sync/cert.pem):
+  workspace "jméno:…" server="localhost:7443" pin="sha256:…" ssh="sync@188.75.189.192:23152"
+EOF2
+}
+
+case ${1:-list} in
+list)
+	[[ -s $KEYS ]] || { echo "žádný klíč ($KEYS)"; exit 0; }
+	n=0
+	while IFS= read -r line; do
+		n=$((n + 1))
+		[[ -z $line || $line == \#* ]] && continue
+		printf '%3d  %s\n' "$n" "$(ssh-keygen -lf /dev/stdin <<<"$line" 2>/dev/null || echo "NEPLATNÝ: ${line:0:60}")"
+	done <"$KEYS"
+	;;
+add)
+	key=${2:?add 'ssh-ed25519 AAAA… jméno'}
+	ssh-keygen -lf /dev/stdin <<<"$key" >/dev/null 2>&1 || { echo "to není veřejný klíč ssh" >&2; exit 1; }
+	[[ $key == ssh-* || $key == ecdsa-* || $key == sk-* ]] || { echo "jen klíč (bez voleb na začátku řádku: ty přidám sám)" >&2; exit 1; }
+	# (root's, as is the directory: sshd checks the path)
+	install -d -m 755 -o root -g root "$(dirname "$KEYS")"
+	grep -qF "$(cut -d' ' -f2 <<<"$key")" "$KEYS" 2>/dev/null && { echo "ten klíč už tam je"; exit 0; }
+	printf '%s %s\n' "$OPTIONS" "$key" >>"$KEYS"
+	chown root:root "$KEYS"
+	chmod 644 "$KEYS"
+	echo "přidán: $(ssh-keygen -lf /dev/stdin <<<"$key")"
+	;;
+rm)
+	what=${2:?rm ČÍSLO|TEXT}
+	tmp=$(mktemp)
+	if [[ $what =~ ^[0-9]+$ ]]; then
+		sed "${what}d" "$KEYS" >"$tmp"
+	else
+		grep -vF -- "$what" "$KEYS" >"$tmp"
+	fi
+	echo "smazáno klíčů: $(($(wc -l <"$KEYS") - $(wc -l <"$tmp")))"
+	cat "$tmp" >"$KEYS"
+	rm -f "$tmp"
+	;;
+-h | --help | help) usage ;;
+*) usage >&2; exit 2 ;;
+esac
