@@ -1,0 +1,23 @@
+[Unit]
+Description=tripscope-sync-server (favourites, history and views of TripScope synchronized: docs/SYNC.md)
+After=network.target
+RequiresMountsFor=/data
+
+[Service]
+User=tripscope
+# its directory and its certificate on the data disk (as root, after the
+# disk's mount)
+ExecStartPre=+/etc/userconfig/tripscope/sync/prepare-data.sh
+ExecStart=/usr/local/bin/tripscope-sync-server --cert /data/tripscope-sync/cert.pem --key /data/tripscope-sync/key.pem --listen [::]:7443 --data /data/tripscope-sync/data
+Restart=always
+RestartSec=5
+ProtectSystem=strict
+# (`-`: not there yet at the first start — the namespace's writable paths
+# apply to the `+` script too, which runs before it is made)
+ReadWritePaths=-/data/tripscope-sync
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

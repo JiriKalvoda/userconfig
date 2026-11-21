@@ -1,0 +1,504 @@
+timetables {
+    default "interrail"
+    // source blatto: předzpracovaná data z mého serveru dat (virtuálka
+    // vm_tripscope_data v blachu, konfigurace server_config.kdl tady
+    // vedle) — správce jízdních řádů: „Stáhnout z blatto“.  Účet data jen
+    // pro SFTP; klíč tohoto zařízení musí být v jeho
+    // /data/tripscope/authorized_keys.  Přesměrování portu 23162 je jen
+    // na IPv4 (blatto.eu má i IPv6), proto adresa.
+    // exportováno z dat Rail Planneru
+    timetable "interrail" {
+        label "Interrail / Eurail (Rail Planner)"
+        short-label "Interrail / Eurail"
+        attribute-codes-interpretation-type "eu-rail"
+        // přímo, bez serveru dat: Rail Planner z APKPure stáhne a převede
+        // deinterrail tady (jen ručně — bez check; jen na desktopu, kde je
+        // ~/deinterrail a python3; na Androidu cmd nejde)
+        source deinterrail cmd {
+            path "/home/u/deinterrail/tripscope-feed"
+            source "interrail"
+        }
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+        // barvy spojů (feed je nemá): docs/FILTER.md, „Formátování“
+        style {
+            // vlaky podle typu linky a druhu (Rail Planner)
+            if { use train; color "#1a66d4" }  // sytě modrá
+            // vysokorychlostní, dálkové, noční
+            if { route-type 101 102 105; color "#2e8b3a" }  // lesní zelená — route-type 101 vysokorychlostní vlaky, 102 dálkové vlaky, 105 noční (lůžkové) vlaky
+            if { route-type 103; color "#d7261e" }  // rumělkově červená — route-type 103 meziregionální vlaky
+            // příměstské (109): spěšné RE, RV, CJX (S-Bahn jako osobní)
+            if { route-type 109; label (re)"^(RE|RV|CJX|IR) "; color "#ef7d00" }  // sytě oranžová — route-type 109 příměstské vlaky
+            // RE v Česku: osobní vlak
+            if { label (re)"^RE "; first-stop { country "Czech Republic"; }; color "#1a66d4" }  // sytě modrá
+            // britské a jiné (106): EXP dálkové, IR, TRN rychlíky
+            if { route-type 106; label (re)"^(IR|TRN) "; color "#d7261e" }  // rumělkově červená — route-type 106 regionální vlaky
+            if { route-type 106; label (re)"^EXP "; color "#2e8b3a" }  // lesní zelená — route-type 106 regionální vlaky
+            // dálkové, ať je typ linky jakýkoli
+            if { use train; label (re)"^(TLK|EC|IC|EN|NJ|ICE|TGV|RJ|RJX) "; color "#2e8b3a" }  // lesní zelená
+            // ostatní druhy; náhradní autobusy (linky X)
+            if { use bus; color "#007da8" }  // petrolejově modrá
+            if { use bus; label (re)#"^\S+ [Xx]"#; color "#f7941d" }  // světle oranžová
+            if { use tram; color "#7a0603" }  // vínová
+            if { route-type 900; label (re)"^FUN "; color "#9f9c9d" }  // šedá — route-type 900 tramvaje (Rail Planner sem dává i lanovky FUN)
+            if { use metro; color "#1f5fa8" }  // kobaltově modrá
+            if { use ship; color "#00b5e2" }  // azurová
+            // dopravci se svou barvou
+            if { use train; operator (re)"(?i)regiojet"; color "#fcc200" }  // zlatě žlutá
+            if { use train; operator (re)"(?i)leo express"; color "#1d1d1b" }  // černá
+            if { use train; operator (re)"(?i)arriva"; color "#00a3ad" }  // tyrkysová
+        }
+    }
+    // exportováno ze souborů CHAPS Jízdního řádu ČD
+    timetable "cd" {
+        label "ČD – České dráhy: jízdní řád ČD (CHAPS)"
+        short-label "ČD"
+        attribute-codes-interpretation-type "cz-rail"
+        // přímo, bez serveru dat: CHAPS z ftp.cd.cz stáhne a převede
+        // deinterrail tady (jen ručně; polohy stanic z feedu interrail)
+        source deinterrail cmd {
+            path "/home/u/deinterrail/tripscope-feed"
+            source "cd"
+            places "interrail"
+        }
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+        // barvy spojů (feed je nemá): docs/FILTER.md, „Formátování“
+        style {
+            // vlaky podle typu linky a druhu (CHAPS: celá Evropa)
+            if { use train; color "#1a66d4" }  // sytě modrá
+            // vysokorychlostní, dálkové, noční
+            if { route-type 101 102 105; color "#2e8b3a" }  // lesní zelená — route-type 101 vysokorychlostní vlaky, 102 dálkové vlaky, 105 noční (lůžkové) vlaky
+            // meziregionální: rychlíky (R, IR), dálkové (D, EN, TLK …)
+            if { route-type 103; color "#d7261e" }  // rumělkově červená — route-type 103 meziregionální vlaky
+            if { route-type 103; label (re)"^(D|EN|TLK|ALX|INT|CAT|OTC) "; color "#2e8b3a" }  // lesní zelená — route-type 103 meziregionální vlaky
+            // regionální: spěšné (Sp, RE, IRE …; S-Bahn jako osobní)
+            if { route-type 106; label (re)"^(Sp|RE|IRE|CJX|RV|REX|TLX) "; color "#ef7d00" }  // sytě oranžová — route-type 106 regionální vlaky
+            // ostatní (typ 100: lanovky, metro, ozubnicové dráhy)
+            if { use bus; color "#007da8" }  // petrolejově modrá
+            if { use ship; color "#00b5e2" }  // azurová
+            if { route-type 100; label (re)"^Lan "; color "#9f9c9d" }  // šedá — route-type 100 železnice bez druhu (v datech ČD lanovky, metro, ozubnicové dráhy)
+            if { route-type 100; label (re)"^(U|Metro) "; color "#1f5fa8" }  // kobaltově modrá — route-type 100 železnice bez druhu (v datech ČD lanovky, metro, ozubnicové dráhy)
+            // dopravci se svou barvou
+            if { use train; operator (re)"(?i)regiojet"; color "#fcc200" }  // zlatě žlutá
+            if { use train; operator (re)"(?i)leo express"; color "#1d1d1b" }  // černá
+            if { use train; operator (re)"(?i)arriva"; color "#00a3ad" }  // tyrkysová
+        }
+    }
+    // jízdní řády základní konfigurace, které server také stahuje
+    timetable "ggu" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "cisjr" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "czptt" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "pid" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "spojenka" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "idsjmk" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "liberec" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "idsbk" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "plzen" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "olomouc" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+    timetable "bratislava" {
+        source blatto tripscope { ssh "data@188.75.189.192" port=23162; path "/pub"; }
+    }
+}
+
+
+// podklady mapy navíc k OpenStreetMap
+maps {
+    base "mapy-base" {
+        name "mapy.cz základní"
+        url "https://mapserver.mapy.cz/base-en/{z}-{x}-{y}"
+        header "Referer" "https://mapy.com/"
+    }
+    base "mapy-turist" {
+        name "mapy.cz turistická"
+        url "https://mapserver.mapy.cz/turist-en/{z}-{x}-{y}"
+        header "Referer" "https://mapy.com/"
+    }
+    base "mapy-base-l" {
+        name "mapy.cz základní (offline)"
+        url "http://127.0.0.1:8080/d_base/{z}/{x}/{y}.png"
+    }
+    base "mapy-turist-l" {
+        name "mapy.cz turistická (offline)"
+        url "http://127.0.0.1:8080/turist/{z}/{x}/{y}.png"
+    }
+    // (neprůhledné: popisky stanic s bílým lemem jsou součástí dlaždic)
+    overlay "orm-standard" {
+        name "Železnice (standard)"
+        url "https://a.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png"
+        attribution "© OpenRailwayMap · © OpenStreetMap"
+    }
+    overlay "orm-maxspeed" {
+        name "Rychlosti (maxspeed)"
+        url "https://a.tiles.openrailwaymap.org/maxspeed/{z}/{x}/{y}.png"
+    }
+    overlay "orm-signals" {
+        name "Návěstidla (signals)"
+        url "https://a.tiles.openrailwaymap.org/signals/{z}/{x}/{y}.png"
+    }
+    overlay "orm-electrification" {
+        name "Elektrizace"
+        url "https://a.tiles.openrailwaymap.org/electrification/{z}/{x}/{y}.png"
+    }
+}
+
+dashboard "Z Oleška" {
+    source "pid"
+    min-stay "1:00"
+    theme "světlý"          // světlý vzhled (jinak tmavý; přepíná i t / ◐)
+
+    column "333" {
+        find "Březová-Oleško,Oleško" "Kačerov"
+    }
+    column "445rev" {
+        find "Zvole" "Vrané n.Vlt.,žel.st."
+    }
+
+    column "vlak" {
+        find "Davle" "Praha-Modřany zast." color=green
+        find "Skochovice" "Praha-Modřany zast." skip-found=#true
+        find "Vrané nad Vltavou" "Praha-Modřany zast." skip-found=#true color=red
+    }
+    column "445" {
+        find "Březová-Oleško,Oleško" "Vrané n.Vlt.,žel.st."
+    }
+    column "Davle" {
+        find "Davle,obec" "Zbraslavské náměstí" "Davle,Na Javorce"
+        highlight "Smíchovské nádraží" color=green
+
+    }
+    column in {
+        find "Březová-Oleško,Oleško" from="Březová-Oleško,Březová" show_origin=#true show_arrival_time=#true
+        title "Příjezdy"
+        hide "-15:00"
+    }
+}
+
+// tabule z náčrtu (sipkotabule.png); časy přesunů jsou odhad — uprav
+dashboard "Z Blatta" {
+    source "pid"
+    min-stay "1:00"
+    theme "světlý"          // světlý vzhled (jinak tmavý; přepíná i t / ◐)
+    // vlevo: vyhledaná spojení z Kačerova — tři hledání v jedné tabulce,
+    // podle odjezdu (bez chůze na začátku a na konci — walk-begin /
+    // walk-end 0, nejvýš 1 přestup — max-transfers; obojí výchozí, lze
+    // nastavit u sloupce i u jednotlivého query)
+    search olesko {
+        title "Z Kačerova"
+        max-transfers 1
+        query {
+            from "Praha-Kačerov"
+            to "Davle" kind="vlak"
+        }
+        query {
+            from "Kačerov" kind="ostatní"
+            to "Březová-Oleško,Oleško"
+        }
+        query {
+            from "Praha-Kačerov"
+            to "Březová-Oleško,Oleško"
+        }
+    }
+    column jih {
+        height "50%"
+        find "I. P. Pavlova" "Kačerov"
+        hide "5:00"
+        arrival "Kačerov"
+    }
+    column zapad {
+        height "50%"
+        find "Náměstí Míru" "I. P. Pavlova"
+        hide "1:00"
+        // spoje, které pojedou přes Národní třídu, žlutě podbarvené
+        highlight "Národní třída" color=yellow
+        highlight "" color=yellow
+    }
+    column sever {
+        height "50%"
+        find "I. P. Pavlova" "Hlavní nádraží"
+        hide "5:00"
+    }
+    column a {
+        height "50%"
+        find "Náměstí Míru" "Muzeum" kind="metro"
+        hide "2:00"
+    }
+    column b {
+        height "50%"
+        find "Můstek" "Náměstí Republiky"
+        hide "5:00"
+    }
+    transfer zapad jih {
+        walk "I. P. Pavlova" to-kind="metro" min="1:00" comfort=2 max=4
+    }
+    transfer zapad sever {
+        times "from"
+        times "to"
+        walk "I. P. Pavlova" to-kind="metro" min="1:00" comfort=2 max=4
+        walk "I. P. Pavlova" min="0:30" comfort="1:30" max=3
+        moves target
+        weight 10
+    }
+    transfer a sever {
+        walk "Muzeum" to-kind=metro min="0:30" comfort=2 max=4
+        moves source
+        weight 5
+    }
+    transfer jih olesko {
+        walk "Kačerov" "Praha-Kačerov" to-kind="vlak" min=0 comfort=5 max=15 max-in=3
+        walk "Kačerov" to-kind="ostatní" min=1 comfort=3 max=13 max-in=2
+        moves target
+    }
+    transfer a b {
+        walk "Můstek" min="0:30" comfort=2 max=5
+    }
+
+
+
+
+
+    column "22" {
+        height "25%"
+        slot 2
+        find "Jana Masaryka" "Krymská"
+        hide "1:00"
+    }
+    column "1016" {
+        height "25%"
+        slot 2
+        find "Šumavská" "Vinohradská vodárna"
+        hide "2:00"
+    }
+    column "135" {
+        height 0.3
+        slot 3
+        find "Náměstí Míru" "Náměstí Winstona Churchilla"
+        hide "0:00"
+    }
+
+
+
+
+    column mn {
+        slot 5
+        height 0.5
+        hide "10:00"
+        find "Praha Masarykovo nádr." source="cd"
+        title "Masaryčka"
+        highlight "Vrané nad Vltavou" color="yellow"
+        highlight "Úvaly" color="green"
+    }
+    column hln {
+        slot 4
+        height 0.5
+        hide "8:00"
+        find "Praha hlavní nádraží" source="cd"
+        highlight "Vrané nad Vltavou" color="yellow"
+        highlight "Úvaly" color="green"
+    }
+  column hln+ {
+        slot 6
+      continues hln
+      height 0.5
+      title "Hlavní nádraží +"
+  }
+    column holesovice {
+        slot 3
+        height 0.2
+        hide "8:00"
+        find "Praha-Holešovice" "Brno" source="cd"
+    }
+
+    transfer hln mn {
+        walk  "Praha-Libeň" min=-3 comfort=2 max=10
+        weight 0
+    }
+    transfer hln+ mn {
+        walk  "Praha-Libeň" min=-3 comfort=2 max=10
+        weight 0
+    }
+    // transfer holesovice brno {
+    // walk  "Pardubice hl. n." min=-3 comfort=2 max=10
+// }
+}
+
+
+
+dashboard "Z Blatta (full)" {
+    source "pid"
+    min-stay "1:00"
+    theme "světlý"          // světlý vzhled (jinak tmavý; přepíná i t / ◐)
+    // vlevo: vyhledaná spojení z Kačerova — tři hledání v jedné tabulce,
+    // podle odjezdu (bez chůze na začátku a na konci — walk-begin /
+    // walk-end 0, nejvýš 1 přestup — max-transfers; obojí výchozí, lze
+    // nastavit u sloupce i u jednotlivého query)
+    search olesko {
+        title "Z Kačerova"
+        max-transfers 1
+        query {
+            from "Praha-Kačerov"
+            to "Davle" kind="vlak"
+        }
+        query {
+            from "Kačerov" kind="ostatní"
+            to "Březová-Oleško,Oleško"
+        }
+        query {
+            from "Praha-Kačerov"
+            to "Březová-Oleško,Oleško"
+        }
+    }
+    column jih {
+        height "50%"
+        find "I. P. Pavlova" "Kačerov"
+        hide "5:00"
+    }
+    column zapad {
+        height "50%"
+        find "Náměstí Míru" "I. P. Pavlova"
+        hide "1:00"
+        // spoje, které pojedou přes Národní třídu, žlutě podbarvené
+        highlight "Národní třída" color=yellow
+        highlight "" color=yellow
+    }
+    column a {
+        height "50%"
+        find "Náměstí Míru" "Muzeum" kind="metro"
+        hide "2:00"
+    }
+    column sever {
+        height "50%"
+        find "I. P. Pavlova" "Muzeum" kind="metro" offset="0:30"
+        find "I. P. Pavlova" "Muzeum" kind="other"
+        hide "5:00"
+    }
+    column hln {
+        hide "10:00"
+        find "Praha hlavní nádraží" kind="vlak"
+        title "Hl. n."
+        highlight "Vrané nad Vltavou" color="yellow"
+        highlight "Úvaly" color="green"
+        slot 6
+    }
+    column "135" {
+        height "50%"
+        find "Náměstí Míru" "Náměstí Winstona Churchilla"
+        hide "0:00"
+    }
+    transfer zapad jih {
+        walk "I. P. Pavlova" to-kind="metro" min="1:00" comfort=2 max=4
+    }
+    transfer zapad sever {
+        times "from"
+        // časy jako tabulka u tramvaje (místo šipek): rezerva na spoj na
+        // stejném řádku, na další pod ním a na ten po něm
+        show "table"
+        times "to"
+        walk "I. P. Pavlova" to-kind="metro" min="1:00" comfort=2 max=4
+        walk "I. P. Pavlova" min="0:30" comfort="1:30" max=3
+        direction "down"
+        weight 5
+    }
+    // A → C na Muzeu, A z Muzea pěšky na vlak (odhad)
+    transfer a sever {
+        walk "Muzeum" to-kind=metro min="0:30" comfort=2 max=4
+        weight 5
+    }
+    // C → vlak na Hlavním nádraží, tramvaj z Muzea → vlak
+    // (times "to": časy přestupů u vlaku, na který se přestupuje — výchozí;
+    // times "from": u spoje, ze kterého se přestupuje)
+    transfer sever hln {
+        times "to"
+        walk "Hlavní nádraží" "Praha hlavní nádraží" from-kind="metro" min=2 comfort=4 max=4 max-in=2
+        walk "Muzeum" "Praha hlavní nádraží" from-kind="ostatní" min=4 comfort=7 max=7 max-in=2
+        moves target
+    }
+    transfer "135" hln {
+        moves source
+        weight 3            // šipky táhnou 3× víc: autobusy dolů k vlakům, nevejde se jich tolik
+        walk "Náměstí Winstona Churchilla" "Praha hlavní nádraží" min=3 comfort=6 max=6 max-out=4
+    }
+    // C na Kačerov → hledaná spojení (vlak z Praha-Kačerov, autobus ze
+    // zastávky Kačerov)
+    transfer jih olesko {
+        walk "Kačerov" "Praha-Kačerov" to-kind="vlak" min=0 comfort=5 max=15 max-in=3
+        walk "Kačerov" to-kind="ostatní" min=1 comfort=3 max=13 max-in=2
+        moves target
+    }
+
+    column "a2" {
+        slot 2
+        height "25%"
+        find "Náměstí Míru" "Můstek"
+        hide "2:00"
+    }
+    column b {
+        slot 3
+        height "25%"
+        find "Můstek" "Náměstí Republiky"
+        hide "5:00"
+    }
+    column mn {
+        slot 4
+        height 0.5
+        hide "10:00"
+        find "Praha Masarykovo nádr." kind="vlak"
+        title "Masaryčka"
+        highlight "Vrané nad Vltavou" color="yellow"
+        highlight "Úvaly" color="green"
+    }
+    column do_libne {
+        slot 5
+        height 0.25
+        hide "10:00"
+        find "Praha hlavní nádraží" "Praha-Libeň"
+        title "Do Libně"
+        highlight "Úvaly" color="green"
+    }
+    transfer a2 b {
+        walk "Můstek" min="0:30" comfort=2 max=5
+    }
+    transfer b mn {
+        walk "Náměstí Republiky" "Praha Masarykovo nádr." min=2 comfort=4 max=10
+    }
+    transfer do_libne mn {
+        walk  "Praha-Libeň" min=-3 comfort=2 max=10
+    }
+
+    column arev {
+        slot 2
+        height "25%"
+        find "Náměstí Míru" "Skalka" kind="metro"
+        hide "2:00"
+    }
+    column "22" {
+        height "25%"
+        slot 3
+        find "Jana Masaryka" "Krymská"
+        hide "1:00"
+    }
+    column "1016" {
+        height "25%"
+        slot 5
+        find "Šumavská" "Vinohradská vodárna"
+        hide "2:00"
+    }
+}

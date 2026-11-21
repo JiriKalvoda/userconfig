@@ -1,0 +1,25 @@
+[Unit]
+Description=tripscope-data-server (the timetables of server_config.kdl downloaded, archived, published)
+After=network-online.target
+Wants=network-online.target
+RequiresMountsFor=/data
+
+[Service]
+User=tripscope
+# its directories on the data disk (as root, after the disk's mount)
+ExecStartPre=+/etc/userconfig/tripscope/server/prepare-data.sh
+# (`-`: none of them there yet at the first start — the working directory
+# and the namespace's writable paths apply to the `+` script too, which
+# runs before they exist; ExecStart's come after it, when they do)
+WorkingDirectory=-/data/tripscope/state
+ExecStart=/usr/local/bin/tripscope-data-server run --config /etc/userconfig/tripscope/server_config.kdl --state /data/tripscope/state
+Restart=always
+RestartSec=30
+ProtectSystem=strict
+ReadWritePaths=-/data/tripscope/export/archive -/data/tripscope/export/pub -/data/tripscope/state
+ProtectHome=yes
+PrivateTmp=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target
