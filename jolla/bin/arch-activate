@@ -1,9 +1,9 @@
 #!/bin/bash
 # arch-activate VER   přepne current na VER a restartuje kontejner
 set -eu
-BASE=/home/arch
+BASE=/home/rootfs/devices/arch-container
 ver=${1:?verze}
-[[ -d $BASE/versions/$ver/fs ]] || { echo "verze $ver není stažená (arch-fetch $ver)"; exit 1; }
+[[ -d $BASE/versions/$ver/fs ]] || { echo "verze $ver tu není (z hopiku: arch-push $ver)"; exit 1; }
 prev=$(readlink "$BASE/current" 2>/dev/null || true)
 ln -sfn "versions/$ver" "$BASE/current.new" && mv -T "$BASE/current.new" "$BASE/current"
 [[ -n $prev ]] && ln -sfn "$prev" "$BASE/previous"

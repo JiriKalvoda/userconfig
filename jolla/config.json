@@ -20,7 +20,7 @@
       "ambient":     [ ]
     }
   },
-  "root": { "path": "/home/arch/root", "readonly": false },
+  "root": { "path": "/home/rootfs/devices/arch-container/root", "readonly": false },
   "mounts": [
     { "destination": "/proc", "type": "proc", "source": "proc" },
     { "destination": "/sys", "type": "bind", "source": "/sys", "options": [ "rbind", "rslave", "rw" ] },
@@ -35,8 +35,8 @@
     { "destination": "/usr/libexec/droid-hybris", "type": "bind", "source": "/usr/libexec/droid-hybris", "options": [ "rbind", "ro" ] },
     { "destination": "/sfos/home", "type": "bind", "source": "/home/defaultuser", "options": [ "rbind", "rslave", "rw" ] },
     { "destination": "/sfos/lib64", "type": "bind", "source": "/usr/lib64", "options": [ "rbind", "ro" ] },
-    { "destination": "/opt/hybris/lib", "type": "bind", "source": "/home/arch/hybris-lib", "options": [ "rbind", "ro" ] },
-    { "destination": "/home/defaultuser", "type": "bind", "source": "/home/arch/home", "options": [ "rbind", "rw" ] }
+    { "destination": "/opt/hybris/lib", "type": "bind", "source": "/home/rootfs/devices/arch-container/hybris-lib", "options": [ "rbind", "ro" ] },
+    { "destination": "/home/defaultuser", "type": "bind", "source": "/home/rootfs/devices/arch-container/home", "options": [ "rbind", "rw" ] }
   ],
   "linux": {
     "namespaces": [

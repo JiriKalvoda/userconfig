@@ -7,8 +7,8 @@ venku, sdílený síťový, UTS a IPC namespace, hostitelský `/dev` a `/sys`.
 Vlastní má jen mount, PID a cgroup namespace (ty vyžaduje systemd jako init).
 
 Rootfs kontejneru je **build artefakt**: recept generuje blach (`jk.py`, stroj
-`major`, systém `os_system`), staví ho rootfs na hopiku, telefon si verze tahá
-rsyncem přes ssh. Na telefonu zůstává jen crun, config a pár skriptů.
+`major`, systém `os_system`), staví ho rootfs na hopiku a hopik ho tlačí na
+telefon rsyncem přes ssh. Na telefonu zůstává jen crun, config a pár skriptů.
 
 ## Tok
 
@@ -17,8 +17,10 @@ rsyncem přes ssh. Na telefonu zůstává jen crun, config a pár skriptů.
 blach/rootfsgen/gen.py jk-major -V v1 | rootfs/build.py
           # arch_base flavour alarm (Arch Linux ARM, snapshot v arch_cache), arch_pkg,
           # klon userconfig, jolla/container/init.sh uvnitř stromu, manifest
-# telefon
-arch-fetch v1        # rsync --link-dest, ověření manifestu -> /home/arch/versions/v1
+userconfig/jolla/arch-push v1 -a
+          # rsync --link-dest na telefon, tam arch-receive (manifest) a arch-activate
+# telefon (dělá to arch-push, ručně jen když je třeba)
+arch-receive v1      # ověření manifestu, <BASE>/tmp/v1 -> <BASE>/versions/v1
 arch-activate v1     # current -> versions/v1, restart arch-container.service
 ```
 
@@ -33,14 +35,17 @@ prvním fetchi a dál servíruje jen z cache (jako Alpine).
 | `container/init.sh` | běží při **buildu** uvnitř stromu | masky služeb, defaultuser uid 100000 + hostitelské gid, locale, profile.d, `hybris` wrapper, dbus-broker |
 | `container/files/` | `/etc/profile.d/sfos.sh`, journald drop-in, `/usr/local/bin/hybris` | linkováno confln z `/etc/userconfig` ve stromu |
 | `init.sh` | telefon, sysconfig | crun, bundle, skripty, unita |
-| `config.json` | `/etc/arch-container/` | OCI bundle, root = overlay `/home/arch/root` |
-| `fetch.conf` | `/etc/arch-container/` | builder, cesta k datům, device |
+| `config.json` | `/etc/arch-container/` | OCI bundle, root = overlay `<BASE>/root` |
+| `arch-push`, `push.conf` | běží na **hopiku** z checkoutu | rsync verze na telefon, pak arch-receive a volitelně arch-activate |
 | `arch-container.service` | `/etc/systemd/system/` | hostitelská unita, `Delegate=yes` |
-| `bin/arch-fetch`, `arch-activate` | `/usr/local/bin/` | stažení verze, přepnutí |
+| `bin/arch-receive`, `arch-activate` | `/usr/local/bin/` | přijetí verze (manifest, atomický mv), přepnutí |
 | `bin/arch-run`, `arch-stop` | `/usr/local/bin/` | overlay mount, hybris symlinky, crun (volá unita) |
 | `bin/arch-exec`, `arch-shell` | `/usr/local/bin/` | root shell / shell jako defaultuser s GUI prostředím |
 
-Na telefonu pod `/home/arch` (LUKS `/home`): `versions/<ver>/fs` (store,
+Na telefonu je `<BASE>` = `/home/rootfs/devices/arch-container` (LUKS `/home`;
+`/home/rootfs` je jeden fs pro všechny store stromy, `devices/<name>` per
+kontejner, aby `rsync --link-dest` mohl hardlinkovat i napříč zařízeními).
+Pod ním: `versions/<ver>/fs` (store,
 hardlinky mezi verzemi), `overlay/<ver>/{upper,work}` (stav per verze),
 `home` (persistentní `/home/defaultuser`, mimo overlay), `root` (mountpoint
 overlaye), `hybris-lib` (symlinky generované při startu), `current`, `previous`.
@@ -49,15 +54,16 @@ overlaye), `hybris-lib` (symlinky generované při startu), `current`, `previous
 
 ```
 devel-su
-pkcon install git rsync
+pkcon install git rsync                    # python3 a curl už jsou
 git clone <userconfig> /etc/userconfig     # sysconfig = cesta musí začínat /etc
-/etc/userconfig/jolla/init.sh
-arch-fetch -l; arch-fetch v1; arch-activate v1
+/etc/userconfig/jolla/init.sh              # konfigurace a enable; crun stáhne (v repu jolla není), nic nestartuje
 ```
 
-Root telefonu potřebuje ssh klíč na `jiri@hopik` (viz `fetch.conf`).
-`container/init.sh` musí být commitnutý a pushnutý v userconfigu, než se
-staví: builder ho klonuje z `git_userconfig_remotes`.
+a pak z hopiku `userconfig/jolla/arch-push v1 -a`. Hopik potřebuje ssh na
+telefon jako root (`PHONE` v `push.conf`); když je přístup jen jako
+defaultuser, nastavte `SUDO=sudo` a na telefonu `pkcon install sudo` s NOPASSWD
+pro rsync a `arch-*`. `container/init.sh` musí být commitnutý a pushnutý
+v userconfigu, než se staví: builder ho klonuje z `git_userconfig_remotes`.
 
 Možná nástraha: Sailfish má busybox verze `ln`, `tar`, `diff`. Pokud `confln`
 spadne na `ln -sr`, nainstalovat GNU coreutils.
@@ -69,7 +75,7 @@ spadne na `ln -sr`, nainstalovat GNU coreutils.
   `WAYLAND_DISPLAY`, session D-Bus a PulseAudio socket pro uid 100000.
   Sailfish OS 5.1+ má v Lipsticku xdg_shell, takže Qt6/GTK4 klienti se připojí přímo.
 - **GPU:** hostitelské `/usr/lib64` je v kontejneru jako `/sfos/lib64` (ro).
-  `arch-run` při každém startu vygeneruje `/home/arch/hybris-lib` se symlinky
+  `arch-run` při každém startu vygeneruje `<BASE>/hybris-lib` se symlinky
   na soubory libhybris RPM (`rpm -ql`), bindnuté jako `/opt/hybris/lib`.
   Wrapper `hybris <cmd>` nastaví `LD_LIBRARY_PATH`, `EGL_PLATFORM=wayland`,
   `HYBRIS_EGLPLATFORM=wayland`. Bez wrapperu běží mesa (llvmpipe). Android

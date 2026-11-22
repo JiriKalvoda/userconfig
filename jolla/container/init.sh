@@ -50,7 +50,8 @@ echo -e "${Blue}== uživatel defaultuser (uid 100000 jako na Sailfish)$None"
 host_groups="video:39 audio:1005 graphics:1003 input:1004 system:1000"
 getent group defaultuser >/dev/null || r groupadd -g 100000 defaultuser
 if ! id defaultuser &>/dev/null; then
-	# bez -m: /home/defaultuser je za běhu bind hostitelského /home/arch/home
+	# bez -m: /home/defaultuser je za běhu bind hostitelského
+	# /home/rootfs/devices/arch-container/home
 	# (persistentní, mimo overlay); kostru tam dá arch-run při prvním startu
 	r useradd -u 100000 -g 100000 -M -s /bin/bash defaultuser
 fi
@@ -77,5 +78,11 @@ confln files/hybris /usr/local/bin/hybris
 mkdir -p /opt/hybris
 [[ -e /usr/lib/libhybris ]] || r ln -s /opt/hybris/lib/libhybris /usr/lib/libhybris
 mkdir -p /sfos/home /sfos/lib64 /opt/hybris/lib
+
+echo -e "${Blue}== úklid /run$None"
+# build chroot nemá na /run tmpfs, takže co si tam systemd nástroje z pacman
+# hooků odložily (run/systemd/dissect-root), by skončilo v obrazu; za běhu je
+# /run tmpfs z crun
+find /run -mindepth 1 -delete 2>/dev/null || true
 
 install_ok

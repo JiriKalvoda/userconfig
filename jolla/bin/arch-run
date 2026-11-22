@@ -4,10 +4,10 @@
 set -u
 BUNDLE=/etc/arch-container
 NAME=arch
-BASE=/home/arch
+BASE=/home/rootfs/devices/arch-container
 ROOT=$BASE/root
 
-ver=$(readlink "$BASE/current" 2>/dev/null) || { echo "arch-run: $BASE/current chybí (arch-fetch, arch-activate)" >&2; exit 1; }
+ver=$(readlink "$BASE/current" 2>/dev/null) || { echo "arch-run: $BASE/current chybí (z hopiku: arch-push VER -a)" >&2; exit 1; }
 ver=${ver#versions/}
 LOWER=$BASE/versions/$ver/fs
 [[ -d $LOWER ]] || { echo "arch-run: $LOWER chybí" >&2; exit 1; }
